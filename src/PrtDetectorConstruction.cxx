@@ -72,20 +72,20 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
   
   // X configuration
-  fPrismRadiatorStep = PrtManager::Instance()->GetPrismStep();
+  fPrismRadiatorStep = PrtManager::Instance()->GetPrismStepY();
   if(fPrismRadiatorStep !=0 ) fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.+fPrismRadiatorStep;
   fCenterShift =  G4ThreeVector(0., 0., 0.);
   
-    if(fGeomId == 2015){
-      //fPrismRadiatorStep = fPrizm[3]/2.-fBar[0]/2.; 
-      //fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.   +30.6;
+  if(fGeomId == 2015){
+    //fPrismRadiatorStep = fPrizm[3]/2.-fBar[0]/2.; 
+    //fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.   +30.6;
       
-      //fCenterShift =  G4ThreeVector(fBar[2]/2.,0,-132);
+    //fCenterShift =  G4ThreeVector(fBar[2]/2.,0,-132);
    
-      Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: fBar[2]/2.-PrtManager::Instance()->GetBeamZ();
-      std::cout<<"zshift  "<<zshift <<std::endl;
-      fCenterShift =  G4ThreeVector(zshift,-PrtManager::Instance()->GetBeamX(),-132);
-    }
+    Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: fBar[2]/2.-PrtManager::Instance()->GetBeamZ();
+    std::cout<<"zshift  "<<zshift <<std::endl;
+    fCenterShift =  G4ThreeVector(zshift,-PrtManager::Instance()->GetBeamX(),-132+8.5);
+  }
   
   
   PrtManager::Instance()->SetRadiatorL(fBar[2]);
@@ -145,8 +145,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   // The Bar
   G4Box* gBar = new G4Box("gBar",fBar[0]/2.,fBar[1]/2.,fBar[2]/2.);
   lBar = new G4LogicalVolume(gBar,BarMaterial,"lBar",0,0,0);
-  G4double xshift = 0;
-  if(fGeomId==2015 && PrtManager::Instance()->GetRadiator()==2) xshift = (fBar[1]-fPrizm[0])/2.;
+  G4double xshift = -(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX();
+  if(fGeomId==2015 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
 
   // The Mirror
@@ -264,7 +264,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0); //Nlak33aMaterial
   }
 
-   if(PrtManager::Instance()->GetLens() == 5){ // Spherical lens with air gap // f =250 , d = , w = 5.7 // black edges
+  if(PrtManager::Instance()->GetLens() == 5){ // Spherical lens with air gap // f =250 , d = , w = 5.7 // black edges
     G4double r1 = 0; // PrtManager::Instance()->GetTest1(); 
     G4double lensrad1 = (r1==0)? 250: r1;
     G4double lensMinThikness = 2; 
@@ -278,12 +278,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens2 = new G4LogicalVolume(gLens2,defaultMaterial,"lLens2",0,0,0);
   }
 
- 
   
   if(PrtManager::Instance()->GetLens() != 0 && PrtManager::Instance()->GetLens() != 10){
-    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,0,fBar[2]/2.+fLens[2]/2.),lLens1,"wLens1", lDirc,false,0);
-    if(PrtManager::Instance()->GetLens() != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,0,fBar[2]/2.+fLens[2]/2.),lLens2,"wLens2", lDirc,false,0);
-    if(PrtManager::Instance()->GetLens() == 3)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,0,fBar[2]/2.+fLens[2]/2.),lLens3,"wLens3", lDirc,false,0);
+    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens1,"wLens1", lDirc,false,0);
+    if(PrtManager::Instance()->GetLens() != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens2,"wLens2", lDirc,false,0);
+    if(PrtManager::Instance()->GetLens() == 3)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens3,"wLens3", lDirc,false,0);
   }else{
     fLens[2]=0; 
   }
@@ -323,8 +322,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
       new G4PVPlacement(0,G4ThreeVector(0,935-shift-150,0),lScan,"wScan",lPrizm,false,0);
     }
   }
-
-
+  
   G4Box* gMcp;
   G4Box* gPixel;
 

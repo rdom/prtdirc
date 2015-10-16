@@ -27,8 +27,8 @@
 using std::cout;
 using std::endl;
 
-TH1F*  fHist1 = new TH1F("Time1","1", 1000,0,20);
-TH1F*  fHist2 = new TH1F("Time2","2", 1000,0,20);
+TH1F*  fHist1 = new TH1F("Time1","1", 1000,-500,500);
+TH1F*  fHist2 = new TH1F("Time2","2", 1000,-500,500);
 TH2F*  fHist3 = new TH2F("Time3","3", 500,5,80, 500,5,60);
 TH2F*  fHist4 = new TH2F("Time4","4", 200,-1,1, 200,-1,1);
 TH2F*  fHist5 = new TH2F("Time5","5", 200,-1,1, 200,-1,1);
@@ -48,7 +48,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist","chrenkov_angle_hist", 200,0,1); //200
+  fHist = new TH1F("chrenkov_angle_hist","chrenkov_angle_hist", 200,0.6,1); //200
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
@@ -96,7 +96,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
   Int_t ntotal=0;
-  PrtLutNode *node;
   
   Int_t nEvents = fChain->GetEntries();
   for (Int_t ievent=0; ievent<nEvents && ievent<end; ievent++){
@@ -117,7 +116,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
 
     if( fEvent->GetType()==1) fAngle =  180 - fEvent->GetAngle(); // sim
-    else fAngle = 180 - PrtManager::Instance()->GetAngle(); // beam data
+    else fAngle = PrtManager::Instance()->GetAngle(); // beam data
     std::cout<<"fAngle  "<<fAngle <<std::endl;
     
     TVector3 rotatedmom = momInBar;
@@ -130,8 +129,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       PrtPhotonInfo photoninfo;
       
       Double_t radiatorL = 1250; //bar
-      lenz = radiatorL/2.-fHit.GetPosition().X();
-      
+
+      if( fEvent->GetType()==1){
+	lenz = radiatorL/2.-fHit.GetPosition().X();
+      }else{
+	lenz = 378/cos(TMath::Pi()*(fAngle-90)/180.);
+	std::cout<<"lenz "<< lenz<<std::endl;
+	
+      }
+     
       TVector3 vv = fHit.GetMomentum();
       vv.RotateY(fAngle/180.*TMath::Pi());
       dirz = vv.Z();
@@ -145,8 +151,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       else reflected = kFALSE;
       
       Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
+      if(sensorId==1) continue;
    
-      node = (PrtLutNode*) fLut->At(sensorId);
+
+      PrtLutNode *node = (PrtLutNode*) fLut->At(sensorId);
       Int_t size = node->Entries();
     
       for(int i=0; i<size; i++){
@@ -154,7 +162,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	evtime = node->GetTime(i);
 
 	for(int u=0; u<4; u++){
-
+	  
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z());
 	  if(u == 2) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
@@ -212,10 +220,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	trackinfo.AddPhoton(photoninfo);
       }
     }
-
-    // FindPeak(cangle,spr, fEvent->GetAngle()+0.01);
-    // std::cout<<"RES   "<<spr*1000 << "   N "<<nHits << "  "<<spr/sqrt(nHits)*1000<<std::endl;
-    
+    if(fVerbose>4){
+      FindPeak(cangle,spr, fAngle); // fEvent->GetAngle()+0.01
+      std::cout<<"RES   "<<spr*1000 << "   N "<<nHits << "  "<<spr/sqrt(nHits)*1000<<std::endl;
+    }
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
 
     if(fVerbose>3){
@@ -235,7 +243,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     }
   }
   
-  FindPeak(cangle,spr,fEvent->GetAngle()+0.01);
+  FindPeak(cangle,spr,fAngle);
   Double_t aEvents = ntotal/(Double_t)nEvents;
 
   nph = ntotal/(Double_t)nEvents;
@@ -268,11 +276,11 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
     fFit->SetParameters(100,cherenkovreco,0.005,10);   // peak
     // fFit->SetParameter(1,cherenkovreco);   // peak
     // fFit->SetParameter(2,0.005); // width
-
-    fFit->FixParameter(2,0.009); // width
+    fFit->SetParameter(0,1000); 
+    fFit->FixParameter(2,0.014); // width
     fHist->Fit("fgaus","","",cherenkovreco-0.07,cherenkovreco+0.07);
     fFit->ReleaseParameter(2); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.07,cherenkovreco+0.07);
+    fHist->Fit("fgaus","M","",cherenkovreco-0.03,cherenkovreco+0.03);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
@@ -284,9 +292,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
       fHist->GetYaxis()->SetTitle("Entries [#]");
       fHist->SetTitle(Form("theta %d", a));
       fHist->Draw();
-      // fHist1->SetLineColor(2);
-      // fHist1->Draw();
-      // fHist2->Draw("same");
+      fHist1->SetLineColor(2);
+      fHist1->Draw();
+      fHist2->Draw("same");
 
       c->Modified();
       c->Update();

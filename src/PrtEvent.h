@@ -41,7 +41,8 @@ public:
   Int_t GetTrigger()       const { return fTrigger; } 
   Double_t GetTest1()      const { return fTest1; }
   Double_t GetTest2()      const { return fTest2; }
-  Double_t GetPrismStep(){ return fPrismStep; }
+  Double_t GetPrismStepX(){ return fPrismStepX; }
+  Double_t GetPrismStepY(){ return fPrismStepY; }
   Double_t GetBeamX(){ return fBeamX; }
   Double_t GetBeamZ(){ return fBeamZ; }
   TString  GetInfo() { return fInfo; }
@@ -62,7 +63,8 @@ public:
   void SetTrigger(Int_t val) { fTrigger = val; }
   void SetTest1(Double_t val) { fTest1 = val; }
   void SetTest2(Double_t val) { fTest2 = val; }
-  void SetPrismStep(Double_t val){ fPrismStep = val; }
+  void SetPrismStepX(Double_t val){ fPrismStepX = val; }
+  void SetPrismStepY(Double_t val){ fPrismStepY = val; }
   void SetBeamX(Double_t val){ fBeamX = val; }
   void SetBeamZ(Double_t val){ fBeamZ = val; }
   void SetInfo(TString val){ fInfo = val; }
@@ -87,7 +89,8 @@ private:
   Int_t fTrigger; 
   Double_t fTest1;
   Double_t fTest2;
-  Double_t fPrismStep;
+  Double_t fPrismStepX;
+  Double_t fPrismStepY;
   Double_t fBeamX;
   Double_t fBeamZ;
   TString  fInfo;

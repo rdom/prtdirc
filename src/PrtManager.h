@@ -59,7 +59,8 @@ public:
   void SetShift(double val){ fShift = val; }
   void SetTest1(double val){ fTest1 = val; }
   void SetTest2(double val){ fTest2 = val; }
-  void SetPrismStep(double val){ fPrismStep = val; }
+  void SetPrismStepX(double val){ fPrismStepX = val; }
+  void SetPrismStepY(double val){ fPrismStepY = val; }
   void SetBeamX(double val){ fBeamX = val; }
   void SetBeamZ(double val){ fBeamZ = val; }
   void SetInfo(TString val){ fInfo = val; }
@@ -83,7 +84,8 @@ public:
   double GetShift(){ return fShift; }
   double GetTest1(){ return fTest1; }
   double GetTest2(){ return fTest2; }
-  double GetPrismStep(){ return fPrismStep; }
+  double GetPrismStepX(){ return fPrismStepX; }
+  double GetPrismStepY(){ return fPrismStepY; }
   double GetBeamX(){ return fBeamX; }
   double GetBeamZ(){ return fBeamZ; }
   TString GetOutName(){return fOutName;}
@@ -109,7 +111,8 @@ private:
   double fShift;
   double fTest1;
   double fTest2;
-  double fPrismStep;
+  double fPrismStepX;
+  double fPrismStepY;
   double fBeamX;
   double fBeamZ;
   TString fOutName;

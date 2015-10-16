@@ -57,7 +57,8 @@ PrtManager::PrtManager(G4String outfile, G4int runtype)
   fMcpLayout = 2014;
   fBeamDimension = 0;
 
-  fPrismStep=0;
+  fPrismStepX=0;
+  fPrismStepY=0;
   fBeamX=0;
   fBeamZ=-1;
   fInfo="";
@@ -88,7 +89,8 @@ void PrtManager::AddEvent(PrtEvent event){
     fEvent->SetLens(fLens);
     fEvent->SetTest1(fTest1);
     fEvent->SetTest2(fTest2);
-    fEvent->SetPrismStep(fPrismStep);
+    fEvent->SetPrismStepX(fPrismStepX);
+    fEvent->SetPrismStepY(fPrismStepY);
     fEvent->SetBeamX(fBeamX);
     fEvent->SetBeamZ(fBeamZ);
     fEvent->SetInfo(fInfo);
