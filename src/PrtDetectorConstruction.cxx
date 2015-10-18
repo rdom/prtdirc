@@ -75,16 +75,14 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   fPrismRadiatorStep = PrtManager::Instance()->GetPrismStepY();
   if(fPrismRadiatorStep !=0 ) fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.+fPrismRadiatorStep;
   fCenterShift =  G4ThreeVector(0., 0., 0.);
-  
+
+  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: 0.5*fBar[2]-PrtManager::Instance()->GetBeamZ()+96;
   if(fGeomId == 2015){
     //fPrismRadiatorStep = fPrizm[3]/2.-fBar[0]/2.; 
-    //fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.   +30.6;
-      
+    //fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.   +30.6;   
     //fCenterShift =  G4ThreeVector(fBar[2]/2.,0,-132);
    
-    Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: fBar[2]/2.-PrtManager::Instance()->GetBeamZ();
-    std::cout<<"zshift  "<<zshift <<std::endl;
-    fCenterShift =  G4ThreeVector(zshift,-PrtManager::Instance()->GetBeamX(),-132+8.5);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-147+25);
   }
   
   
@@ -109,6 +107,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   // The experimental Hall
   G4Box* gExpHall = new G4Box("gExpHall",fHall[0],fHall[1],fHall[2]);
   lExpHall = new G4LogicalVolume(gExpHall,defaultMaterial,"lExpHall",0,0,0);
+  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-96;
   G4VPhysicalVolume* wExpHall  = new G4PVPlacement(0,G4ThreeVector(),lExpHall,"gExpHall",0,false,0);
 
   // The Trigger and The front material
@@ -132,7 +131,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     dircpos.rotateY((PrtManager::Instance()->GetAngle()-90)*deg);
   }
   //tilt scan  fPrtRot->rotateX(PrtManager::Instance()->GetTest1()*deg);
-  wDirc  = new G4PVPlacement(fPrtRot,dircpos,lDirc,"wDirc",lExpHall,false,0);
+  wDirc  = new G4PVPlacement(fPrtRot,dircpos+G4ThreeVector(-zshift,0,0),lDirc,"wDirc",lExpHall,false,0);
 
   // The DIRC cover box
   G4Box* gCover = new G4Box("gCover",1,150,fBar[2]/2.);
@@ -737,7 +736,7 @@ void PrtDetectorConstruction::SetVisualization(){
   lExpHall->SetVisAttributes(waExpHall);
 
   G4VisAttributes *waDirc = new G4VisAttributes(DircColour);
-  waDirc->SetVisibility(false);
+  //waDirc->SetVisibility(false);
   lDirc->SetVisAttributes(waDirc);
 
   G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
