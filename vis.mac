@@ -61,6 +61,7 @@
 #/vis/viewer/set/style wireframe
 #
 # Draw coordinate axes:
+#/vis/scene/add/axes -0.285 0 0122 1 m
 /vis/scene/add/axes 0 0 0 1 m
 #/vis/scene/add/axes 0.4 0 0.15 0.1 m
 #

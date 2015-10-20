@@ -76,13 +76,12 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   if(fPrismRadiatorStep !=0 ) fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.+fPrismRadiatorStep;
   fCenterShift =  G4ThreeVector(0., 0., 0.);
 
-  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: 0.5*fBar[2]-PrtManager::Instance()->GetBeamZ()+96;
   if(fGeomId == 2015){
     //fPrismRadiatorStep = fPrizm[3]/2.-fBar[0]/2.; 
     //fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.   +30.6;   
     //fCenterShift =  G4ThreeVector(fBar[2]/2.,0,-132);
    
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-147+25);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
   }
   
   
