@@ -134,7 +134,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   // time since track created
 
   G4double time = step->GetPreStepPoint()->GetLocalTime();
-  G4double resolution = 0.3; //ns
+  G4double resolution = 0.25; //ns
   time = G4RandGauss::shoot(time,resolution);
   hit.SetLeadTime(time);
   hit.SetTotTime(1);
