@@ -115,9 +115,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
 
+
+    if(fEvent->GetParticle()!=2212) continue;
     if( fEvent->GetType()==1) fAngle =  180 - fEvent->GetAngle(); // sim
-    else fAngle = PrtManager::Instance()->GetAngle(); // beam data
-    std::cout<<"fAngle  "<<fAngle <<std::endl;
+    else fAngle = fEvent->GetAngle(); //PrtManager::Instance()->GetAngle(); // beam data
     
     TVector3 rotatedmom = momInBar;
     rotatedmom.RotateY(fAngle/180.*TMath::Pi());
@@ -133,9 +134,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if( fEvent->GetType()==1){
 	lenz = radiatorL/2.-fHit.GetPosition().Z();
       }else{
-	lenz = 898.;//378/cos(TMath::Pi()*(fAngle-90)/180.);
+	lenz = 378;//898.;//378/cos(TMath::Pi()*(fAngle-90)/180.);
+	lenz = fEvent->GetBeamZ()-1/tan(fAngle)*(122+(378-96)/tan(135-0.5*fAngle));
       }
-
+      
       TVector3 vv = fHit.GetMomentum();
       vv.RotateY(fAngle/180.*TMath::Pi());
       dirz = vv.Z();
@@ -147,12 +149,17 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       if(dirz<0) reflected = kTRUE;
       else reflected = kFALSE;
-      reflected = kFALSE;
+
+      if(hitTime>12) {
+      	reflected = kTRUE;
+	lenz = 2*radiatorL - lenz;
+      }else{
+	reflected = kFALSE;
+      }
       
       Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
       if(sensorId==1) continue;
    
-
       PrtLutNode *node = (PrtLutNode*) fLut->At(sensorId);
       Int_t size = node->Entries();
     
@@ -171,11 +178,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  double criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
 	  if(dir.Angle(fnX1) < criticalAngle || dir.Angle(fnY1) < criticalAngle) continue;
 	  
-	  luttheta = dir.CosTheta();	
-	  //if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
-	  
-	  if(!reflected) bartime = lenz/luttheta/198.; 
-	  else bartime = (2*radiatorL - lenz)/luttheta/198.;
+	  luttheta = dir.Theta();  
+	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
+	  // if(luttheta <0 ) luttheta = TMath::Pi()+luttheta;
+
+	  bartime = fabs(lenz/cos(luttheta)/198.); 
 	 
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(bartime + evtime);
@@ -277,9 +284,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
     // fFit->SetParameter(2,0.005); // width
     fFit->SetParameter(0,1000); 
     fFit->FixParameter(2,0.014); // width
-    fHist->Fit("fgaus","","",cherenkovreco-0.07,cherenkovreco+0.07);
+    fHist->Fit("fgaus","","",cherenkovreco-0.15,cherenkovreco+0.15);
     fFit->ReleaseParameter(2); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.03,cherenkovreco+0.03);
+    fHist->Fit("fgaus","M","",cherenkovreco-0.07,cherenkovreco+0.07);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
@@ -291,14 +298,18 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
       fHist->GetYaxis()->SetTitle("Entries [#]");
       fHist->SetTitle(Form("theta %d", a));
       fHist->Draw();
-      // fHist1->SetLineColor(2);
-      // fHist1->Draw();
-      // fHist2->Draw("same");
 
+      TCanvas* c2 = new TCanvas("c2","c2",0,0,800,500);
+      fHist1->SetLineColor(2);
+      fHist1->Draw();
+      fHist2->Draw("same");
+      c2->Modified();
+      c2->Update();
+      
       c->Modified();
       c->Update();
       c->Print(Form("spr/tangle_%d.png", a));
-      c->WaitPrimitive("s");
+      c2->WaitPrimitive("s");
       //Int_t ii; std::cin>>ii;
 
       // TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
@@ -392,8 +403,6 @@ void circleFcn2(Int_t &, Double_t *, Double_t &f, Double_t *par, Int_t) {
 }
 
 void PrtLutReco::FitRing(Double_t& x0, Double_t& y0, Double_t& theta){
-
-
   TGraph ff_gr;
   Int_t ff_i(0);
   Int_t np = gg_gr.GetN();
