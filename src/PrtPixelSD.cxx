@@ -89,8 +89,9 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
   TVector3 momentum(g4mom.x(),g4mom.y(),g4mom.z());
-  TVector3 position(g4pos.x(),g4pos.y(),g4pos.z());
-
+  G4ThreeVector lp = touchable->GetHistory()->GetTransform(1).TransformPoint(g4pos); //pos in wDirc
+  TVector3 position(lp.x(),lp.y(),lp.z());
+  
   // information form prizm
   G4SDManager* fSDM = G4SDManager::GetSDMpointer();
   G4RunManager* fRM = G4RunManager::GetRunManager();
