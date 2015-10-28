@@ -40,8 +40,7 @@ PrtPrimaryGeneratorAction::~PrtPrimaryGeneratorAction()
   delete fGunMessenger;
 }
 
-void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
-{ 
+void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   G4double x,y,z;
   G4double radiatorL = PrtManager::Instance()->GetRadiatorL();
   G4double radiatorW = PrtManager::Instance()->GetRadiatorW();
@@ -108,7 +107,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
   }
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
-
+ 
   G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
   dir *= fParticleGun->GetParticleMomentum();
   PrtManager::Instance()->SetMomentum(TVector3(dir.x(),dir.y(),dir.z()));

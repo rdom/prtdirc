@@ -80,7 +80,7 @@ printf "====== Run PRTDIRC with $tseed seed base ======\n"
 simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 0 -gs 15.5 -g 2015 -c 2015 -e 100 -b 1 "
 
 if [ ${run} == "1" ]; then
-    ../build/prtdirc  $simopt -s 1 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 500000  
+    ../build/prtdirc  $simopt -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 500000  
     exit
 fi
 

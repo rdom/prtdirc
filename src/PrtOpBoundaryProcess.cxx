@@ -3,13 +3,11 @@
 #include "PrtManager.h"
 
 PrtOpBoundaryProcess::PrtOpBoundaryProcess()
-  : G4OpBoundaryProcess()
-{
+  : G4OpBoundaryProcess(){
   fLensId = PrtManager::Instance()->GetLens();
 }
 
-G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep)
-{  
+G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, const G4Step& aStep){
   G4StepPoint* pPreStepPoint  = aStep.GetPreStepPoint();
   G4StepPoint* pPostStepPoint = aStep.GetPostStepPoint();
   G4VParticleChange* particleChange = G4OpBoundaryProcess::PostStepDoIt(aTrack, aStep); 

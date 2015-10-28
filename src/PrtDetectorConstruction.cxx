@@ -129,6 +129,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     dircpos = fCenterShift; // G4ThreeVector(fCenterShift, 0., 0.);
     dircpos.rotateY((PrtManager::Instance()->GetAngle()-90)*deg);
   }
+  if(fGeomId == 0) zshift=0;
   //tilt scan  fPrtRot->rotateX(PrtManager::Instance()->GetTest1()*deg);
   wDirc  = new G4PVPlacement(fPrtRot,dircpos+G4ThreeVector(-zshift,0,0),lDirc,"wDirc",lExpHall,false,0);
 
