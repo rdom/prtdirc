@@ -23,15 +23,17 @@
 #include <TVirtualFitter.h>
 #include <TArc.h>
 #include <TLegend.h>
+#include "../../prttools/prttools.C"
 
 using std::cout;
 using std::endl;
 
-TH1F*  fHist1 = new TH1F("Time1","1", 1000,-100,100);
-TH1F*  fHist2 = new TH1F("Time2","2", 1000,-100,100);
-TH2F*  fHist3 = new TH2F("Time3","3", 500,5,80, 500,5,60);
-TH2F*  fHist4 = new TH2F("Time4","4", 200,-1,1, 200,-1,1);
-TH2F*  fHist5 = new TH2F("Time5","5", 200,-1,1, 200,-1,1);
+TH1F*  fHist0 = new TH1F("timediff",";t_{calc}-t_{measured} [ns];entries [#]", 500,-10,10);
+TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,100);
+TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100);
+TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
+TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 200,-1,1, 200,-1,1);
+TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 200,-1,1, 200,-1,1);
 Int_t gg_i(0);
 TGraph gg_gr;
 
@@ -48,7 +50,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist","chrenkov_angle_hist", 200,0.6,1); //200
+  fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 200,0.6,1); //200
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
@@ -94,10 +96,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   test1 = PrtManager::Instance()->GetTest1();
   
+  fSavePath =  PrtManager::Instance()->GetOutName();
+  Int_t nEvents = fChain->GetEntries();
+  if(end==0) end = nEvents;
+  
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
   Int_t ntotal=0;
   
-  Int_t nEvents = fChain->GetEntries();
   for (Int_t ievent=0; ievent<nEvents && ievent<end; ievent++){
     fChain->GetEntry(ievent);
     Int_t nHits = fEvent->GetHitSize();
@@ -114,14 +119,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     }
 
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
-
-
     if(fEvent->GetParticle()!=2212) continue;
-    if( fEvent->GetType()==1) fAngle =  180 - fEvent->GetAngle(); // sim
-    else fAngle = fEvent->GetAngle(); //PrtManager::Instance()->GetAngle(); // beam data
-    
+    fAngle = fEvent->GetAngle();
+
+    Double_t rad = TMath::Pi()/180.;
     TVector3 rotatedmom = momInBar;
-    rotatedmom.RotateY(fAngle/180.*TMath::Pi());
+    rotatedmom.RotateY(fAngle*rad);
     TVector3 cz = rotatedmom.Unit();
     cz = TVector3(-cz.X(),cz.Y(),cz.Z());    
     for(Int_t h=0; h<nHits; h++) {
@@ -131,15 +134,23 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       Double_t radiatorL = 1250; //bar
 
+
+      std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
+      Double_t z =  fEvent->GetBeamZ();
+
       if( fEvent->GetType()==1){
 	lenz = radiatorL/2.-fHit.GetPosition().Z();
+	std::cout<<"lenz 0  "<<lenz;
       }else{
-	lenz = 378;//898.;//378/cos(TMath::Pi()*(fAngle-90)/180.);
-	lenz = fEvent->GetBeamZ()-1/tan(fAngle)*(122+(378-96)/tan(135-0.5*fAngle));
+	lenz = z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad));
+	// Double_t b = 122*tan(0.5*((fAngle-90)*rad)); 
+	// Double_t lenz = (z-96+b)/cos((fAngle-90)*rad)+b+96;     
       }
+      std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
+      
       
       TVector3 vv = fHit.GetMomentum();
-      vv.RotateY(fAngle/180.*TMath::Pi());
+      vv.RotateY(fAngle*rad);
       dirz = vv.Z();
 
       TVector3 cd = fHit.GetMomentum();
@@ -184,11 +195,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
 	  bartime = fabs(lenz/cos(luttheta)/198.); 
 	 
+	  fHist0->Fill((bartime+evtime)-hitTime);
 	  fHist1->Fill(hitTime);
-	  fHist2->Fill(bartime + evtime);
+	  fHist2->Fill(bartime+evtime);
 	  
-	  if(fabs((bartime + evtime)-hitTime)>test1) continue;
-	  fHist3->Fill(fabs((bartime + evtime)),hitTime);
+	  if(fabs((bartime+evtime)-hitTime)>test1) continue;
+	  fHist3->Fill(fabs((bartime+evtime)),hitTime);
 	  tangle = rotatedmom.Angle(dir);
 	  if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
 	  
@@ -210,7 +222,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    // Double_t tt =  rdir.Theta();
 	    // fHist4->Fill(tt*TMath::Sin(phi),tt*TMath::Cos(phi));
 
-	    // for cherenckov circle fit
+	    // //for cherenckov circle fit
 	    // gg_gr.SetPoint(gg_i,tangle*TMath::Sin(phi),tangle*TMath::Cos(phi));
 	    // gg_i++;
 	  }
@@ -267,7 +279,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 }
 
 Int_t g_num =0;
-Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
+Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
   cherenkovreco=0;
   spr=0;
   //  gStyle->SetCanvasPreferGL(kTRUE);
@@ -293,35 +305,32 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
     
     Bool_t storePics(true);
     if(storePics){
-      TCanvas* c = new TCanvas("c","c",0,0,800,500);
-      fHist->GetXaxis()->SetTitle("#theta_{C} [rad]");
-      fHist->GetYaxis()->SetTitle("Entries [#]");
-      fHist->SetTitle(Form("theta %d", a));
+      canvasAdd("tangle",800,400);
+      fHist->SetTitle(Form("theta %3.1f", a));
       fHist->Draw();
-
-      TCanvas* c2 = new TCanvas("c2","c2",0,0,800,500);
+      
+      canvasAdd("time",800,400);
+      fHist1->SetTitle(Form("theta %3.1f", a));
       fHist1->SetLineColor(2);
       fHist1->Draw();
       fHist2->Draw("same");
-      c2->Modified();
-      c2->Update();
-      
-      c->Modified();
-      c->Update();
-      c->Print(Form("spr/tangle_%d.png", a));
-      c2->WaitPrimitive("s");
-      //Int_t ii; std::cin>>ii;
 
+      canvasAdd("diff",800,400);
+      fHist0->SetTitle(Form("theta %3.1f", a));
+      fHist0->Draw();
+    
+      canvasAdd("cm",800,400);
+      fHist3->SetTitle(Form("theta %3.1f", a));
+      fHist3->Draw("colz");
+
+      //waitPrimitive("cm");
+      canvasSave(1,0);
+      
       // TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
       // c2->Divide(2,1);
       // c2->cd(1);
-      // fHist3->GetXaxis()->SetTitle("calculated time [ns]");
-      // fHist3->GetYaxis()->SetTitle("measured time [ns]");
-      // fHist3->SetTitle(Form("theta %d", a));
-
+     
       // fHist4->SetStats(0);
-      // fHist4->GetXaxis()->SetTitle("#theta_{c}sin(#varphi_{c})");
-      // fHist4->GetYaxis()->SetTitle("#theta_{c}cos(#varphi_{c})");
       // fHist4->SetTitle(Form("Calculated from LUT, #theta = %d#circ", a));
       // fHist4->Draw("colz");
       // Double_t x0(0), y0(0), theta(cherenkovreco);
@@ -350,21 +359,20 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Int_t a){
 
       // c2->cd(2);
       // gStyle->SetOptStat(1110); 
-      // fHist5->GetXaxis()->SetTitle("#theta_{c}sin(#varphi_{c})");
-      // fHist5->GetYaxis()->SetTitle("#theta_{c}cos(#varphi_{c})");
       // fHist5->SetTitle(Form("True from MC, #theta = %d#circ", a));
       // fHist5->Draw("colz");
 
       // c2->Print(Form("spr/tcorr_%d.png", a));
       // c2->Modified();
       // c2->Update();
-      // c2->WaitPrimitive();
+      // c2->WaitPrimitive("s");
     
     }
   }
 
   if(fVerbose<2) gROOT->SetBatch(0);
   fHist->Reset();
+  fHist0->Reset();
   fHist1->Reset();
   fHist2->Reset();
   fHist3->Reset();
