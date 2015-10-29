@@ -54,6 +54,17 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
+  if(infile.Contains("beam_")){
+    TString fileid(infile);
+    fileid.Remove(0,fileid.Last('/')+1);
+    fileid.Remove(fileid.Last('.')-1);
+    prt_data_info = getDataInfo(fileid);
+    
+    TString opath(infile);
+    opath.Remove(opath.Last('/'));
+    fSavePath = opath+Form("/%dr/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
+    std::cout<<"fSavePath  "<< fSavePath <<std::endl;    
+  }
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
 }
 
@@ -96,7 +107,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   test1 = PrtManager::Instance()->GetTest1();
   
-  fSavePath =  PrtManager::Instance()->GetOutName();
   Int_t nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
   
@@ -135,18 +145,17 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Double_t radiatorL = 1250; //bar
 
 
-      std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
       Double_t z =  fEvent->GetBeamZ();
-
       if( fEvent->GetType()==1){
 	lenz = radiatorL/2.-fHit.GetPosition().Z();
-	std::cout<<"lenz 0  "<<lenz;
+	//std::cout<<"lenz 0  "<<lenz;
       }else{
 	lenz = z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad));
 	// Double_t b = 122*tan(0.5*((fAngle-90)*rad)); 
 	// Double_t lenz = (z-96+b)/cos((fAngle-90)*rad)+b+96;     
       }
-      std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
+      //      std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
+      //std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
       
       
       TVector3 vv = fHit.GetMomentum();
