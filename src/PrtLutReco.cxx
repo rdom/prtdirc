@@ -150,7 +150,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Double_t radiatorL = 1250; //bar
 
 
-      Double_t z =  fEvent->GetBeamZ();
+      Double_t z =  fEvent->GetBeamZ()+200;
       if( fEvent->GetType()==1){
 	lenz = radiatorL/2.-fHit.GetPosition().Z();
 	//std::cout<<"lenz 0  "<<lenz;
@@ -159,8 +159,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	// Double_t b = 122*tan(0.5*((fAngle-90)*rad)); 
 	// Double_t lenz = (z-96+b)/cos((fAngle-90)*rad)+b+96;     
       }
-      std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
-      std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
+      // std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
+      // std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
       
       
       TVector3 vv = fHit.GetMomentum();
