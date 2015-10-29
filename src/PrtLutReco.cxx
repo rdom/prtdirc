@@ -316,6 +316,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     if(storePics){
       canvasAdd("tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
+      fHist->SetMinimum(0);
       fHist->Draw();
       
       canvasAdd("time",800,400);
