@@ -150,7 +150,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Double_t radiatorL = 1250; //bar
 
 
-      Double_t z =  fEvent->GetBeamZ()+200;
+      Double_t z =  fEvent->GetBeamZ();
       if( fEvent->GetType()==1){
 	lenz = radiatorL/2.-fHit.GetPosition().Z();
 	//std::cout<<"lenz 0  "<<lenz;
