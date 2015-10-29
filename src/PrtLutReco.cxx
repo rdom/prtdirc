@@ -159,8 +159,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	// Double_t b = 122*tan(0.5*((fAngle-90)*rad)); 
 	// Double_t lenz = (z-96+b)/cos((fAngle-90)*rad)+b+96;     
       }
-      //      std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
-      //std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
+      std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
+      std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
       
       
       TVector3 vv = fHit.GetMomentum();
@@ -319,26 +319,26 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     
     Bool_t storePics(true);
     if(storePics){
-      canvasAdd("tangle",800,400);
+      canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
       fHist->SetMinimum(0);
       fHist->Draw();
       
-      canvasAdd("time",800,400);
+      canvasAdd("r_time",800,400);
       fHist1->SetTitle(Form("theta %3.1f", a));
       fHist1->SetLineColor(2);
       fHist1->Draw();
       fHist2->Draw("same");
 
-      canvasAdd("diff",800,400);
+      canvasAdd("r_diff",800,400);
       fHist0->SetTitle(Form("theta %3.1f", a));
       fHist0->Draw();
     
-      canvasAdd("cm",800,400);
+      canvasAdd("r_cm",800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
 
-      //waitPrimitive("cm");
+      waitPrimitive("r_cm");
       canvasSave(1,0);
       
       // TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
