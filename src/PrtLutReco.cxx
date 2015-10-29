@@ -62,7 +62,12 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     
     TString opath(infile);
     opath.Remove(opath.Last('/'));
-    fSavePath = opath+Form("/%dr/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
+    if(infile.Contains("C.root")){
+      fSavePath = opath+Form("/%dr/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
+    }else{
+      fSavePath = opath+Form("/%ds/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
+    }
+    
     std::cout<<"fSavePath  "<< fSavePath <<std::endl;    
   }
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
