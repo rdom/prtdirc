@@ -207,7 +207,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
 	  // if(luttheta <0 ) luttheta = TMath::Pi()+luttheta;
 
-	  bartime = fabs(lenz/cos(luttheta)/198.); 
+	  bartime = fabs(lenz/cos(luttheta)/198.);
 	 
 	  fHist0->Fill((bartime+evtime)-hitTime);
 	  fHist1->Fill(hitTime);
@@ -301,8 +301,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
   if(fHist->GetEntries()>20 ){
     gROOT->SetBatch(1);
     Int_t nfound = fSpect->Search(fHist,1,"",0.9); //0.6
-    Float_t *xpeaks = fSpect->GetPositionX();
-    if(nfound>0) cherenkovreco = xpeaks[0];
+    if(nfound>0) cherenkovreco = fSpect->GetPositionX()[0];
     else cherenkovreco =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
     fFit->SetParameters(100,cherenkovreco,0.005,10);   // peak
