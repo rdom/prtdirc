@@ -276,9 +276,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   }
   
   FindPeak(cangle,spr,fAngle);
-  Double_t aEvents = ntotal/(Double_t)nEvents;
+  Double_t aEvents = ntotal/(Double_t)end;
 
-  nph = ntotal/(Double_t)nEvents;
+  nph = ntotal/(Double_t)end;
   spr = spr*1000;
   trr = spr/sqrt(aEvents);
   theta = fEvent->GetAngle();
