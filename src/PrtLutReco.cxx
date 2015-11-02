@@ -136,7 +136,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
     if(fEvent->GetParticle()!=2212) continue;
     fAngle = fEvent->GetAngle();
-
+    Int_t studyId = fEvent->GetGeometry();
+    
     Double_t rad = TMath::Pi()/180.;
     TVector3 rotatedmom = momInBar;
     rotatedmom.RotateY(fAngle*rad);
@@ -145,9 +146,27 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      PrtPhotonInfo photoninfo;
       
+      { //time cuts
+	if(fAngle<=80){
+	  if(hitTime<11 || hitTime>35) continue;
+	  reflected = kTRUE;
+	}else if(fAngle>=95){
+	  if(hitTime<3 || hitTime>20) continue;
+	  reflected = kFALSE;
+	}else{
+	  if(hitTime<13.5)  reflected = kFALSE;
+	  else reflected = kTRUE;
+	}
+      }
+      
+      
+      PrtPhotonInfo photoninfo;      
       Double_t radiatorL = 1250; //bar
+
+      if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==1175 || studyId==176 || studyId==177 || studyId==178){
+	radiatorL = 1224.9; //plate
+      }
 
 
       Double_t z =  fEvent->GetBeamZ();
@@ -159,8 +178,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	// Double_t b = 122*tan(0.5*((fAngle-90)*rad)); 
 	// Double_t lenz = (z-96+b)/cos((fAngle-90)*rad)+b+96;     
       }
-      // std::cout<<"z "<<fEvent->GetBeamZ()  << "  a "<< fAngle  <<std::endl;
-      // std::cout<<" lenz 1  "<< z-1/tan(fAngle*rad)*(122+(z-96)/tan((135-0.5*fAngle)*rad)) <<std::endl;
       
       
       TVector3 vv = fHit.GetMomentum();
@@ -172,15 +189,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Double_t theta0 = cd.Theta();      
       fHist5->Fill(theta0*TMath::Sin(phi0),theta0*TMath::Cos(phi0));
       
-      if(dirz<0) reflected = kTRUE;
-      else reflected = kFALSE;
+      // if(dirz<0) reflected = kTRUE;
+      // else reflected = kFALSE;
 
-      if(hitTime>12) {
-      	reflected = kTRUE;
-	lenz = 2*radiatorL - lenz;
-      }else{
-	reflected = kFALSE;
-      }
+      if(reflected) lenz = 2*radiatorL - lenz;
       
       Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
       if(sensorId==1) continue;
