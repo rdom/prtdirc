@@ -116,12 +116,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   if(end==0) end = nEvents;
   
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
-  Int_t ntotal=0;
+  Int_t nsHits(0),nsEvents(0);
   
   for (Int_t ievent=0; ievent<nEvents && ievent<end; ievent++){
     fChain->GetEntry(ievent);
     Int_t nHits = fEvent->GetHitSize();
-    ntotal+=nHits;
     std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
     tree.SetTitle(fEvent->PrintInfo());
     Double_t minChangle = -3.35;
@@ -135,6 +134,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
     if(fEvent->GetParticle()!=2212) continue;
+    nsEvents++;
     fAngle = fEvent->GetAngle();
     Int_t studyId = fEvent->GetGeometry();
     
@@ -160,6 +160,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
       
+      nsHits++;
       
       PrtPhotonInfo photoninfo;      
       Double_t radiatorL = 1250; //bar
@@ -288,11 +289,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   }
   
   FindPeak(cangle,spr,fAngle);
-  Double_t aEvents = ntotal/(Double_t)end;
 
-  nph = ntotal/(Double_t)end;
+  nph = nsHits/(Double_t)nsEvents;
   spr = spr*1000;
-  trr = spr/sqrt(aEvents);
+  trr = spr/sqrt(nph);
   theta = fEvent->GetAngle();
   par3 = fEvent->GetTest1();
   
