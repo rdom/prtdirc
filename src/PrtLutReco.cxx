@@ -323,7 +323,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     fFit->FixParameter(2,0.014); // width
     fHist->Fit("fgaus","","",cherenkovreco-0.15,cherenkovreco+0.15);
     fFit->ReleaseParameter(2); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.07,cherenkovreco+0.07);
+    fHist->Fit("fgaus","M","",cherenkovreco-0.04,cherenkovreco+0.04);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
