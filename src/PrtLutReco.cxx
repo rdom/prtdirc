@@ -134,9 +134,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
     if(fEvent->GetParticle()!=2212) continue;
-    if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
-    if( fEvent->GetParticle()==212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.10 || fEvent->GetTest1()>175.2) ) continue;
-
+    if( fEvent->GetType()==0){
+      if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
+      if( fEvent->GetParticle()==212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.10 || fEvent->GetTest1()>175.2) ) continue;
+    }
     if(nsEvents>end) break;
     
     nsEvents++;
