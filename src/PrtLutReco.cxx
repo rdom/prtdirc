@@ -240,7 +240,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle);
-	    if(0.7<tangle && tangle<0.87) isGoodHit=true;
+	    if(0.65<tangle && tangle<0.95) isGoodHit=true;
 	    
 	    // TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	    // rdir.RotateUz(cz);
