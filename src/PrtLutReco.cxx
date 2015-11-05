@@ -231,12 +231,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist0->Fill((bartime+evtime)-hitTime);
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(bartime+evtime);
-	  
+
+	  if(hitTime>11) test1= 3;
 	  if(fabs((bartime+evtime)-hitTime)>test1) continue;
 	  fHist3->Fill(fabs((bartime+evtime)),hitTime);
 	  tangle = rotatedmom.Angle(dir);
 	  if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
-	  
+
 	  if(fVerbose>3){
 	    PrtAmbiguityInfo ambinfo;
 	    ambinfo.SetBarTime(bartime);
@@ -247,7 +248,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle);
-	    if(0.65<tangle && tangle<0.95) isGoodHit=true;
+	    if(0.4<tangle && tangle<1) isGoodHit=true;
 	    
 	    // TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	    // rdir.RotateUz(cz);
