@@ -160,15 +160,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
       
-      nsHits++;
-      
       PrtPhotonInfo photoninfo;      
       Double_t radiatorL = 1250; //bar
 
       if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==1175 || studyId==176 || studyId==177 || studyId==178){
 	radiatorL = 1224.9; //plate
       }
-
 
       Double_t z =  fEvent->GetBeamZ();
       if( fEvent->GetType()==1){
@@ -197,7 +194,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
       if(sensorId==1) continue;
-   
+
+
+      Bool_t isGoodHit(false);
       PrtLutNode *node = (PrtLutNode*) fLut->At(sensorId);
       Int_t size = node->Entries();
     
@@ -241,7 +240,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle);
-	   
+	    if(0.7<tangle && tangle<0.87) isGoodHit=true;
+	    
 	    // TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	    // rdir.RotateUz(cz);
 	 
@@ -255,6 +255,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  }
 	}
       }
+      
+      if(isGoodHit) nsHits++; 	
       if(fVerbose>3){
 	photoninfo.SetHitTime(hitTime);
 	photoninfo.SetReflected(reflected);
