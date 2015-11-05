@@ -118,7 +118,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
   Int_t nsHits(0),nsEvents(0);
   
-  for (Int_t ievent=0; ievent<nEvents && ievent<end; ievent++){
+  for (Int_t ievent=0; ievent<nEvents; ievent++){ //&& ievent<end
     fChain->GetEntry(ievent);
     Int_t nHits = fEvent->GetHitSize();
     std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
@@ -134,9 +134,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     //    TVector3 rotatedmom = fEvent->GetMomentum().Unit();
     if(fEvent->GetParticle()!=2212) continue;
+    if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
+    if( fEvent->GetParticle()==212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.10 || fEvent->GetTest1()>175.2) ) continue;
+
+    if(nsEvents>end) break;
+    
     nsEvents++;
     fAngle = fEvent->GetAngle();
     Int_t studyId = fEvent->GetGeometry();
+
     
     Double_t rad = TMath::Pi()/180.;
     TVector3 rotatedmom = momInBar;
@@ -318,12 +324,12 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     if(nfound>0) cherenkovreco = fSpect->GetPositionX()[0];
     else cherenkovreco =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
-    fFit->SetParameters(100,cherenkovreco,0.005,10);   // peak
+    fFit->SetParameters(100,cherenkovreco,0.010,10);   // peak
     // fFit->SetParameter(1,cherenkovreco);   // peak
     // fFit->SetParameter(2,0.005); // width
     fFit->SetParameter(0,1000); 
     fFit->FixParameter(2,0.014); // width
-    fHist->Fit("fgaus","","",cherenkovreco-0.15,cherenkovreco+0.15);
+    fHist->Fit("fgaus","M","",cherenkovreco-0.15,cherenkovreco+0.15);
     fFit->ReleaseParameter(2); // width
     fHist->Fit("fgaus","M","",cherenkovreco-0.04,cherenkovreco+0.04);
     cherenkovreco = fFit->GetParameter(1);
