@@ -203,7 +203,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(sensorId==1) continue;
 
 
-      Bool_t isGoodHit(false);
+      Bool_t isGoodHit(true);
       PrtLutNode *node = (PrtLutNode*) fLut->At(sensorId);
       Int_t size = node->Entries();
     
@@ -232,7 +232,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(bartime+evtime);
 
-	  if(hitTime>15) test1=3;
+	  //  if(hitTime>15) test1=3;
 	  if(fabs((bartime+evtime)-hitTime)>test1) continue;
 	  fHist3->Fill(fabs((bartime+evtime)),hitTime);
 	  tangle = rotatedmom.Angle(dir);
@@ -330,9 +330,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     // fFit->SetParameter(1,cherenkovreco);   // peak
     // fFit->SetParameter(2,0.005); // width
     fFit->SetParameter(0,1000); 
-    fFit->FixParameter(2,0.014); // width
+    fFit->SetLimits(2,0.008,0.020); // width
     fHist->Fit("fgaus","M","",cherenkovreco-0.15,cherenkovreco+0.15);
-    fFit->ReleaseParameter(2); // width
     fHist->Fit("fgaus","M","",cherenkovreco-0.04,cherenkovreco+0.04);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
