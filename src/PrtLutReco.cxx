@@ -203,7 +203,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(sensorId==1) continue;
 
 
-      Bool_t isGoodHit(true);
+      Bool_t isGoodHit(false);
       PrtLutNode *node = (PrtLutNode*) fLut->At(sensorId);
       Int_t size = node->Entries();
     
