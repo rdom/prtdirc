@@ -360,7 +360,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist3->Draw("colz");
 
       waitPrimitive("r_cm");
-      canvasSave(1,0);
+      canvasSave(0,0);
       
       // TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
       // c2->Divide(2,1);
