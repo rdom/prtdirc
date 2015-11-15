@@ -111,12 +111,12 @@ void PrtManager::AddHit(PrtHit hit){
     }
   }
   if(fRunType==1 || fRunType==5){
-    if(fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle){     
+    if(fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle){
       Int_t id = 100*hit.GetMcpId() + hit.GetPixelId();
-       ((PrtLutNode*)(fLut->At(id)))->
-	 AddEntry(id, fMomentum, hit.GetPathInPrizm(),
-		  hit.GetNreflectionsInPrizm(),
-		  hit.GetLeadTime(),hit.GetGlobalPos(),hit.GetDigiPos());
+      ((PrtLutNode*)(fLut->At(id)))->
+	AddEntry(id, fMomentum, hit.GetPathInPrizm(),
+		 hit.GetNreflectionsInPrizm(),
+		 hit.GetLeadTime(),hit.GetGlobalPos(),hit.GetDigiPos());
     }
   }
 }
