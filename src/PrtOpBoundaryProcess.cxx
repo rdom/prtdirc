@@ -45,7 +45,11 @@ G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
 
-  if(PrtManager::Instance()->GetRunType() == 5 &&  aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wDirc" && aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wPrizm" && GetStatus() == FresnelRefraction){
+  if(PrtManager::Instance()->GetRunType() == 0 && pPostStepPoint->GetPhysicalVolume()->GetName()=="wPrizm" && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){
+    particleChange->ProposeTrackStatus(fStopAndKill);
+  }
+
+  if(PrtManager::Instance()->GetRunType() == 5 &&  pPreStepPoint->GetPhysicalVolume()->GetName()=="wDirc" && pPostStepPoint->GetPhysicalVolume()->GetName()=="wPrizm" && GetStatus() == FresnelRefraction){
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
   
