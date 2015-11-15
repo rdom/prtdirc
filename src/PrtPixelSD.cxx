@@ -103,7 +103,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
 
  
   Double_t pathId = 0;
-  Int_t refl=-1;
+  Int_t refl=0;
   for (G4int i=0;i<prizmCol->entries();i++){
     PrtPrizmHit* phit = (*prizmCol)[i];
     if(phit->GetTrackID()==track->GetTrackID()) {
@@ -129,7 +129,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   }
   hit.SetParticleId(track->GetTrackID());
   hit.SetParentParticleId(track->GetParentID());
-  hit.SetNreflectionsInPrizm(refl);
+  hit.SetNreflectionsInPrizm(refl-1);
   hit.SetPathInPrizm(pathId);
   hit.SetCherenkovMC(PrtManager::Instance()->GetCurrentCherenkov());
   // time since track created
