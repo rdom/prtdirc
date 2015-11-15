@@ -117,6 +117,10 @@ private:
   double fBeamZ;
   TString fOutName;
   TString fInfo;
+
+  TVector3 fnX1;
+  TVector3 fnY1;
+  Double_t fCriticalAngle;
 };
 
 #endif
