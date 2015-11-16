@@ -51,7 +51,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 100,0.6,1); //150
+  fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
@@ -202,7 +202,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       Int_t size =fLutNode[sensorId]->Entries();
       for(int i=0; i<size; i++){	
-	weight = fLutNode[sensorId]->GetWeight(i);
+	weight = 1; //fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	
