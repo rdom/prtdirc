@@ -51,7 +51,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
+  fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 100,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
@@ -102,7 +102,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t maxChangle(1.0);
   Double_t rad = TMath::Pi()/180.;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
-	  
+  TRandom rnd;
+  
   TFile f(outFile,"recreate");
   TTree tree("dirc","SPR");
   tree.Branch("spr", &spr,"spr/D");
@@ -247,7 +248,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  }
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
-	    fHist->Fill(tangle,weight);
+	    fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9) isGoodHit=true;
 	    
 	    // TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
