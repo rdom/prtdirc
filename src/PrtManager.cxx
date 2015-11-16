@@ -8,13 +8,13 @@
 
 PrtManager * PrtManager::fInstance= NULL;
 
-PrtManager::PrtManager(G4String outfile, G4int runtype)
-{
+PrtManager::PrtManager(G4String outfile, G4int runtype){
   TString filename = outfile;
   fOutName = filename; 
   fOutName = fOutName.Remove(fOutName.Last('.'));
   fRunType = runtype;
-  fRootFile = new TFile(filename,"RECREATE");
+  
+  if(fRunType!=2) fRootFile = new TFile(filename,"RECREATE");
 
   if(fRunType==0 || fRunType==6){
     fTree = new TTree("data","Prototype hits tree");
@@ -34,11 +34,11 @@ PrtManager::PrtManager(G4String outfile, G4int runtype)
     }    
   }
 
-  if(fRunType==2){
-    fTree = new TTree("recodata","Reconstructed info for the prototype");
-    fTrackInfoArray = new TClonesArray("PrtTrackInfo");
-    fTree->Branch("PrtTrackInfo",&fTrackInfoArray,256000,2); 
-  }
+  // if(fRunType==2){
+  //   fTree = new TTree("recodata","Reconstructed info for the prototype");
+  //   fTrackInfoArray = new TClonesArray("PrtTrackInfo");
+  //   fTree->Branch("PrtTrackInfo",&fTrackInfoArray,256000,2); 
+  // }
   
   // fHist = new TH1F("id", "name", 100, 0., 100);
 
@@ -122,7 +122,7 @@ void PrtManager::AddHit(PrtHit hit){
 }
 
 void PrtManager::AddTrackInfo(PrtTrackInfo trackinfo){
-  new ((*fTrackInfoArray)[fTrackInfoArray->GetEntriesFast()]) PrtTrackInfo(trackinfo);
+  // new ((*fTrackInfoArray)[fTrackInfoArray->GetEntriesFast()]) PrtTrackInfo(trackinfo);
 }
 
 
@@ -132,10 +132,10 @@ void PrtManager::Fill(){
     fTree->Fill();
     fEvent->Clear();
   }
-  if(fRunType==2){
-    fTree->Fill();
-    fTrackInfoArray->Clear();
-  }
+  // if(fRunType==2){
+  //   fTree->Fill();
+  //   fTrackInfoArray->Clear();
+  // }
 }
 
 void PrtManager::FillLut(){

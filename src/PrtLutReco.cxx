@@ -104,7 +104,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
   TRandom rnd;
   
-  TFile f(outFile,"recreate");
+  TFile file(outFile,"recreate");
   TTree tree("dirc","SPR");
   tree.Branch("spr", &spr,"spr/D");
   tree.Branch("trr", &trr,"trr/D");
@@ -141,12 +141,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // cz = TVector3(-cz.X(),cz.Y(),cz.Z());
     }
     
-    PrtTrackInfo trackinfo;
-    if(fVerbose>3){
-      trackinfo.AddInfo(fEvent->PrintInfo()+"\n Basic reco informaion: \n");
-      trackinfo.AddInfo(Form("Cerenkov angle selection: (%f,%f) \n",minChangle,maxChangle));
-    }
-
     if(fEvent->GetParticle()!=2212) continue;
     // if( fEvent->GetType()==0){
     //   if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
@@ -238,14 +232,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist3->Fill(fabs((bartime+evtime)),hitTime);
 	  tangle = momInBar.Angle(dir);	  
 	  if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
-
-	  if(fVerbose>3){
-	    PrtAmbiguityInfo ambinfo;
-	    ambinfo.SetBarTime(bartime);
-	    ambinfo.SetEvTime(evtime);
-	    ambinfo.SetCherenkov(tangle);
-	    photoninfo.AddAmbiguity(ambinfo);
-	  }
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle ,weight);
@@ -266,37 +252,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
       
       if(isGoodHit) nsHits++; 	
-      if(fVerbose>3){
-	photoninfo.SetHitTime(hitTime);
-	photoninfo.SetReflected(reflected);
-	photoninfo.SetEvReflections(evpointcount);
-	photoninfo.SetSensorId(sensorId);
-	photoninfo.SetMcCherenkovInBar(fHit.GetCherenkovMC());
-
-	trackinfo.AddPhoton(photoninfo);
-      }
     }
     if(fVerbose>4){
       FindPeak(cangle,spr, prtangle); // fEvent->GetAngle()+0.01
       std::cout<<"RES   "<<spr*1000 << "   N "<<nHits << "  "<<spr/sqrt(nHits)*1000<<std::endl;
     }
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
-
-    if(fVerbose>3){
-      //if(testTrRes) trackinfo.SetMomentum(TVector3(dtheta,dtphi,0)); //track deviation
-      trackinfo.SetMcMomentum(fEvent->GetMomentum());
-      trackinfo.SetMcMomentumInBar(momInBar);
-      trackinfo.SetMcPdg(0);
-      trackinfo.SetPdg(0);
-      trackinfo.SetAngle(fEvent->GetAngle());
-      trackinfo.SetMcCherenkov(cangle);
-      
-      //trackinfo.SetCherenkov(cherenkovreco);
-      trackinfo.SetMcTimeInBar(barHitTime);
-      
-      PrtManager::Instance()->AddTrackInfo(trackinfo);
-      PrtManager::Instance()->Fill();
-    }
+    
     if(++nsEvents>=end) break;
   }
   
@@ -313,7 +275,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Fill();
   tree.Write();
 
-  PrtManager::Instance()->Save();
+  file.Write();
+  //PrtManager::Instance()->Save();
 }
 
 Int_t g_num =0;
