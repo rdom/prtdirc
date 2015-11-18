@@ -126,8 +126,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
   Int_t nsHits(0),nsEvents(0),studyId(0), nHits(0);
+  Bool_t loopoverall(false);
+  if(start==-1) {
+    loopoverall=true;
+    start=0;
+  }
   
-  for (Int_t ievent=0; ievent<nEvents; ievent++){ //&& ievent<end
+  for (Int_t ievent=start; ievent<nEvents; ievent++){ //&& ievent<end
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
@@ -148,7 +153,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //   if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
     //   if( fEvent->GetParticle()==212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.10 ||  fEvent->GetTest1()>175.2) ) continue;
     // }
-    
     
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
@@ -259,30 +263,25 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       if(isGoodHit) nsHits++; 	
     }
-    if(fVerbose>4){
-      FindPeak(cangle,spr, prtangle); // fEvent->GetAngle()+0.01
-      std::cout<<"RES   "<<spr*1000 << "   N "<<nHits << "  "<<spr/sqrt(nHits)*1000<<std::endl;
+
+    if(++nsEvents>=end || fVerbose>4){
+      FindPeak(cangle,spr, prtangle);
+      nph = nsHits/(Double_t)nsEvents;
+      spr = spr*1000;
+      trr = spr/sqrt(nph);
+      theta = fEvent->GetAngle();
+      par3 = fEvent->GetTest1();
+      std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
+      tree.Fill();
+      if(!loopoverall) break;
+      nsEvents=0;
+      nsHits=0;
     }
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
-    
-    if(++nsEvents>=end) break;
   }
   
-  FindPeak(cangle,spr,prtangle);
- 
-  nph = nsHits/(Double_t)nsEvents;
-  spr = spr*1000;
-  trr = spr/sqrt(nph);
-  theta = fEvent->GetAngle();
-  par3 = fEvent->GetTest1();
-  
-  std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl;
-    
-  tree.Fill();
   tree.Write();
-
   file.Write();
-  //PrtManager::Instance()->Save();
 }
 
 Int_t g_num =0;
@@ -310,7 +309,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
     
-    Bool_t storePics(true);
+    Bool_t storePics(false);
     if(storePics){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
