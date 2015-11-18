@@ -52,7 +52,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->GetEntry(0);
 
   fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
-  fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +[3]",0.35,0.9);
+  fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
   if(infile.Contains("beam_")){
@@ -202,7 +202,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       Int_t size =fLutNode[sensorId]->Entries();
       for(int i=0; i<size; i++){	
-	weight = 1;//fLutNode[sensorId]->GetWeight(i);
+	weight = fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
@@ -212,7 +212,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//std::cout<<"pathid "<< pathid <<std::endl;
 
 	
-	for(int u=0; u<4; u++){
+	for(int u=0; u<2; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
@@ -303,8 +303,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     fFit->SetParLimits(0,0,1E6);
     fFit->SetParLimits(1,cherenkovreco-0.04,cherenkovreco+0.04); 
     fFit->SetParLimits(2,0.005,0.030); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.1,cherenkovreco+0.1);
-    fHist->Fit("fgaus","M","",cherenkovreco-0.04,cherenkovreco+0.04);
+    //fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
+    //fFit->FixParameter(3,fFit->GetParameter(3)); // width
+    fHist->Fit("fgaus","M","",cherenkovreco-0.035,cherenkovreco+0.035);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
