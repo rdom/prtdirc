@@ -16,17 +16,14 @@
 PrtPixelSD::PrtPixelSD( const G4String& name, 
 			const G4String& hitsCollectionName,
 			G4int nofCells)
-  : G4VSensitiveDetector(name)
-{
+  : G4VSensitiveDetector(name){
   collectionName.insert(hitsCollectionName);
 }
 
-PrtPixelSD::~PrtPixelSD() 
-{ 
+PrtPixelSD::~PrtPixelSD(){ 
 }
 
-void PrtPixelSD::Initialize(G4HCofThisEvent* hce)
-{
+void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
 
  // TTree *gTree = new TTree("Prt","Prototype hits tree");
  // Event *fHit = 0;
@@ -50,8 +47,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce)
   //PrtManager::Instance()->AddEvent(PrtEvent());
 }
 
-G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
-{  
+G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){  
   // // energy deposit
   // G4double edep = step->GetTotalEnergyDeposit();
   
@@ -100,8 +96,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   const G4Event* currentEvent = fRM->GetCurrentEvent();
   G4HCofThisEvent* HCofEvent = currentEvent->GetHCofThisEvent();
   PrtPrizmHitsCollection* prizmCol = (PrtPrizmHitsCollection*)(HCofEvent->GetHC(collectionID));
-
-
  
   Double_t pathId = 0;
   Int_t refl=0;
@@ -117,7 +111,8 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
 
   PrtHit hit;
   hit.SetMcpId(touchable->GetReplicaNumber(1));
-  hit.SetPixelId(touchable->GetReplicaNumber(0));
+  Int_t pixid = touchable->GetReplicaNumber(0);
+  hit.SetPixelId(pixid);
   hit.SetGlobalPos(globalPos);
   hit.SetLocalPos(localPos);
   hit.SetDigiPos(digiPos);
@@ -143,9 +138,31 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
  
-
   PrtManager::Instance()->AddHit(hit);
+
+
   
+  //charge sharing for 8x8 MCP
+  Double_t pixdim=53/16.,chargesig=0.5;
+  Double_t x=localPos.x(), y=localPos.y();
+  Int_t p=pixid;
+
+  Bool_t ok(false);
+  if(pixdim-fabs(x)<1){
+    if(x<0 && pixid%8!=1 && exp(-(pixdim-fabs(x))/chargesig)>G4UniformRand()){ok=true; p-=1;}
+    if(x>0 && pixid%8!=0 && exp(-(pixdim-fabs(x))/chargesig)>G4UniformRand()){ok=true; p+=1;}
+  }
+
+  if(pixdim-fabs(y)<1){
+    if(y<0 && pixid>8 && exp(-(pixdim-fabs(y))/chargesig)>G4UniformRand()){ok=true; p-=8;}
+    if(y>0 && pixid<57 && exp(-(pixdim-fabs(y))/chargesig)>G4UniformRand()){ok=true; p+=8;}
+  }
+ 
+  if(ok) {
+    hit.SetPixelId(p);
+    PrtManager::Instance()->AddHit(hit);
+  }
+
   // // Get hit accounting data for this cell
   // B4cCalorHit* hit = (*fHitsCollection)[layerNumber];
   // if ( ! hit ) {
@@ -166,8 +183,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   return true;
 }
 
-void PrtPixelSD::EndOfEvent(G4HCofThisEvent*)
-{ 
+void PrtPixelSD::EndOfEvent(G4HCofThisEvent*){ 
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
   if(eventNumber%1==0 && PrtManager::Instance()->GetRunType()==0) std::cout<<"Event # "<<eventNumber <<std::endl;
   if(eventNumber%1000==0 && PrtManager::Instance()->GetRunType()!=0) std::cout<<"Event # "<<eventNumber <<std::endl;

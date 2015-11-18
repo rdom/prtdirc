@@ -24,7 +24,8 @@ void drawScan(TString infile="../build/hits.root"){
     }
   }
   itest = fTest1+50;
-  drawDigi("m,p,v\n",2,-2,-2);
+  //  drawDigi("m,p,v\n",2,-2,-2);
+  drawDigi("m,p,v\n",2,0,0);
   cDigi->SetName(Form("sc_%d_%d",fAngle,fMomentum/1000));
   canvasAdd(cDigi);  
   canvasSave(1,0);
