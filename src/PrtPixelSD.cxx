@@ -87,6 +87,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   TVector3 globalPos(inPrismpos.x(),inPrismpos.y(),inPrismpos.z());
   //TVector3 globalPos(globalpos.x(),globalpos.y(),globalpos.z());
   TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
+  translation=touchable->GetHistory()->GetTransform( 1 ).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
   TVector3 momentum(g4mom.x(),g4mom.y(),g4mom.z());
   G4ThreeVector lp = touchable->GetHistory()->GetTransform(1).TransformPoint(g4pos); //pos in wDirc
@@ -135,12 +136,12 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist)
   // time since track created
 
   G4double time = step->GetPreStepPoint()->GetLocalTime();
-  G4double resolution = 0.25; //ns
-  time = G4RandGauss::shoot(time,resolution);
+  if(PrtManager::Instance()->GetRunType()==0) time = G4RandGauss::shoot(time,0.2); //resolution [ns]
   hit.SetLeadTime(time);
-  hit.SetTotTime(1);
+  Double_t wavelength = 1.2398/(track->GetMomentum().mag()*1E6)*1000;
+  hit.SetTotTime(wavelength); //set photon wavelength
   // time since event created
-  //hit.SetTrailTime(0,step->GetPreStepPoint()->GetGlobalTime()*1000); 
+  // step->GetPreStepPoint()->GetGlobalTime()*1000
  
 
   PrtManager::Instance()->AddHit(hit);

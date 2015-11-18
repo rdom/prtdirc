@@ -17,7 +17,8 @@ void drawPrism(Double_t x, Double_t y){
 
 void drawLoad(TString infile="../build/hits.root"){
   gStyle->SetOptStat(0);
-  fInfo = "drawScan.C \n";
+  fSavePath = "load";
+  
   PrtInit(infile,0); //digi
   
   TH2F* hHits = new TH2F("hHits",";x, [mm];y, [mm]",500,-40,350,500,-100,100);
@@ -28,7 +29,6 @@ void drawLoad(TString infile="../build/hits.root"){
     PrtNextEvent(ievent,1000);
     if(ievent==0){
       angle = fEvent->GetAngle() + 0.01;
-      step = fEvent->GetPrismStep()*2;
       test = fEvent->GetTest1();
       fInfo +=  fEvent->PrintInfo();
     }
@@ -52,5 +52,5 @@ void drawLoad(TString infile="../build/hits.root"){
   //hHits->SetTitle(Form("#theta_{track} = %d#circ",angle));
   hHits->Draw("colz");
   drawPrism(prismShift,0);
-  canvasSave(0,"drawLoad.C",1,"data/load");
+  canvasSave(1,0);
 }

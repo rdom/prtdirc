@@ -32,11 +32,11 @@ TH1F*  fHist0 = new TH1F("timediff",";t_{calc}-t_{measured} [ns];entries [#]", 5
 TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,100);
 TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100);
 TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
-TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 200,-1,1, 200,-1,1);
-TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 200,-1,1, 200,-1,1);
+TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
+TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 Int_t gg_i(0);
 TGraph gg_gr;
-PrtLutNode *fLutNode[4000];
+PrtLutNode *fLutNode[5000];
 
 // -----   Default constructor   -------------------------------------------
 PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
@@ -71,7 +71,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     
     std::cout<<"fSavePath  "<< fSavePath <<std::endl;    
   }
-  for(Int_t i=0; i<4000; i++){
+  for(Int_t i=0; i<5000; i++){
     fLutNode[i] = (PrtLutNode*) fLut->At(i);
   }
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
@@ -84,7 +84,7 @@ PrtLutReco::~PrtLutReco(){
  
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
-  TVector3 dird, dir, momInBar(0,0,1),posInBar;
+  TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
   Double_t cangle,spr,tangle,boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
   Int_t pdgcode, evpointcount=0;
   Bool_t reflected = kFALSE;
@@ -98,8 +98,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),phi(0), trr(0),  nph(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0);
-  Double_t minChangle(0.6);
-  Double_t maxChangle(1.0);
+  Double_t minChangle(0);
+  Double_t maxChangle(1);
   Double_t rad = TMath::Pi()/180.;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
   TRandom rnd;
@@ -135,10 +135,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
-      momInBar.RotateY(prtangle*rad);
+      momInBar.RotateY(TMath::Pi()-prtangle*rad);
       // momInBar = fEvent->GetMomentum().Unit();
-      // TVector3 cz = momInBar.Unit();
-      // cz = TVector3(-cz.X(),cz.Y(),cz.Z());
+      if(fVerbose==3){
+	cz = momInBar.Unit();
+	cz = TVector3(-cz.X(),cz.Y(),cz.Z());
+      }
     }
     
     if(fEvent->GetParticle()!=2212) continue;
@@ -160,12 +162,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(hitTime<3 || hitTime>20) continue;
 	  reflected = kFALSE;
 	}else{
-	  if(hitTime<13.5)  reflected = kFALSE;
+	  if(hitTime<13.5)  reflected = kFALSE; //13.5
 	  else reflected = kTRUE;
 	}
       }
       
-      PrtPhotonInfo photoninfo;      
       Double_t radiatorL = 1250; //bar
 
       if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==1175 || studyId==176 || studyId==177 || studyId==178){
@@ -175,21 +176,20 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Double_t z =  fEvent->GetBeamZ();
       if( fEvent->GetType()==1){
 	lenz = radiatorL/2.-fHit.GetPosition().Z();
-	//std::cout<<"lenz 0  "<<lenz;
       }else{
 	lenz = z-1/tan(prtangle*rad)*(122+(z-96)/tan((135-0.5*prtangle)*rad));
 	// Double_t b = 122*tan(0.5*((prtangle-90)*rad)); 
 	// Double_t lenz = (z-96+b)/cos((prtangle-90)*rad)+b+96;     
       }
-  
+
+      if(fVerbose==3){
+	TVector3 cd = fHit.GetMomentum();
+	fHist5->Fill(cd.Theta()*TMath::Sin(cd.Phi()),cd.Theta()*TMath::Cos(cd.Phi()));
+      }
+
       // TVector3 vv = fHit.GetMomentum();
       // vv.RotateY(prtangle*rad);
       // dirz = vv.Z();
-      // TVector3 cd = fHit.GetMomentum();
-      // Double_t phi0 =  cd.Phi();        
-      // Double_t theta0 = cd.Theta();      
-      // fHist5->Fill(theta0*TMath::Sin(phi0),theta0*TMath::Cos(phi0));
-      
       // if(dirz<0) reflected = kTRUE;
       // else reflected = kFALSE;
 
@@ -202,24 +202,30 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       Int_t size =fLutNode[sensorId]->Entries();
       for(int i=0; i<size; i++){	
-	weight = 1; //fLutNode[sensorId]->GetWeight(i);
+	weight = 1;//fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
+	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
+	//if(pathid!=fHit.GetPathInPrizm()) continue;
+	//if(fLutNode[sensorId]->GetNRefl(i)!=1 ) continue;
+	//if(pathid != 130000 && pathid != 199000) continue;
+	//std::cout<<"pathid "<< pathid <<std::endl;
+
 	
 	for(int u=0; u<4; u++){
-	  
+	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
+	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
+	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
+
 	  if(u == 0) dir = dird;
-	  if(u == 1) continue;
-	  if(u == 1) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z());
-	  if(u == 2) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
-	  if(u == 3) continue;
-	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z());
+	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
+	  if(u == 2) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
+	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
 	  if(reflected) dir.SetXYZ( dir.X(), dir.Y(), -dir.Z());
 	  if(dir.Angle(fnX1) < criticalAngle || dir.Angle(fnY1) < criticalAngle) continue;
 
 	  luttheta = dir.Theta();  
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
-	  // if(luttheta <0 ) luttheta = TMath::Pi()+luttheta;
 
 	  bartime = fabs(lenz/cos(luttheta)/198.);
 	 
@@ -231,22 +237,22 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(fabs((bartime+evtime)-hitTime)>test1) continue;
 	  fHist3->Fill(fabs((bartime+evtime)),hitTime);
 	  tangle = momInBar.Angle(dir);	  
-	  if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
+	  //if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9) isGoodHit=true;
-	    
-	    // TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
-	    // rdir.RotateUz(cz);
-	 
-	    // Double_t phi = rdir.Phi();
-	    // Double_t tt =  rdir.Theta();
-	    // fHist4->Fill(tt*TMath::Sin(phi),tt*TMath::Cos(phi));
+	    if(fVerbose==3){	      
+	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
+	      rdir.RotateUz(cz);	      
+	      Double_t phi = rdir.Phi();
+	      Double_t tt =  rdir.Theta();
+	      fHist4->Fill(tt*TMath::Sin(phi),tt*TMath::Cos(phi));
 
-	    // //for cherenckov circle fit
-	    // gg_gr.SetPoint(gg_i,tangle*TMath::Sin(phi),tangle*TMath::Cos(phi));
-	    // gg_i++;
+	      //for cherenckov circle fit
+	      gg_gr.SetPoint(gg_i,tt*TMath::Sin(phi),tt*TMath::Cos(phi));
+	      gg_i++;
+	    }
 	  }
 	}
       }
@@ -315,59 +321,58 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist1->SetLineColor(2);
       fHist1->Draw();
       fHist2->Draw("same");
-      waitPrimitive("r_time");
 
-      // canvasAdd("r_diff",800,400);
-      // fHist0->SetTitle(Form("theta %3.1f", a));
-      // fHist0->Draw();
+      canvasAdd("r_diff",800,400);
+      fHist0->SetTitle(Form("theta %3.1f", a));
+      fHist0->Draw();
     
-      // canvasAdd("r_cm",800,400);
-      // fHist3->SetTitle(Form("theta %3.1f", a));
-      // fHist3->Draw("colz");
+      canvasAdd("r_cm",800,400);
+      fHist3->SetTitle(Form("theta %3.1f", a));
+      fHist3->Draw("colz");
 
       // waitPrimitive("r_cm");
-      canvasSave(1,0);
+      // canvasSave(1,0);
       
-      // TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
-      // c2->Divide(2,1);
-      // c2->cd(1);
+      TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
+      c2->Divide(2,1);
+      c2->cd(1);
      
-      // fHist4->SetStats(0);
-      // fHist4->SetTitle(Form("Calculated from LUT, #theta = %d#circ", a));
-      // fHist4->Draw("colz");
-      // Double_t x0(0), y0(0), theta(cherenkovreco);
-      // FitRing(x0,y0,theta);
-      // TVector3 corr(x0,y0,1-TMath::Sqrt(x0*x0+y0*y0));
-      // std::cout<<"Tcorr "<< corr.Theta()*1000<< "  Pcorr "<< corr.Phi() <<std::endl;
+      fHist4->SetStats(0);
+      fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
+      fHist4->Draw("colz");
+      Double_t x0(0), y0(0), theta(cherenkovreco);
+      FitRing(x0,y0,theta);
+      TVector3 corr(x0,y0,1-TMath::Sqrt(x0*x0+y0*y0));
+      std::cout<<"Tcorr "<< corr.Theta()*1000<< "  Pcorr "<< corr.Phi() <<std::endl;
 
-      // TLegend *leg = new TLegend(0.5,0.7,0.85,0.87);
-      // //      leg->SetFillColor(0);
-      // //leg->SetFillColorAlpha(0,0.8);
-      // leg->SetFillStyle(0);
-      // //leg->SetFillStyle(4000); 
-      // leg->SetBorderSize(0);
-      // leg->AddEntry((TObject*)0,Form("Entries %0.0f",fHist4->GetEntries()),"");
-      // leg->AddEntry((TObject*)0,Form("#Delta#theta_{c} %f [mrad]",corr.Theta()*1000),"");
-      // leg->AddEntry((TObject*)0,Form("#Delta#varphi_{c} %f [rad]",corr.Phi()),"");
-      // leg->Draw();
+      TLegend *leg = new TLegend(0.5,0.7,0.85,0.87);
+      //      leg->SetFillColor(0);
+      //leg->SetFillColorAlpha(0,0.8);
+      leg->SetFillStyle(0);
+      //leg->SetFillStyle(4000); 
+      leg->SetBorderSize(0);
+      leg->AddEntry((TObject*)0,Form("Entries %0.0f",fHist4->GetEntries()),"");
+      leg->AddEntry((TObject*)0,Form("#Delta#theta_{c} %f [mrad]",corr.Theta()*1000),"");
+      leg->AddEntry((TObject*)0,Form("#Delta#varphi_{c} %f [mrad]",corr.Phi()),"");
+      leg->Draw();
 
-      // TArc *arc = new TArc(x0,y0,theta);
-      // arc->SetLineColor(kRed);
-      // arc->SetLineWidth(1);
-      // arc->SetFillStyle(0);
-      // arc->Draw();
-      // gg_i=0;
-      // gg_gr.Set(0);
+      TArc *arc = new TArc(x0,y0,theta);
+      arc->SetLineColor(kRed);
+      arc->SetLineWidth(1);
+      arc->SetFillStyle(0);
+      arc->Draw();
+      gg_i=0;
+      gg_gr.Set(0);
 
-      // c2->cd(2);
-      // gStyle->SetOptStat(1110); 
-      // fHist5->SetTitle(Form("True from MC, #theta = %d#circ", a));
-      // fHist5->Draw("colz");
+      c2->cd(2);
+      gStyle->SetOptStat(1110); 
+      fHist5->SetTitle(Form("True from MC, #theta = %d#circ", a));
+      fHist5->Draw("colz");
 
-      // c2->Print(Form("spr/tcorr_%d.png", a));
-      // c2->Modified();
-      // c2->Update();
-      // c2->WaitPrimitive("s");
+      c2->Print(Form("spr/tcorr_%d.png", a));
+      c2->Modified();
+      c2->Update();
+      c2->WaitPrimitive("s");
     
     }
   }

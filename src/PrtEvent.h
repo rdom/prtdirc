@@ -95,6 +95,6 @@ private:
   Double_t fBeamZ;
   TString  fInfo;
   
-  ClassDef(PrtEvent, 3);
+  ClassDef(PrtEvent, 4);
 };
 #endif
