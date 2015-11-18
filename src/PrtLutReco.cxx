@@ -331,49 +331,50 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist3->Draw("colz");
 
       // waitPrimitive("r_cm");
-      // canvasSave(1,0);
+      canvasSave(1,0);
       
-      TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
-      c2->Divide(2,1);
-      c2->cd(1);
+      if(fVerbose==3){
+	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
+	c2->Divide(2,1);
+	c2->cd(1);
      
-      fHist4->SetStats(0);
-      fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
-      fHist4->Draw("colz");
-      Double_t x0(0), y0(0), theta(cherenkovreco);
-      FitRing(x0,y0,theta);
-      TVector3 corr(x0,y0,1-TMath::Sqrt(x0*x0+y0*y0));
-      std::cout<<"Tcorr "<< corr.Theta()*1000<< "  Pcorr "<< corr.Phi() <<std::endl;
+	fHist4->SetStats(0);
+	fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
+	fHist4->Draw("colz");
+	Double_t x0(0), y0(0), theta(cherenkovreco);
+	FitRing(x0,y0,theta);
+	TVector3 corr(x0,y0,1-TMath::Sqrt(x0*x0+y0*y0));
+	std::cout<<"Tcorr "<< corr.Theta()*1000<< "  Pcorr "<< corr.Phi() <<std::endl;
 
-      TLegend *leg = new TLegend(0.5,0.7,0.85,0.87);
-      //      leg->SetFillColor(0);
-      //leg->SetFillColorAlpha(0,0.8);
-      leg->SetFillStyle(0);
-      //leg->SetFillStyle(4000); 
-      leg->SetBorderSize(0);
-      leg->AddEntry((TObject*)0,Form("Entries %0.0f",fHist4->GetEntries()),"");
-      leg->AddEntry((TObject*)0,Form("#Delta#theta_{c} %f [mrad]",corr.Theta()*1000),"");
-      leg->AddEntry((TObject*)0,Form("#Delta#varphi_{c} %f [mrad]",corr.Phi()),"");
-      leg->Draw();
+	TLegend *leg = new TLegend(0.5,0.7,0.85,0.87);
+	//      leg->SetFillColor(0);
+	//leg->SetFillColorAlpha(0,0.8);
+	leg->SetFillStyle(0);
+	//leg->SetFillStyle(4000); 
+	leg->SetBorderSize(0);
+	leg->AddEntry((TObject*)0,Form("Entries %0.0f",fHist4->GetEntries()),"");
+	leg->AddEntry((TObject*)0,Form("#Delta#theta_{c} %f [mrad]",corr.Theta()*1000),"");
+	leg->AddEntry((TObject*)0,Form("#Delta#varphi_{c} %f [mrad]",corr.Phi()),"");
+	leg->Draw();
 
-      TArc *arc = new TArc(x0,y0,theta);
-      arc->SetLineColor(kRed);
-      arc->SetLineWidth(1);
-      arc->SetFillStyle(0);
-      arc->Draw();
-      gg_i=0;
-      gg_gr.Set(0);
+	TArc *arc = new TArc(x0,y0,theta);
+	arc->SetLineColor(kRed);
+	arc->SetLineWidth(1);
+	arc->SetFillStyle(0);
+	arc->Draw();
+	gg_i=0;
+	gg_gr.Set(0);
 
-      c2->cd(2);
-      gStyle->SetOptStat(1110); 
-      fHist5->SetTitle(Form("True from MC, #theta = %d#circ", a));
-      fHist5->Draw("colz");
+	c2->cd(2);
+	gStyle->SetOptStat(1110); 
+	fHist5->SetTitle(Form("True from MC, #theta = %d#circ", a));
+	fHist5->Draw("colz");
 
-      c2->Print(Form("spr/tcorr_%d.png", a));
-      c2->Modified();
-      c2->Update();
-      c2->WaitPrimitive("s");
-    
+	c2->Print(Form("spr/tcorr_%d.png", a));
+	c2->Modified();
+	c2->Update();
+	c2->WaitPrimitive("s");
+      }
     }
   }
 
