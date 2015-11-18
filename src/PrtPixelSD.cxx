@@ -141,28 +141,29 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   PrtManager::Instance()->AddHit(hit);
 
 
-  
-  //charge sharing for 8x8 MCP
-  Double_t pixdim=53/16.,chargesig=0.5;
-  Double_t x=localPos.x(), y=localPos.y();
-  Int_t p=pixid;
+  if(PrtManager::Instance()->GetRunType()==0){
+    //charge sharing for 8x8 MCP
+    Double_t pixdim=53/16.,chargesig=0.5;
+    Double_t x=localPos.x(), y=localPos.y();
+    Int_t p=pixid;
 
-  Bool_t ok(false);
-  if(pixdim-fabs(x)<1){
-    if(x<0 && pixid%8!=1 && exp(-(pixdim-fabs(x))/chargesig)>G4UniformRand()){ok=true; p-=1;}
-    if(x>0 && pixid%8!=0 && exp(-(pixdim-fabs(x))/chargesig)>G4UniformRand()){ok=true; p+=1;}
-  }
+    Bool_t ok(false);
+    if(pixdim-fabs(x)<1){
+      if(x<0 && pixid%8!=1 && exp(-(pixdim-fabs(x))/chargesig)>G4UniformRand()){ok=true; p-=1;}
+      if(x>0 && pixid%8!=0 && exp(-(pixdim-fabs(x))/chargesig)>G4UniformRand()){ok=true; p+=1;}
+    }
 
-  if(pixdim-fabs(y)<1){
-    if(y<0 && pixid>8 && exp(-(pixdim-fabs(y))/chargesig)>G4UniformRand()){ok=true; p-=8;}
-    if(y>0 && pixid<57 && exp(-(pixdim-fabs(y))/chargesig)>G4UniformRand()){ok=true; p+=8;}
-  }
+    if(pixdim-fabs(y)<1){
+      if(y<0 && pixid>8 && exp(-(pixdim-fabs(y))/chargesig)>G4UniformRand()){ok=true; p-=8;}
+      if(y>0 && pixid<57 && exp(-(pixdim-fabs(y))/chargesig)>G4UniformRand()){ok=true; p+=8;}
+    }
  
-  if(ok) {
-    hit.SetPixelId(p);
-    PrtManager::Instance()->AddHit(hit);
+    if(ok) {
+      hit.SetPixelId(p);
+      PrtManager::Instance()->AddHit(hit);
+    }
   }
-
+  
   // // Get hit accounting data for this cell
   // B4cCalorHit* hit = (*fHitsCollection)[layerNumber];
   // if ( ! hit ) {
