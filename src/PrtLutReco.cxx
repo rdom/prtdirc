@@ -69,8 +69,9 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
       fSavePath = opath+Form("/%ds/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
     }
     
-    std::cout<<"fSavePath  "<< fSavePath <<std::endl;    
-  }
+  }else fSavePath="auto";
+  std::cout<<"fSavePath  "<< fSavePath <<std::endl;    
+
   for(Int_t i=0; i<5000; i++){
     fLutNode[i] = (PrtLutNode*) fLut->At(i);
   }
@@ -148,7 +149,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
     }
     
+    //if(fEvent->GetParticle()!=211) continue;
     if(fEvent->GetParticle()!=2212) continue;
+
     // if( fEvent->GetType()==0){
     //   if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
     //   if( fEvent->GetParticle()==212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.10 ||  fEvent->GetTest1()>175.2) ) continue;
