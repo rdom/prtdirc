@@ -309,7 +309,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
     
-    Bool_t storePics(false);
+    Bool_t storePics(true);
     if(storePics){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
@@ -330,8 +330,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
 
-      // waitPrimitive("r_cm");
+      waitPrimitive("r_cm");
       canvasSave(1,0);
+      canvasDel("*");
       
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
@@ -373,7 +374,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
 	c2->Print(Form("spr/tcorr_%d.png", a));
 	c2->Modified();
 	c2->Update();
-	c2->WaitPrimitive("s");
+	c2->WaitPrimitive("");
       }
     }
   }

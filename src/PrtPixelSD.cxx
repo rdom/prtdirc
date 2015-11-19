@@ -143,7 +143,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
   if(PrtManager::Instance()->GetRunType()==0){
     //charge sharing for 8x8 MCP
-    Double_t pixdim=53/16.,chargesig=0.5;
+    Double_t pixdim=53/16.,chargesig=1;
     Double_t x=localPos.x(), y=localPos.y();
     Int_t p=pixid;
 
