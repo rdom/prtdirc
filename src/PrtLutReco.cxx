@@ -205,7 +205,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Bool_t isGoodHit(false);
 
       Int_t size =fLutNode[sensorId]->Entries();
-      for(int i=0; i<size; i++){	
+      for(int i=0; i<size; i++){
 	weight = fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
@@ -265,20 +265,30 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     }
 
     if(++nsEvents>=end || fVerbose>4){
-      FindPeak(cangle,spr, prtangle);
-      nph = nsHits/(Double_t)nsEvents;
-      spr = spr*1000;
-      trr = spr/sqrt(nph);
-      theta = fEvent->GetAngle();
-      par3 = fEvent->GetTest1();
-      std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
-      tree.Fill();
-      if(!loopoverall) break;
-      nsEvents=0;
-      nsHits=0;
+      if(loopoverall){
+	FindPeak(cangle,spr, prtangle);
+	nph = nsHits/(Double_t)nsEvents;
+	spr = spr*1000;
+	trr = spr/sqrt(nph);
+	theta = fEvent->GetAngle();
+	par3 = fEvent->GetTest1();
+	std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
+	tree.Fill();
+	nsEvents=0;
+	nsHits=0;
+      }else break;
     }
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
   }
+  
+  FindPeak(cangle,spr, prtangle);
+  nph = nsHits/(Double_t)nsEvents;
+  spr = spr*1000;
+  trr = spr/sqrt(nph);
+  theta = fEvent->GetAngle();
+  par3 = fEvent->GetTest1();
+  std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
+  tree.Fill();
   
   tree.Write();
   file.Write();
