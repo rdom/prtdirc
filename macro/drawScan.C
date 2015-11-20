@@ -25,7 +25,7 @@ void drawScan(TString infile="../build/hits.root"){
   }
   itest = fTest1+50;
   //  drawDigi("m,p,v\n",2,-2,-2);
-  drawDigi("m,p,v\n",3,0,0);
+  drawDigi("m,p,v\n",3,-2,-2);
   cDigi->cd();
   (new TPaletteAxis(0.90,0.1,0.94,0.90,fhDigi[0]))->Draw();
    
