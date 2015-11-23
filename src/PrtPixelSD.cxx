@@ -143,7 +143,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
   if(PrtManager::Instance()->GetRunType()==0){
     //charge sharing for 8x8 MCP
-    Double_t pixdim(53/16.),chargesig(1),threshold(0.2);
+    Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
     Double_t x(localPos.x()), y(localPos.y());
     Int_t p(pixid);
     Bool_t ok(false);
@@ -155,10 +155,10 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     if(y<0 && pixid>8    && expd>G4UniformRand() && expd<threshold){ok=true; p-=8;}
     if(y>0 && pixid<57   && expd>G4UniformRand() && expd<threshold){ok=true; p+=8;}
  
-    // if(ok) {
-    //   hit.SetPixelId(p);
-    //   PrtManager::Instance()->AddHit(hit);
-    // }
+    if(ok) {
+      hit.SetPixelId(p);
+      PrtManager::Instance()->AddHit(hit);
+    }
   }
   
   // // Get hit accounting data for this cell
