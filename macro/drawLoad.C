@@ -28,12 +28,12 @@ void drawLoad(TString infile="../build/hits.root"){
   for (Int_t ievent=0; ievent<fCh->GetEntries(); ievent++){
     PrtNextEvent(ievent,1000);
     if(ievent==0){
-      angle = fEvent->GetAngle() + 0.01;
-      test = fEvent->GetTest1();
-      fInfo +=  fEvent->PrintInfo();
+      angle = prt_event->GetAngle() + 0.01;
+      test = prt_event->GetTest1();
+      fInfo +=  prt_event->PrintInfo();
     }
-    for(Int_t h=0; h<fEvent->GetHitSize(); h++){
-      fHit = fEvent->GetHit(h);
+    for(Int_t h=0; h<prt_event->GetHitSize(); h++){
+      fHit = prt_event->GetHit(h);
       Int_t mcpid = fHit.GetMcpId();
       Int_t pixid = fHit.GetPixelId()-1;
       TVector3 pos = fHit.GetGlobalPos();

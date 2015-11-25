@@ -14,8 +14,8 @@ void drawScan(TString infile="../build/hits.root"){
   PrtHit fHit;
   for (Int_t ievent=0; ievent< fCh->GetEntries(); ievent++){
     PrtNextEvent(ievent,1000);
-    for(Int_t h=0; h<fEvent->GetHitSize(); h++){
-      fHit = fEvent->GetHit(h);
+    for(Int_t h=0; h<prt_event->GetHitSize(); h++){
+      fHit = prt_event->GetHit(h);
       Int_t mcpid = fHit.GetMcpId();
       Int_t pixid = fHit.GetPixelId()-1;
       
