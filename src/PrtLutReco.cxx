@@ -23,6 +23,8 @@
 #include <TVirtualFitter.h>
 #include <TArc.h>
 #include <TLegend.h>
+
+#define prt__sim
 #include "../../prttools/prttools.C"
 
 using std::cout;
@@ -121,6 +123,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("phi",&phi,"phi/D");
 
   test1 = PrtManager::Instance()->GetTest1();
+  test2 = PrtManager::Instance()->GetTest2();
   
   Int_t nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
@@ -248,8 +251,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle ,weight);
-	    if(0.7<tangle && tangle<0.9) isGoodHit=true;
-	    if(fVerbose==3){	      
+	    if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
+	    if(studyId>=160 && 0.7<tangle && tangle<0.9) isGoodHit=true;
+	    
+	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	      rdir.RotateUz(cz);	      
 	      Double_t phi = rdir.Phi();
@@ -317,7 +322,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     fFit->SetParLimits(2,0.005,0.030); // width
     //fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
     //fFit->FixParameter(3,fFit->GetParameter(3)); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.035,cherenkovreco+0.035);
+    fHist->Fit("fgaus","M","",cherenkovreco-0.04,cherenkovreco+0.04);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
