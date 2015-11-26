@@ -348,7 +348,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
 
-      //waitPrimitive("r_cm");
+      waitPrimitive("r_cm");
       canvasSave(1,0);
       canvasDel("*");
       
