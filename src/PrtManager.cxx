@@ -61,7 +61,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   fPrismStepY=0;
   fBeamX=0;
   fBeamZ=-1;
-  fInfo("");
+  fInfo="";
 
   fnX1 = TVector3(1,0,0);   
   fnY1 = TVector3( 0,1,0);
