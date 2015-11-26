@@ -59,6 +59,14 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     
     fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
     PrtManager::Instance()->Event()->SetPosition(TVector3(x,y,z));
+
+    G4double angle = -G4UniformRand()*M_PI;
+    G4ThreeVector vec(0,0,1);
+    vec.setTheta(G4RandGauss::shoot(0,0.003)); //beam divergence  
+    vec.setPhi(2*M_PI*G4UniformRand());
+
+    fParticleGun->SetParticleMomentumDirection(vec);
+    
   }
   if(PrtManager::Instance()->GetRunType() == 1){ // LUT generation
     fParticleGun->SetParticlePosition(G4ThreeVector(0,0,radiatorL/2.-0.1));
