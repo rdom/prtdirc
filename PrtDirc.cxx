@@ -117,7 +117,7 @@ int main(int argc,char** argv)
   //if(beamDimension.size())PrtManager::Instance()->SetTest1(atoi(beamDimension));
 
   if(runtype == 2){
-    PrtLutReco * reco = new PrtLutReco(infile,lutfile,verbose); 
+    PrtLutReco * reco = new PrtLutReco(infile.c_str(),lutfile.c_str(),verbose); 
     reco->Run(firstevent, atoi(events));
     return 0;
   }
