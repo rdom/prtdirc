@@ -36,7 +36,6 @@ TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100
 TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
-TH1F*  fhLength = new TH1F("hLength",";photon path length [m];", 1000,0,10);
 
 Int_t gg_i(0);
 TGraph gg_gr;
@@ -264,7 +263,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    if(0.7<tangle && tangle<0.9){
 	      if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
-	      fhLength->Fill(totaltime*198/1000.);
 	    }
 	    
 	    if(fVerbose==3){
@@ -341,7 +339,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
     
-    Bool_t storePics(true);
+    Bool_t storePics(false);
     if(storePics){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
@@ -358,14 +356,11 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist0->SetTitle(Form("theta %3.1f", a));
       fHist0->Draw();
       
-      canvasAdd("r_len",800,400);
-      fhLength->Draw();
-    
       canvasAdd("r_cm",800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
 
-      if(true){
+      if(false){
 	Int_t tmax, max=0;
 	for(Int_t m=0; m<15;m++){
 	  fhDigi[m]->Rebin2D(8,8);
