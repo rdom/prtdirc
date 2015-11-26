@@ -392,7 +392,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
 	c2->Print(Form("spr/tcorr_%d.png", a));
 	c2->Modified();
 	c2->Update();
-	//c2->WaitPrimitive("");
+	c2->WaitPrimitive("");
       }
     }
   }
