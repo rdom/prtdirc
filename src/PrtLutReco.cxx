@@ -36,6 +36,8 @@ TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100
 TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
+TH1F*  fhLength = new TH1F("hLength",";photon path length [m];", 1000,0,10);
+
 Int_t gg_i(0);
 TGraph gg_gr;
 PrtLutNode *fLutNode[5000];
@@ -106,6 +108,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t rad = TMath::Pi()/180.;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
   TRandom rnd;
+
+  SetRootPalette(1);
+  CreateMap();
+  initDigi();
   
   TFile file(outFile,"recreate");
   TTree tree("dirc","SPR");
@@ -203,9 +209,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // if(dirz<0) reflected = kTRUE;
       // else reflected = kFALSE;
 
+      Int_t pixid=fHit.GetPixelId()-1;
+      Int_t mcpid=fHit.GetMcpId();
       if(reflected) lenz = 2*radiatorL - lenz;
+      Int_t ch = map_mpc[mcpid][pixid];
+      if(badcannel(ch)) continue;
       
-      Int_t sensorId = 100*fHit.GetMcpId()+fHit.GetPixelId();
+      Int_t sensorId = 100*mcpid+pixid;
       if(sensorId==1) continue;
 
       Bool_t isGoodHit(false);
@@ -238,21 +248,24 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
 
 	  bartime = fabs(lenz/cos(luttheta)/198.);
-	 
-	  fHist0->Fill((bartime+evtime)-hitTime);
+	  Double_t totaltime = fabs(bartime+evtime);
+	  fHist0->Fill(totaltime-hitTime);
 	  fHist1->Fill(hitTime);
-	  fHist2->Fill(bartime+evtime);
+	  fHist2->Fill(totaltime);
 
 	  //  if(hitTime>15) test1=3;
-	  if(fabs((bartime+evtime)-hitTime)>test1) continue;
-	  fHist3->Fill(fabs((bartime+evtime)),hitTime);
+	  if(fabs(totaltime-hitTime)>test1) continue;
+	  fHist3->Fill(totaltime,hitTime);
 	  tangle = momInBar.Angle(dir);	  
 	  //if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle ,weight);
-	    if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
-	    if(studyId>=160 && 0.7<tangle && tangle<0.9) isGoodHit=true;
+	    if(0.7<tangle && tangle<0.9){
+	      if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
+	      if(studyId>=160) isGoodHit=true;
+	      fhLength->Fill(totaltime*198/1000.);
+	    }
 	    
 	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
@@ -269,7 +282,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
       
-      if(isGoodHit) nsHits++; 	
+      if(isGoodHit) nsHits++;
+      if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     }
 
     if(++nsEvents>=end || fVerbose>4){
@@ -288,7 +302,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     }
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
   }
-  
+
   FindPeak(cangle,spr, prtangle);
   nph = nsHits/(Double_t)nsEvents;
   spr = spr*1000;
@@ -343,10 +357,36 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       canvasAdd("r_diff",800,400);
       fHist0->SetTitle(Form("theta %3.1f", a));
       fHist0->Draw();
+      
+      canvasAdd("r_len",800,400);
+      fhLength->Draw();
     
       canvasAdd("r_cm",800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
+
+      if(true){
+	Int_t tmax, max=0;
+	for(Int_t m=0; m<15;m++){
+	  fhDigi[m]->Rebin2D(8,8);
+	  fhDigi[m]->GetXaxis()->SetNdivisions(0);
+	  fhDigi[m]->GetYaxis()->SetNdivisions(0);
+	  fhDigi[m]->GetXaxis()->SetTickLength(0);
+	  fhDigi[m]->GetYaxis()->SetTickLength(0);
+	  fhDigi[m]->GetXaxis()->SetAxisColor(1);
+	  fhDigi[m]->GetYaxis()->SetAxisColor(1);
+	  fhDigi[m]->SetMarkerSize(10);
+	  tmax = fhDigi[m]->GetMaximum();
+	  if(max<tmax) max = tmax;
+	}
+	for(Int_t m=0; m<15;m++){
+	  fhDigi[m]->Scale(1/(Double_t)max);
+	}
+      }
+
+      drawDigi("m,p,v\n",2);
+      cDigi->SetName("r_hits");
+      canvasAdd(cDigi);  
 
       waitPrimitive("r_cm");
       canvasSave(1,0);
