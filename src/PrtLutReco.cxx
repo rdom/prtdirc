@@ -134,10 +134,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   if(end==0) end = nEvents;
   
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
-  Int_t nsHits(0),nsEvents(0),studyId(0), nHits(0);
+  Int_t nsHits(0),nsEvents(0),studyId(0), nHits(0), ninfit(0);
   Bool_t loopoverall(false);
-  if(start==-1) {
+  if(start<0) {
     loopoverall=true;
+    ninfit=abs(start);
     start=0;
   }
   
@@ -283,32 +284,34 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(isGoodHit) nsHits++;
       if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     }
-
-    if(++nsEvents>=end || fVerbose>4){
-      if(loopoverall){
-	FindPeak(cangle,spr, prtangle);
-	nph = nsHits/(Double_t)nsEvents;
-	spr = spr*1000;
-	trr = spr/sqrt(nph);
-	theta = fEvent->GetAngle();
-	par3 = fEvent->GetTest1();
-	std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
-	tree.Fill();
-	nsEvents=0;
-	nsHits=0;
-      }else break;
+    
+    if(loopoverall && nsEvents%ninfit==0){
+      FindPeak(cangle,spr, prtangle);
+      nph = nsHits/(Double_t)ninfit;
+      spr = spr*1000;
+      trr = spr/sqrt(nph);
+      theta = fEvent->GetAngle();
+      par3 = fEvent->GetTest1();
+      std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
+      tree.Fill();
+      nsHits=0;
     }
+    
+    if(++nsEvents>=end || fVerbose>4) break;
+  
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
   }
 
-  FindPeak(cangle,spr, prtangle);
-  nph = nsHits/(Double_t)nsEvents;
-  spr = spr*1000;
-  trr = spr/sqrt(nph);
-  theta = fEvent->GetAngle();
-  par3 = fEvent->GetTest1();
-  std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
-  tree.Fill();
+  if(!loopoverall){
+    FindPeak(cangle,spr, prtangle);
+    nph = nsHits/(Double_t)nsEvents;
+    spr = spr*1000;
+    trr = spr/sqrt(nph);
+    theta = fEvent->GetAngle();
+    par3 = fEvent->GetTest1();
+    std::cout<<"RES   "<<spr << "   N "<< nph << " trr  "<<trr<<std::endl; 
+    tree.Fill();
+  }
   
   tree.Write();
   file.Write();
