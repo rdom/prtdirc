@@ -44,6 +44,7 @@ PrtLutNode *fLutNode[5000];
 // -----   Default constructor   -------------------------------------------
 PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fVerbose = verbose;
+  fLoopoverAll = false;
   fChain = new TChain("data");
   fChain->Add(infile);
   fChain->SetBranchAddress("PrtEvent", &fEvent);
@@ -135,9 +136,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
   Int_t nsHits(0),nsEvents(0),studyId(0), nHits(0), ninfit(0);
-  Bool_t loopoverall(false);
+
   if(start<0) {
-    loopoverall=true;
+    fLoopoverAll=true;
     ninfit=abs(start);
     start=0;
   }
@@ -285,7 +286,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     }
     
-    if(loopoverall && nsEvents%ninfit==0){
+    if(fLoopoverAll && nsEvents%ninfit==0){
       FindPeak(cangle,spr, prtangle);
       nph = nsHits/(Double_t)ninfit;
       spr = spr*1000;
@@ -302,7 +303,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
   }
 
-  if(!loopoverall){
+  if(!fLoopoverAll){
     FindPeak(cangle,spr, prtangle);
     nph = nsHits/(Double_t)nsEvents;
     spr = spr*1000;
@@ -343,7 +344,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     if(fVerbose>1) gROOT->SetBatch(0);
     
     Bool_t storePics(true);
-    if(storePics){
+    if(storePics && !fLoopoverAll){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
       fHist->SetMinimum(0);
