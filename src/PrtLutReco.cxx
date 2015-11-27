@@ -210,11 +210,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // if(dirz<0) reflected = kTRUE;
       // else reflected = kFALSE;
 
-      Int_t pixid=fHit.GetPixelId()-1;
+      Int_t pixid=fHit.GetPixelId();
       Int_t mcpid=fHit.GetMcpId();
       if(reflected) lenz = 2*radiatorL - lenz;
-      Int_t ch = map_mpc[mcpid][pixid];
-      if(badcannel(ch)) continue;
+      Int_t ch = map_mpc[mcpid][pixid-1];
+      //if(badcannel(ch)) continue;
       
       Int_t sensorId = 100*mcpid+pixid;
       if(sensorId==1) continue;
