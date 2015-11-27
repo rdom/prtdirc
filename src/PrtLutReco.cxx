@@ -330,15 +330,14 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     if(nfound>0) cherenkovreco = fSpect->GetPositionX()[0];
     else cherenkovreco =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
-    fFit->SetParameters(100,cherenkovreco,0.010,10);   // peak
-    // fFit->SetParameter(1,cherenkovreco);   // peak
-    // fFit->SetParameter(2,0.005); // width
-    fFit->SetParLimits(0,0,1E6);
+    if(cherenkovreco>0.85) cherenkovreco=0.82;
+    fFit->SetParameters(100,cherenkovreco,0.010,10);
+    fFit->SetParLimits(0,1,1E6);
     fFit->SetParLimits(1,cherenkovreco-0.04,cherenkovreco+0.04); 
     fFit->SetParLimits(2,0.005,0.030); // width
     //fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
     //fFit->FixParameter(3,fFit->GetParameter(3)); // width
-    fHist->Fit("fgaus","M","",cherenkovreco-0.04,cherenkovreco+0.04);
+    fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
     cherenkovreco = fFit->GetParameter(1);
     spr = fFit->GetParameter(2); 
     if(fVerbose>1) gROOT->SetBatch(0);
