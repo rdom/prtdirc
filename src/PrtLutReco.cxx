@@ -249,14 +249,14 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
 
 	  bartime = fabs(lenz/cos(luttheta)/198.);
-	  Double_t totaltime = fabs(bartime+evtime);
+	  Double_t totaltime = bartime+evtime;
 	  fHist0->Fill(totaltime-hitTime);
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
 	  //  if(hitTime>15) test1=3;
 	  if(fabs(totaltime-hitTime)>test1) continue;
-	  fHist3->Fill(totaltime,hitTime);
+	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);	  
 	  //if(tangle>TMath::PiOver2()) tangle = TMath::Pi()-tangle;
 	  
@@ -298,7 +298,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       nsHits=0;
     }
     
-    if(++nsEvents>=end || fVerbose>4) break;
+    if(++nsEvents>=end) break;
   
     //Int_t pdgreco = FindPdg(fEvent->GetMomentum().Mag(), cherenkovreco);
   }
@@ -344,7 +344,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
     if(fVerbose>1) gROOT->SetBatch(0);
     
     Bool_t storePics(true);
-    if(storePics && !fLoopoverAll){
+    if(storePics && (!fLoopoverAll || fVerbose==2)){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f", a));
       fHist->SetMinimum(0);
