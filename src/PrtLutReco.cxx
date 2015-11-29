@@ -159,8 +159,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
     }
     
-    //if(fEvent->GetParticle()!=211) continue;
-    if(fEvent->GetParticle()!=2212) continue;
+    if(fEvent->GetParticle()!=211 && fEvent->GetParticle()!=212) continue;
+    //if(fEvent->GetParticle()!=2212) continue;
 
     // if( fEvent->GetType()==0){
     //   if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
