@@ -210,20 +210,20 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // if(dirz<0) reflected = kTRUE;
       // else reflected = kFALSE;
 
-      Int_t pixid=fHit.GetPixelId();
+      Int_t pixid=fHit.GetPixelId()-1;
       Int_t mcpid=fHit.GetMcpId();
       if(reflected) lenz = 2*radiatorL - lenz;
-      Int_t ch = map_mpc[mcpid][pixid-1];
+      Int_t ch = map_mpc[mcpid][pixid];
       if(badcannel(ch)) continue;
       
-      Int_t sensorId = 100*mcpid+pixid;
+      Int_t sensorId = 100*mcpid+fHit.GetPixelId();
       if(sensorId==1) continue;
 
       Bool_t isGoodHit(false);
 
       Int_t size =fLutNode[sensorId]->Entries();
-      for(int i=0; i<size; i++){
-	weight = fLutNode[sensorId]->GetWeight(i);
+      for(Int_t i=0; i<size; i++){
+	weight = 1; //fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
@@ -363,7 +363,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
 
-      if(true){
+      if(false){
 	Int_t tmax, max=0;
 	for(Int_t m=0; m<15;m++){
 	  fhDigi[m]->Rebin2D(8,8);
@@ -442,7 +442,11 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
   fHist2->Reset();
   fHist3->Reset();
   fHist4->Reset();
-
+  
+  for(Int_t m=0; m<15;m++){
+    fhDigi[m]->Reset();
+  }
+  
   return (cherenkovreco>0 && cherenkovreco<1);
 }
 
