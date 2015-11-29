@@ -332,10 +332,13 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
 
     if(cherenkovreco>0.85) cherenkovreco=0.82;
     fFit->SetParameters(100,cherenkovreco,0.010,10);
+    fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");
+
+      
     fFit->SetParLimits(0,1,1E6);
     fFit->SetParLimits(1,cherenkovreco-0.04,cherenkovreco+0.04); 
     fFit->SetParLimits(2,0.005,0.030); // width
-    //fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
+    fHist->Fit("fgaus","I","",cherenkovreco-0.05,cherenkovreco+0.05);
     //fFit->FixParameter(3,fFit->GetParameter(3)); // width
     fHist->Fit("fgaus","M","",cherenkovreco-0.05,cherenkovreco+0.05);
     cherenkovreco = fFit->GetParameter(1);
@@ -348,7 +351,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist->SetTitle(Form("theta %3.1f", a));
       fHist->SetMinimum(0);
       fHist->Draw();
-       
+
       canvasAdd("r_time",800,400);
       fHist1->SetTitle(Form("theta %3.1f", a));
       fHist1->SetLineColor(2);
