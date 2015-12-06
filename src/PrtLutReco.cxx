@@ -159,8 +159,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
     }
     
-    if(fEvent->GetParticle()!=211 && fEvent->GetParticle()!=212) continue;
-    //if(fEvent->GetParticle()!=2212) continue;
+    //if(fEvent->GetParticle()!=211 && fEvent->GetParticle()!=212) continue;
+    if(fEvent->GetParticle()!=2212) continue;
 
     // if( fEvent->GetType()==0){
     //   if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
@@ -215,6 +215,28 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(reflected) lenz = 2*radiatorL - lenz;
       Int_t ch = map_mpc[mcpid][pixid];
       if(badcannel(ch)) continue;
+
+      Int_t x(0),y(0), piid(pixid+1) , nedge(0);
+      for(Int_t h=0; h<nHits; h++) {
+	Int_t pid=fEvent->GetHit(h).GetPixelId();
+	Int_t mid=fEvent->GetHit(h).GetMcpId();
+	if(mid!=mcpid || pid==piid) continue;
+	if(pid==piid-1 && piid%8!=1) x-=1;
+	if(pid==piid+1 && piid%8!=0) x+=1;
+
+	if(pid==piid+8 && piid<57) y+=1;
+	if(pid==piid-8 && piid>8)  y-=1;
+      }
+      
+      if(x== 0 && y== 0) nedge=0;
+      if(x==-1 && y== 0) nedge=1;
+      if(x==-1 && y== 1) nedge=2;
+      if(x== 0 && y== 1) nedge=3;
+      if(x== 1 && y== 1) nedge=4;
+      if(x== 1 && y== 0) nedge=5;
+      if(x== 1 && y==-1) nedge=6;
+      if(x== 0 && y==-1) nedge=7;
+      if(x==-1 && y==-1) nedge=8;
       
       Int_t sensorId = 100*mcpid+fHit.GetPixelId();
       if(sensorId==1) continue;
@@ -224,9 +246,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	dird   = fLutNode[sensorId]->GetEntry(i);
+	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge);
+	//dird   = fLutNode[sensorId]->GetEntry(i);
+	
 	evtime = fLutNode[sensorId]->GetTime(i);
-	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
+	//Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	//if(pathid!=fHit.GetPathInPrizm()) continue;
 	//if(fLutNode[sensorId]->GetNRefl(i)!=1 ) continue;
 	//if(pathid != 130000 && pathid != 199000) continue;

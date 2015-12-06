@@ -194,23 +194,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     }
     
   }
-  
-  // // Get hit accounting data for this cell
-  // B4cCalorHit* hit = (*fHitsCollection)[layerNumber];
-  // if ( ! hit ) {
-  //   G4ExceptionDescription msg;
-  //   msg << "Cannot access hit " << layerNumber; 
-  //   G4Exception("PrtPixelSD::ProcessHits()",
-  //     "MyCode0004", FatalException, msg);
-  // }         
-
-  // // Get hit for total accounting
-  // B4cCalorHit* hitTotal 
-  //   = (*fHitsCollection)[fHitsCollection->entries()-1];
-  
-  // // Add values
-  // hit->Add(edep, stepLength);
-  // hitTotal->Add(edep, stepLength); 
       
   return true;
 }

@@ -116,7 +116,7 @@ void PrtManager::AddHit(PrtHit hit){
       ((PrtLutNode*)(fLut->At(id)))->
 	AddEntry(id, fMomentum, hit.GetPathInPrizm(),
 		 hit.GetNreflectionsInPrizm(),
-		 hit.GetLeadTime(),hit.GetGlobalPos(),hit.GetDigiPos());
+		 hit.GetLeadTime(),hit.GetLocalPos(),hit.GetDigiPos());
     }
   }
 }
