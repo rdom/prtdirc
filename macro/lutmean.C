@@ -94,7 +94,7 @@ void lutmean(TString baseFile = "../data/lut.root"){
       sum *= weight;
       sumt *= weight;
       
-      ((PrtLutNode*)(fLutNew->At(inode)))->AddEntry(node->GetDetectorId(), sum,j,node->GetNRefl(0),sumt, node->GetDigiPos(),node->GetDigiPos(),vArray[j].size()/(Double_t)size); 
+      ((PrtLutNode*)(fLutNew->At(inode)))->AddEntry(node->GetDetectorId(), sum,pArray[j],node->GetNRefl(0),sumt, node->GetDigiPos(),node->GetDigiPos(),vArray[j].size()/(Double_t)size); 
     }
     for(int i=0; i<100; i++) {vArray[i].clear();  tArray[i].clear();}
     pArray.clear();

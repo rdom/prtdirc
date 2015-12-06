@@ -31,6 +31,7 @@ using std::cout;
 using std::endl;
 
 TH1F*  fHist0 = new TH1F("timediff",";t_{calc}-t_{measured} [ns];entries [#]", 500,-10,10);
+TH1F*  fHist0i = new TH1F("timediffi",";t_{calc}-t_{measured} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,100);
 TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100);
 TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
@@ -56,6 +57,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->GetEntry(0);
 
   fHist = new TH1F("chrenkov_angle_hist","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
+  fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
@@ -237,7 +239,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(x== 1 && y==-1) nedge=6;
       if(x== 0 && y==-1) nedge=7;
       if(x==-1 && y==-1) nedge=8;
-      
+
       Int_t sensorId = 100*mcpid+fHit.GetPixelId();
       if(sensorId==1) continue;
 
@@ -248,10 +250,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge);
 	//dird   = fLutNode[sensorId]->GetEntry(i);
-	
 	evtime = fLutNode[sensorId]->GetTime(i);
-	//Int_t pathid = fLutNode[sensorId]->GetPathId(i);
-	//if(pathid!=fHit.GetPathInPrizm()) continue;
+	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
+	Bool_t samepath(false);
+	if(pathid==fHit.GetPathInPrizm()) samepath=true;
 	//if(fLutNode[sensorId]->GetNRefl(i)!=1 ) continue;
 	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
@@ -275,6 +277,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  bartime = fabs(lenz/cos(luttheta)/198.);
 	  Double_t totaltime = bartime+evtime;
 	  fHist0->Fill(totaltime-hitTime);
+	  if(samepath)  fHist0i->Fill(totaltime-hitTime);
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
@@ -286,6 +289,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  if(tangle > minChangle && tangle < maxChangle){
 	    fHist->Fill(tangle ,weight);
+	    if(samepath) fHisti->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
 	      if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
@@ -375,7 +379,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       fHist->SetTitle(Form("theta %3.1f", a));
       fHist->SetMinimum(0);
       fHist->Draw();
-
+      fHisti->SetLineColor(kRed+2);
+      if(fHisti->GetEntries()>5) fHisti->Draw("same");
+ 
       canvasAdd("r_time",800,400);
       fHist1->SetTitle(Form("theta %3.1f", a));
       fHist1->SetLineColor(2);
@@ -385,6 +391,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
       canvasAdd("r_diff",800,400);
       fHist0->SetTitle(Form("theta %3.1f", a));
       fHist0->Draw();
+      fHist0i->SetLineColor(kRed+2);
+      if(fHist0i->GetEntries()>5)  fHist0i->Draw("same");
       
       canvasAdd("r_cm",800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
@@ -464,7 +472,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cherenkovreco, Double_t& spr, Double_t a){
 
   if(fVerbose<2) gROOT->SetBatch(0);
   fHist->Reset();
+  fHisti->Reset();
   fHist0->Reset();
+  fHist0i->Reset();
   fHist1->Reset();
   fHist2->Reset();
   fHist3->Reset();

@@ -56,6 +56,7 @@ private:
   Int_t nevents;
   TString fInputFile;
   TH1F *fHist;
+  TH1F *fHisti;
   TF1 *fFit;
   TSpectrum *fSpect;
   Bool_t fLoopoverAll;
