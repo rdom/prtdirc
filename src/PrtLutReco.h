@@ -35,6 +35,8 @@ private:
   Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Double_t a);
   Int_t FindPdg(Double_t mom, Double_t cangle);
   void FitRing(Double_t& x0, Double_t& y0, Double_t& theta);
+  Double_t fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom);
+  void ResetHists();
   Int_t fDetectorID;  
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
 
@@ -47,9 +49,6 @@ private:
 
   PrtEvent* fEvent;
   PrtHit fHit;
-  
-  // Set the parameters to the default values.
-  void SetDefaultParameters();
   
   // Verbosity level
   Int_t fVerbose;
