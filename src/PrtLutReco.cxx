@@ -354,6 +354,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl; 
     tree.Fill();
   }else{
+    if(!fVerbose) gROOT->SetBatch(1);
     canvasAdd("r_lhood",800,400);
     prt_normalize(hLnDiffP,hLnDiffPi);
     hLnDiffP->SetLineColor(2);
@@ -362,6 +363,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     hLnDiffPi->Draw("same");
     //waitPrimitive("r_lhood","");
     canvasSave(1,0);
+    if(fVerbose) gROOT->SetBatch(0);
   }
   
   ResetHists();
