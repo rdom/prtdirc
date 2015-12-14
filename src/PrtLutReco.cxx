@@ -261,8 +261,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
 	//nedge=0;
-	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge);
-        //dird   = fLutNode[sensorId]->GetEntry(i);
+	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge);
+        dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -297,11 +297,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(fabs(totaltime-hitTime)>test1) continue;
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);	  
-	  if(tangle > minChangle && tangle < maxChangle && tangle < 0.85){
-	    //fHist->Fill(tangle ,weight);
+	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
+	    fHist->Fill(tangle ,weight);
 	    //for(Int_t i=0; i<100; i++) fHist->Fill(gRandom->Gaus(tangle,0.003) ,weight);
 	    
-	    if(samepath) fHist->Fill(tangle ,weight);
+	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
 	      if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
@@ -414,8 +414,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
     fFit->SetParLimits(2,0.005,0.030); // width
 
-    fFit->FixParameter(3,0); 
-    fFit->FixParameter(4,0); 
+    // fFit->FixParameter(3,0); 
+    // fFit->FixParameter(4,0); 
     Int_t status(0);
     if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
     else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
