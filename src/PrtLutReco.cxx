@@ -38,10 +38,10 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",200,-50,50);
-TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",200,-50,50);
+TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",200,-80,80);
+TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",200,-80,80);
 
-Int_t gg_i(0);
+Int_t gg_i(0), gg_ind(0);
 TGraph gg_gr;
 PrtLutNode *fLutNode[5000];
 
@@ -59,8 +59,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 70,0.6,1); //150
-  fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 70,0.6,1); //150
+  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 100,0.6,1); //150
+  fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 100,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
 
@@ -170,6 +170,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if( fEvent->GetType()==1) momentum /= 1000;
     tofPid=fEvent->GetParticle();
     if(tofPid==212) tofPid=211;
+
     //if(tofPid!=211 && tofPid!=212) continue;
     //if(tofPid!=2212) continue;
 
@@ -232,12 +233,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       for(Int_t h=0; h<nHits; h++) {
 	Int_t pid=fEvent->GetHit(h).GetPixelId();
 	Int_t mid=fEvent->GetHit(h).GetMcpId();
-	if(mid!=mcpid || pid==piid) continue;
+	Double_t tdif=fabs(hitTime-fEvent->GetHit(h).GetLeadTime());
+	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
 	if(pid==piid-1 && piid%8!=1) x-=1;
 	if(pid==piid+1 && piid%8!=0) x+=1;
 
-	if(pid==piid+8 && piid<57) y+=1;
-	if(pid==piid-8 && piid>8)  y-=1;
+	if(pid==piid+8 && piid<57) y-=1;
+	if(pid==piid-8 && piid>8)  y+=1;
       }
       
       if(x== 0 && y== 0) nedge=0;
@@ -260,7 +262,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
 	//nedge=0;
 	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge);
-	//dird   = fLutNode[sensorId]->GetEntry(i);
+        //dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -295,9 +297,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(fabs(totaltime-hitTime)>test1) continue;
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);	  
-	  if(tangle > minChangle && tangle < maxChangle){
-	    fHist->Fill(tangle ,weight);
-	    if(samepath) fHisti->Fill(tangle ,weight);
+	  if(tangle > minChangle && tangle < maxChangle && tangle < 0.85){
+	    //fHist->Fill(tangle ,weight);
+	    //for(Int_t i=0; i<100; i++) fHist->Fill(gRandom->Gaus(tangle,0.003) ,weight);
+	    
+	    if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
 	      if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
@@ -325,8 +329,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(fLoopoverAll && nsEvents%ninfit==0){
       if(nsHits>5){
 	if(!FindPeak(cangle,spr, prtangle)) continue;
-	if(tofPid==2212) hLnDiffP->Fill(fillLnDiffPPi(cangle,tofPid,momentum));
-	if(tofPid==211) hLnDiffPi->Fill(fillLnDiffPPi(cangle,tofPid,momentum));
+	if(tofPid==2212) hLnDiffP->Fill(fillLnDiffPPi(cangle,tofPid,momentum)/1.);
+	if(tofPid==211) hLnDiffPi->Fill(fillLnDiffPPi(cangle,tofPid,momentum)/1.);
       
 	distPid = FindPdg(momentum,cangle);	 
 	nph = nsHits/(Double_t)ninfit;
@@ -354,15 +358,34 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl; 
     tree.Fill();
   }else{
-    if(!fVerbose) gROOT->SetBatch(1);
+    //if(!fVerbose) gROOT->SetBatch(1);
     canvasAdd("r_lhood",800,400);
     prt_normalize(hLnDiffP,hLnDiffPi);
     hLnDiffP->SetLineColor(2);
+
+    TF1 *ff;
+    Double_t m1,m2,s1,s2; 
+    if(hLnDiffP->GetEntries()>10){
+      hLnDiffP->Fit("gaus","S");
+      ff = hLnDiffP->GetFunction("gaus");
+      m1=ff->GetParameter(1);
+      s1=ff->GetParameter(2);
+    }
+    if(hLnDiffPi->GetEntries()>10){
+      hLnDiffPi->Fit("gaus","S");
+      ff = hLnDiffPi->GetFunction("gaus");
+      m2=ff->GetParameter(1);
+      s2=ff->GetParameter(2);
+    }
+    Double_t sep = (fabs(m1)+fabs(m2))/(0.5*(s1+s2));
+    std::cout<<"separation "<< sep <<std::endl;
+    
+    hLnDiffP->SetName(Form("s_%2.2f",sep));
     hLnDiffP->Draw();
     hLnDiffPi->SetLineColor(4);
     hLnDiffPi->Draw("same");
-    //waitPrimitive("r_lhood","");
     canvasSave(1,0);
+    //waitPrimitive("r_lhood","w");
     if(fVerbose) gROOT->SetBatch(0);
   }
   
@@ -383,17 +406,20 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
     else cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
     if(cangle>0.85) cangle=0.82;
-    fFit->SetParameters(100,cangle,0.010,10);
+    fFit->SetParameters(100,cangle,0.010);
     fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");
 
       
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
     fFit->SetParLimits(2,0.005,0.030); // width
+
+    fFit->FixParameter(3,0); 
+    fFit->FixParameter(4,0); 
     Int_t status(0);
     if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
     else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
-    //    std::cout<<"status  "<<status <<std::endl;    
+    
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
  
@@ -408,6 +434,29 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
       fHisti->SetLineColor(kRed+2);
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
+      canvasGet("r_tangle")->Update();
+      Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
+      Double_t mom(7);
+      Double_t angleP = acos(sqrt(mom*mom + mass[4]*mass[4])/mom/1.4712); //1.4712 (3.18 eV / 390 nm)
+      Double_t anglePi= acos(sqrt(mom*mom + mass[2]*mass[2])/mom/1.4712);
+      TLine *line = new TLine(0,0,0,1000);
+      line->SetX1(angleP);
+      line->SetX2(angleP);
+      line->SetY1(gPad->GetUymin());
+      line->SetY2(gPad->GetUymax());
+      line->SetLineColor(kRed);
+      line->Draw();
+
+      TLine *line2 = new TLine(0,0,0,1000);
+      line2->SetX1(anglePi);
+      line2->SetX2(anglePi);
+      line2->SetY1(gPad->GetUymin());
+      line2->SetY2(gPad->GetUymax());
+      line2->SetLineColor(kBlue);
+      line2->Draw();
+      std::cout<<"anglePi "<< anglePi<<std::endl;
+
+      
       canvasAdd("r_time",800,400);
       fHist1->SetTitle(Form("theta %3.1f", a));
       fHist1->SetLineColor(2);
@@ -418,7 +467,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
       fHist0->SetTitle(Form("theta %3.1f", a));
       fHist0->Draw();
       fHist0i->SetLineColor(kRed+2);
-      if(fHist0i->GetEntries()>5)  fHist0i->Draw("same");
+      if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
       
       canvasAdd("r_cm",800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
@@ -513,34 +562,27 @@ void PrtLutReco::ResetHists(){
   for(Int_t m=0; m<15;m++) fhDigi[m]->Reset();
 }
 
+
+TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
+TF1 *lFitPi = new TF1("lgausPi","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
+
 Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
  if(fHist->GetEntries()>20 ){
   Int_t pdg[]={11,13,211,321,2212};
   Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
 
-  Double_t angle1(0), angle2(0), sigma(0.006),range(0.06),
-    angleP = acos(sqrt(mom*mom + mass[4]*mass[4])/mom/1.46907); //1.46907 - fused silica
-  Double_t anglePi= acos(sqrt(mom*mom + mass[2]*mass[2])/mom/1.46907); //1.46907 - fused silica
+  Double_t angle1(0), angle2(0), sigma(0.006),range(0.2),
+    angleP = acos(sqrt(mom*mom + mass[4]*mass[4])/mom/1.4738)+0.000; //1.4738 = 370 = 3.35
+  Double_t anglePi= acos(sqrt(mom*mom + mass[2]*mass[2])/mom/1.4738)+0.000;
   
-  TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",angleP-range,angleP+range);
+  lFit->SetRange(angleP-range,angleP+range);
   lFit->FixParameter(0,fFit->GetParameter(0));
   lFit->FixParameter(1,angleP);
   if(fFit->GetParameter(2)>sigma) sigma=fFit->GetParameter(2);
   lFit->FixParameter(2,sigma);
   lFit->FixParameter(3,fFit->GetParameter(3));
   lFit->FixParameter(4,fFit->GetParameter(4));
-  
-  // lFit->SetParameters(100,cangle,0.010);
-  // lFit->SetParLimits(0,1,1E6);
-  // lFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-  // lFit->SetParLimits(2,0.01,0.01); // width
-  // lFit->FixParameter(1,angleP);
-
-  fFit->FixParameter(0,fFit->GetParameter(0));
-  fFit->FixParameter(1,angleP);
-  fFit->FixParameter(2,fFit->GetParameter(2));
-  fFit->FixParameter(3,fFit->GetParameter(3));
-  fFit->FixParameter(4,fFit->GetParameter(4));
+ 
 
   fHist->Fit("lgaus","lq","",angleP-range,angleP+range);
   Double_t amin,amin2,edm,errdef;
@@ -549,38 +591,34 @@ Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
   fitter->GetStats(amin,edm,errdef,nvpar,nparx);
   
 
-  TF1 *lFitPi = new TF1("lgausPi","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",anglePi-range,anglePi+range);
+  lFitPi->SetRange(anglePi-range,anglePi+range);
   lFitPi->SetLineColor(4);
   lFitPi->FixParameter(0,fFit->GetParameter(0));
   lFitPi->FixParameter(1,anglePi);
   lFitPi->FixParameter(2,sigma);
   lFitPi->FixParameter(3,fFit->GetParameter(3));
   lFitPi->FixParameter(4,fFit->GetParameter(4));
-  //lFitP->SetRange(angleP-0.02,angleP+0.02);
-  
+
   fHist->Fit("lgausPi","lq","",anglePi-range,anglePi+range);
   fitter = TVirtualFitter::Fitter(fHist);
   fitter->GetStats(amin2,edm,errdef,nvpar,nparx);
-
-  fFit->ReleaseParameter(0);
-  fFit->ReleaseParameter(1);
-  fFit->ReleaseParameter(2);
-  fFit->ReleaseParameter(3);
-  fFit->ReleaseParameter(4);
   
-  if(fVerbose) printf("tofPid %04d | %1.4f (%1.4f/%1.4f) \n",tofPid,cangle,angleP,anglePi);
+  if(fVerbose) printf("tofPid %04d | %1.4f (%1.4f/%1.4f) likelihood is %1.2f/%1.2f \n",tofPid,cangle,angleP,anglePi, amin, amin2);
+  gg_ind++;
 
-  // canvasAdd("ff",800,400);
-  // fHist->SetTitle(Form("%d",tofPid));
-  // fHist->Draw();
-  // lFit->SetLineColor(2);
-  // lFit->Draw("same");
-  // //if(fabs(amin-amin2)<5)
-  // waitPrimitive("ff");
-  // canvasDel("ff");
-  
-  lFit->Delete();
-  lFitPi->Delete();
+  if(fVerbose==1){
+    canvasAdd("ff",800,400);
+    //canvasAdd(Form("lh_%d",gg_ind),800,400);
+    fHist->SetTitle(Form("%d",tofPid));
+    fHist->Draw();
+    lFit->SetLineColor(2);
+    lFit->Draw("same");
+    //if(fabs(amin-amin2)<5)
+    waitPrimitive("ff");
+    canvasDel("ff");
+    //canvasSave(1,0);
+    //canvasDel(Form("lh_%d",gg_ind));
+  }
   
   return amin-amin2;
  }
@@ -607,7 +645,7 @@ void circleFcn2(Int_t &, Double_t *, Double_t &f, Double_t *par, Int_t) {
   f = 0;
   Double_t *x = gg_gr.GetX();
   Double_t *y = gg_gr.GetY();
-  for (Int_t i=0;i<np;i++) {
+  for (Int_t i=0;i<np;i++){
     Double_t u = x[i] + par[0];
     Double_t v = y[i] + par[1];
     Double_t dr = par[2] - TMath::Sqrt(u*u+v*v);

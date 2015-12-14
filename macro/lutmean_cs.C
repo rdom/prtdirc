@@ -1,4 +1,4 @@
-void lutmean_cs(TString baseFile = "../data/lut50M.root"){
+void lutmean_cs(TString baseFile = "../data/lut.root"){
   gROOT->ProcessLine(".L ../src/PrtLutNode.cxx+");
   gInterpreter->GenerateDictionary("vector<TVector3>","TVector3.h"); 
   

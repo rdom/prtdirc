@@ -6,6 +6,8 @@
 void drawScan(TString infile="../build/hits.root"){
   // infile="/SAT/hera/had1/dervish/data/prt/study/151/beam*Sx*.root";
   // infile="/SAT/hera/had1/dirc/testbeam/2015/proc/151/beam*C.root";
+
+  infile="/data.local/data/jun15/beam_15177135523C.root";
   
   fSavePath = "scan3";
   PrtInit(infile,1); //digi
