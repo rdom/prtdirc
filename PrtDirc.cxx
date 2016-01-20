@@ -51,7 +51,7 @@ int main(int argc,char** argv)
 
   G4String macro, events, geometry, radiator, physlist, outfile, 
     session,geomAng,batchmode,lensId,particle,momentum,testVal1,testVal2,
-    prismStepX,prismStepY,beamZ,beamX,
+    prismStepX,prismStepY,beamZ,beamX,timeRes,
     beamDimension, mcpLayout, infile = "hits.root", lutfile = "../data/lut.root";
   G4int firstevent(0), runtype(0), verbose(0);
 
@@ -80,8 +80,9 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-t2" ) testVal2   = argv[i+1];
     else if ( G4String(argv[i]) == "-gsx" ) prismStepX   = argv[i+1];
     else if ( G4String(argv[i]) == "-gsy" ) prismStepY   = argv[i+1];
-    else if ( G4String(argv[i]) == "-gz" ) beamZ   = argv[i+1];
-    else if ( G4String(argv[i]) == "-gx" ) beamX   = argv[i+1];
+    else if ( G4String(argv[i]) == "-gz" ) beamZ    = argv[i+1];
+    else if ( G4String(argv[i]) == "-gx" ) beamX    = argv[i+1];
+    else if ( G4String(argv[i]) == "-tr" ) timeRes  = argv[i+1];
     else if ( G4String(argv[i]) == "-v" ) verbose   = atoi(argv[i+1]);
     else {
       PrintUsage();
@@ -113,6 +114,7 @@ int main(int argc,char** argv)
   if(prismStepY.size())   PrtManager::Instance()->SetPrismStepY(atof(prismStepY));
   if(beamX.size())   PrtManager::Instance()->SetBeamX(atof(beamX));
   if(beamZ.size())   PrtManager::Instance()->SetBeamZ(atof(beamZ));
+  if(timeRes.size())   PrtManager::Instance()->SetTimeRes(atof(timeRes));
 
   //if(beamDimension.size())PrtManager::Instance()->SetTest1(atoi(beamDimension));
 

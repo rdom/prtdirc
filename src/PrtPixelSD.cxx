@@ -158,7 +158,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // time since track created
 
   G4double time = step->GetPreStepPoint()->GetLocalTime();
-  if(PrtManager::Instance()->GetRunType()==0) time = G4RandGauss::shoot(time,0.2); //resolution [ns]
+  if(PrtManager::Instance()->GetRunType()==0) time = G4RandGauss::shoot(time,PrtManager::Instance()->GetTimeRes()); //resolution [ns]
   hit.SetLeadTime(time);
   Double_t wavelength = 1.2398/(track->GetMomentum().mag()*1E6)*1000;
   hit.SetTotTime(wavelength); //set photon wavelength
@@ -167,7 +167,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
 
   Bool_t charge_sharing(true);
-  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()==2015 && true){
+  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()==2015 && charge_sharing){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) PrtManager::Instance()->AddHit(hit);
     else charge_sharing=false;
   }else{

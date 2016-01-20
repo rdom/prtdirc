@@ -45,6 +45,7 @@ public:
   Double_t GetPrismStepY(){ return fPrismStepY; }
   Double_t GetBeamX(){ return fBeamX; }
   Double_t GetBeamZ(){ return fBeamZ; }
+  Double_t GetTimeRes(){ return fTimeRes; }
   TString  GetInfo() { return fInfo; }
   
   // Mutators
@@ -67,6 +68,7 @@ public:
   void SetPrismStepY(Double_t val){ fPrismStepY = val; }
   void SetBeamX(Double_t val){ fBeamX = val; }
   void SetBeamZ(Double_t val){ fBeamZ = val; }
+  void SetTimeRes(Double_t val){ fTimeRes = val; }
   void SetInfo(TString val){ fInfo = val; }
 
 private: 
@@ -93,6 +95,7 @@ private:
   Double_t fPrismStepY;
   Double_t fBeamX;
   Double_t fBeamZ;
+  Double_t fTimeRes;
   TString  fInfo;
   
   ClassDef(PrtEvent, 4);
