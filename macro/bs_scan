@@ -1,6 +1,6 @@
 #!/bin/bash
 
-threads=5
+threads=30
 path="/d/proc/jun15/151"
 #path="/data.local/data/jun15/"
 
