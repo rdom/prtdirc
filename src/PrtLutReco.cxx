@@ -38,8 +38,8 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",200,-80,80);
-TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",200,-80,80);
+TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",200,-40,40);
+TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",200,-40,40);
 
 Int_t gg_i(0), gg_ind(0);
 TGraph gg_gr;
@@ -59,7 +59,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 100,0.6,1); //150
+  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
   fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 100,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
@@ -95,7 +95,7 @@ PrtLutReco::~PrtLutReco(){
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
-  Double_t cangle,spr,tangle,boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
+  Double_t cangle,spr,tangle,likelihood(0),boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
   Int_t  tofPid(0),distPid(0),likePid(0),pdgcode, evpointcount=0;
   Bool_t reflected = kFALSE;
   gStyle->SetOptFit(111);
@@ -107,7 +107,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),phi(0), trr(0),  nph(0),
-    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0);
+    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0),test3(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
   Double_t rad = TMath::Pi()/180.;
@@ -127,17 +127,19 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("trr", &trr,"trr/D");
   tree.Branch("nph",&nph,"nph/D");
   tree.Branch("cangle",&cangle,"cangle/D");
-  tree.Branch("par3",&par3,"par3/D");
+  tree.Branch("likelihood",&likelihood,"par3/D");
   tree.Branch("par4",&par4,"par4/D");
   tree.Branch("par5",&par5,"par5/D");
   tree.Branch("par6",&par6,"par6/D");
   tree.Branch("test1",&test1,"test1/D");
   tree.Branch("test2",&test2,"test2/D");
+  tree.Branch("test3",&test3,"test3/D");
   tree.Branch("theta",&theta,"theta/D");
   tree.Branch("phi",&phi,"phi/D");
 
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
+  test3 = PrtManager::Instance()->GetTest3();
   
   Int_t nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
@@ -159,7 +161,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
-      momInBar.RotateY(TMath::Pi()-prtangle*rad);
+      momInBar.RotateY(TMath::Pi()-prtangle*rad+test2);
+      momInBar.RotateX(test3);
       // momInBar = fEvent->GetMomentum().Unit();
       if(fVerbose==3){
 	cz = momInBar.Unit();
@@ -174,10 +177,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //if(tofPid!=211 && tofPid!=212) continue;
     //if(tofPid!=2212) continue;
 
-    // if( fEvent->GetType()==0){
-    //   if( fEvent->GetParticle()==2212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.90 || fEvent->GetTest1()>176) ) continue;
-    //   if( fEvent->GetParticle()==212 && fabs(fEvent->GetMomentum().Mag()-7)<0.1 && ( fEvent->GetTest1()<175.10 ||  fEvent->GetTest1()>175.2) ) continue;
-    // }
+    if( fEvent->GetType()==0){
+      if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
+	if( fEvent->GetParticle()==2212 && fEvent->GetTest1()<175.6 ) continue;
+	if( fEvent->GetParticle()==211  && fEvent->GetTest1()>175.1 ) continue;
+      }
+    }
 
     if(nHits<4) continue;
     for(Int_t h=0; h<nHits; h++) {
@@ -259,7 +264,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){
-	weight = 1; //fLutNode[sensorId]->GetWeight(i);
+	weight = 1; //10*fLutNode[sensorId]->GetWeight(i);
 	//nedge=0;
 	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge);
         dird   = fLutNode[sensorId]->GetEntry(i);
@@ -328,9 +333,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
     if(fLoopoverAll && nsEvents%ninfit==0){
       if(nsHits>5){
-	if(!FindPeak(cangle,spr, prtangle)) continue;
-	if(tofPid==2212) hLnDiffP->Fill(fillLnDiffPPi(cangle,tofPid,momentum)/1.);
-	if(tofPid==211) hLnDiffPi->Fill(fillLnDiffPPi(cangle,tofPid,momentum)/1.);
+	//if(!FindPeak(cangle,spr, prtangle)) continue;
+	likelihood = fillLnDiffPPi(cangle,tofPid,momentum)/1.;
+	if(tofPid==2212) hLnDiffP->Fill(likelihood);
+	if(tofPid==211) hLnDiffPi->Fill(likelihood);
       
 	distPid = FindPdg(momentum,cangle);	 
 	nph = nsHits/(Double_t)ninfit;
@@ -348,7 +354,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(++nsEvents>=end) break;
   }
 
-  if(!fLoopoverAll){    
+  if(!fLoopoverAll){
     FindPeak(cangle,spr, prtangle);
     nph = nsHits/(Double_t)nsEvents;
     spr = spr*1000;
@@ -377,7 +383,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       m2=ff->GetParameter(1);
       s2=ff->GetParameter(2);
     }
-    Double_t sep = (fabs(m1)+fabs(m2))/(0.5*(s1+s2));
+    Double_t sep = (fabs(m2-m1))/(0.5*(s1+s2));
     std::cout<<"separation "<< sep <<std::endl;
     
     hLnDiffP->SetName(Form("s_%2.2f",sep));
@@ -404,6 +410,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
     Int_t nfound = fSpect->Search(fHist,1,"",0.9); //0.6
     if(nfound>0) cangle = fSpect->GetPositionX()[0];
     else cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
+    cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
     if(cangle>0.85) cangle=0.82;
     fFit->SetParameters(100,cangle,0.010);
@@ -413,7 +420,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
     fFit->SetParLimits(2,0.005,0.030); // width
-
+    
+    // fFit->FixParameter(2,0.01); 
     // fFit->FixParameter(3,0); 
     // fFit->FixParameter(4,0); 
     Int_t status(0);
@@ -455,7 +463,6 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a){
       line2->SetLineColor(kBlue);
       line2->Draw();
       std::cout<<"anglePi "<< anglePi<<std::endl;
-
       
       canvasAdd("r_time",800,400);
       fHist1->SetTitle(Form("theta %3.1f", a));
@@ -566,40 +573,84 @@ void PrtLutReco::ResetHists(){
 TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
 TF1 *lFitPi = new TF1("lgausPi","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
 
+TF1 *gFp = new TF1("gaus0","[0]*exp(-0.5*((x-[1])/0.01)*(x-[1])/0.01)+1",0.7,0.9);
+TF1 *gFpi= new TF1("gaus0","[0]*exp(-0.5*((x-[1])/0.01)*(x-[1])/0.01)+1",0.7,0.9);
+
 Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
  if(fHist->GetEntries()>20 ){
   Int_t pdg[]={11,13,211,321,2212};
   Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
 
-  Double_t angle1(0), angle2(0), sigma(0.006),range(0.2),
-    angleP = acos(sqrt(mom*mom + mass[4]*mass[4])/mom/1.4738)+0.000; //1.4738 = 370 = 3.35
-  Double_t anglePi= acos(sqrt(mom*mom + mass[2]*mass[2])/mom/1.4738)+0.000;
+  Double_t angle1(0), angle2(0), sigma(0.006),range(0.03),
+    angleP = acos(sqrt(mom*mom + mass[4]*mass[4])/mom/1.4738)+0.00; //1.4738 = 370 = 3.35
+  Double_t anglePi= acos(sqrt(mom*mom + mass[2]*mass[2])/mom/1.4738)+0.00;
+
+  // gFp->SetParameter(0,fHist->GetMaximum());
+  // gFpi->SetParameter(0,fHist->GetMaximum());
+  // gFp->SetParameter(1,angleP);
+  // gFpi->SetParameter(1,anglePi);
+
+  // //fHist->Scale(1/fHist->GetMaximum());
+
+  // Double_t d1,d2, sum1(0),sum2(0);
+  // Int_t sbin = fHist->FindBin(angleP-range);
+  // Int_t ebin = fHist->FindBin(angleP+range); 
+  // // fHist->GetXaxis()->GetNbins()
+  // for(Int_t i=sbin; i< ebin; i++){
+  //   if(fHist->GetBinContent(i) < 0.01 ) continue;
+  //   d1 = gFp->Eval(fHist->GetBinCenter(i))- fHist->GetBinContent(i);
+  //   d2 = gFpi->Eval(fHist->GetBinCenter(i))- fHist->GetBinContent(i);
+
+  //   std::cout<<"f1 "<< gFp->Eval(fHist->GetBinCenter(i)) << "   f2 "<<gFpi->Eval(fHist->GetBinCenter(i)) << "    v "<< fHist->GetBinContent(i) <<std::endl;
+    
+  //   // if(d1>0) sum1+=TMath::Log(d1);
+  //   // if(d2>0) sum2+=TMath::Log(d2);
+  //   sum1+=TMath::Log(fabs(d1));
+  //   sum2+=TMath::Log(fabs(d2));
+
+  // }
+  // Double_t amin(sum1),amin2(sum2); 
   
-  lFit->SetRange(angleP-range,angleP+range);
-  lFit->FixParameter(0,fFit->GetParameter(0));
+  // lFit->SetRange(angleP-range,angleP+range);
+  // lFit->FixParameter(0,fFit->GetParameter(0));
+  // lFit->FixParameter(1,angleP);
+  // if(fFit->GetParameter(2)>sigma) sigma=fFit->GetParameter(2);
+  // lFit->FixParameter(2,sigma);
+  // lFit->FixParameter(3,fFit->GetParameter(3));
+  // lFit->FixParameter(4,fFit->GetParameter(4));
+    
+  lFit->SetRange(angleP-range,anglePi+range);
+  lFit->FixParameter(0,fHist->GetMaximum()-1);
   lFit->FixParameter(1,angleP);
-  if(fFit->GetParameter(2)>sigma) sigma=fFit->GetParameter(2);
-  lFit->FixParameter(2,sigma);
-  lFit->FixParameter(3,fFit->GetParameter(3));
-  lFit->FixParameter(4,fFit->GetParameter(4));
+  lFit->FixParameter(2,0.01);
+  lFit->FixParameter(3,0);
+  lFit->FixParameter(4,1);
  
 
-  fHist->Fit("lgaus","lq","",angleP-range,angleP+range);
+  fHist->Fit("lgaus","lq","",angleP-range,anglePi+range);
   Double_t amin,amin2,edm,errdef;
   Int_t nvpar,nparx;
   TVirtualFitter *fitter = TVirtualFitter::Fitter(fHist);
   fitter->GetStats(amin,edm,errdef,nvpar,nparx);
   
 
-  lFitPi->SetRange(anglePi-range,anglePi+range);
-  lFitPi->SetLineColor(4);
-  lFitPi->FixParameter(0,fFit->GetParameter(0));
-  lFitPi->FixParameter(1,anglePi);
-  lFitPi->FixParameter(2,sigma);
-  lFitPi->FixParameter(3,fFit->GetParameter(3));
-  lFitPi->FixParameter(4,fFit->GetParameter(4));
+  // lFitPi->SetRange(anglePi-range,anglePi+range);
+  // lFitPi->SetLineColor(4);
+  // lFitPi->FixParameter(0,fFit->GetParameter(0));
+  // lFitPi->FixParameter(1,anglePi);
+  // lFitPi->FixParameter(2,sigma);
+  // lFitPi->FixParameter(3,fFit->GetParameter(3));
+  // lFitPi->FixParameter(4,fFit->GetParameter(4));
 
-  fHist->Fit("lgausPi","lq","",anglePi-range,anglePi+range);
+  lFitPi->SetRange(angleP-range,anglePi+range);
+  lFitPi->SetLineColor(4);
+  lFitPi->FixParameter(0,fHist->GetMaximum()-1);
+  lFitPi->FixParameter(1,anglePi);
+  lFitPi->FixParameter(2,0.01);
+  lFitPi->FixParameter(3,0);
+  lFitPi->FixParameter(4,1);
+
+  fHist->Fit("lgausPi","lq","",angleP-range,anglePi+range);
   fitter = TVirtualFitter::Fitter(fHist);
   fitter->GetStats(amin2,edm,errdef,nvpar,nparx);
   
@@ -613,6 +664,10 @@ Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
     fHist->Draw();
     lFit->SetLineColor(2);
     lFit->Draw("same");
+    // gFp->Draw("same");
+    // gFpi->SetLineColor(4);
+    // gFpi->Draw("same");
+     
     //if(fabs(amin-amin2)<5)
     waitPrimitive("ff");
     canvasDel("ff");
@@ -698,6 +753,7 @@ Int_t PrtLutReco::FindPdg(Double_t mom, Double_t cangle){
   // Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
   // Int_t pdg[]={211,321,2212};
   // Double_t mass[] = {0.139570,0.49368,0.9382723};
+  cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
   
   Int_t pdg[]={211,2212};
   Double_t mass[] = {0.139570,0.9382723};
