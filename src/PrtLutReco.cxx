@@ -393,6 +393,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     canvasSave(1,0);
     //waitPrimitive("r_lhood","w");
     if(fVerbose) gROOT->SetBatch(0);
+    tree.Fill();
   }
   
   ResetHists();
