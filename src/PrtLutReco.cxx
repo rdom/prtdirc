@@ -107,7 +107,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),phi(0), trr(0),  nph(0),
-    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0),test3(0);
+    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0),test3(0),separation(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
   Double_t rad = TMath::Pi()/180.;
@@ -128,7 +128,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("nph",&nph,"nph/D");
   tree.Branch("cangle",&cangle,"cangle/D");
   tree.Branch("likelihood",&likelihood,"par3/D");
-  tree.Branch("par4",&par4,"par4/D");
+  tree.Branch("separation",&separation,"separation/D");
   tree.Branch("par5",&par5,"par5/D");
   tree.Branch("par6",&par6,"par6/D");
   tree.Branch("test1",&test1,"test1/D");
@@ -383,10 +383,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       m2=ff->GetParameter(1);
       s2=ff->GetParameter(2);
     }
-    Double_t sep = (fabs(m2-m1))/(0.5*(s1+s2));
-    std::cout<<"separation "<< sep <<std::endl;
+    separation = (fabs(m2-m1))/(0.5*(s1+s2));
+    std::cout<<"separation "<< separation <<std::endl;
     
-    hLnDiffP->SetName(Form("s_%2.2f",sep));
+    hLnDiffP->SetName(Form("s_%2.2f",separation));
     hLnDiffP->Draw();
     hLnDiffPi->SetLineColor(4);
     hLnDiffPi->Draw("same");
