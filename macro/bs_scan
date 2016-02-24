@@ -20,7 +20,7 @@ statusline="Reco"
 for i in -0.01 0.001 0.01 ; do
     for j in -0.01 0.001 0.01 ; do
 	echo  r_b_${i}_${j}.root
-	../build/prtdirc -s 2 -u ${path}/lut_beam_15177135523S10M_cs_avr.root -i ${path}/beam_15177135523C.root -o r_b_${i}_${j}.root -t1 1.5 -f -1 -e 1000 -v 0 -t2 ${i} -t3 ${j} -b 1   #> /dev/null 2> /dev/null &
+	../build/prtdirc -s 2 -u ${path}/lut_beam_15177135523S10M_cs_avr.root -i ${path}/beam_15177135523C.root -o r_b_${i}_${j}.root -t1 1.5 -f -1 -e 1000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
 	waitForMe $threads
     done
 done
