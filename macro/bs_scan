@@ -28,5 +28,5 @@ printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]         \n"
 
 
 sleep 2
-hadd r_sscan.root r_b_*.root
+hadd -f r_sscan.root r_b_*.root
 rm r_b_*.root 
