@@ -161,8 +161,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
-      momInBar.RotateY(TMath::Pi()-prtangle*rad+test2);
-      momInBar.RotateX(test3);
+      momInBar.RotateY(TMath::Pi()-prtangle*rad-0.0045);
+      momInBar.RotateX(0.0045);
       // momInBar = fEvent->GetMomentum().Unit();
       if(fVerbose==3){
 	cz = momInBar.Unit();
