@@ -32,10 +32,11 @@ public:
   void Run(Int_t start=0, Int_t end=0);
 
 private:
-  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Double_t a);
+  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Double_t a, Int_t tofpid=0);
   Int_t FindPdg(Double_t mom, Double_t cangle);
   void FitRing(Double_t& x0, Double_t& y0, Double_t& theta);
   Double_t fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom);
+  Double_t fillLnDiffPPi2(Double_t cangle, Int_t tofPid, Double_t mom);
   void ResetHists();
   Int_t fDetectorID;  
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
@@ -59,6 +60,8 @@ private:
   TF1 *fFit;
   TSpectrum *fSpect;
   Bool_t fLoopoverAll;
+  Double_t fAngleP;
+  Double_t fAnglePi;
 
 };
 
