@@ -200,12 +200,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       studyId = fEvent->GetGeometry();
       Double_t beamdiv(0);
       // if(fEvent->GetType()==0)  beamdiv=0.0025;
-      momInBar.SetTheta(test2);
-      momInBar.SetPhi(test3);
-      momInBar.RotateY(TMath::Pi()-prtangle*rad);
       
-      // momInBar.RotateY(TMath::Pi()-prtangle*rad-beamdiv);
-      // momInBar.RotateX(beamdiv);
+      momInBar.RotateY(TMath::Pi()-prtangle*rad+test2);
+      momInBar.RotateX(test3);
 
       // momInBar = fEvent->GetMomentum().Unit();
       if(fVerbose==3){

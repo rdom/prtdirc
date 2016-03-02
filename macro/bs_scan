@@ -1,7 +1,7 @@
 #!/bin/bash
 
 threads=30
-path="/d/proc/jun15/151"
+path="/d/proc/jun15/160"
 #path="/data.local/data/jun15/"
 
 waitForMe (){
@@ -38,9 +38,9 @@ fi
 
 if [ ${1} == "2" ]; then
     statusline="Divergence scan "
-    for i in `seq -0.015 0.0005 0.015` ; do
-	for j in `seq 0 0.105 6.3` ; do
-	    ../build/prtdirc -s 2 -u ${path}/lut_beam_15177135523S10M_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 1000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
+    for i in `seq -0.02 0.0005 0.02` ; do
+	for j in `seq  -0.02 0.0005 0.02` ; do
+	    ../build/prtdirc -s 2 -u ${path}/lut_beam_15178202056S10M_cs_avr.root -i ${path}/beam_15178202056C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 1000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
 	    waitForMe $threads
 	done
     done
