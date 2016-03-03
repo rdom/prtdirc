@@ -1,7 +1,7 @@
 #!/bin/bash
 
 threads=30
-path="/d/proc/jun15/160"
+path="/d/proc/jun15/151"
 #path="/data.local/data/jun15/"
 
 waitForMe (){
@@ -24,12 +24,12 @@ if [ ${1} == "0" ]; then
     statusline="X step scan "
     for i in `seq 12 0.25 22` ; do
 	for j in `seq 60 0.25 75` ; do	
-	    ../build/prtdirc -o b_l$i.root \
+	    ../build/prtdirc -o b_l${i}_${j}.root \
 			     -p 7 -h 1 -l 3 -a 125 -gz 378 -gx 85 -gsx ${j} -gsy ${i} -z 10  -g 2015 -c 2015 \
 			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 \
 			     > l_b$i.log && \
-		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}${j}.root\")" && \
-		../build/prtdirc -s 2 -u b_l${i}_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}.root -t1 1.5 -f -1 -e 2000 -v 0 -b 1 -t2 $j  -t3 $i > /dev/null 2> /dev/null &
+		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}_${j}.root\")" && \
+		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -b 1 -t2 $i  -t3 $j > /dev/null 2> /dev/null &
 	done
     done
     waitForMe "1"
