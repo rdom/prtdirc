@@ -20,9 +20,27 @@ start_time=$(date +%s)
 
 rm b_*.root 
 
+if [ ${1} == "0" ]; then
+    statusline="X step scan "
+    for i in `seq 12 0.25 22` ; do
+	for j in `seq 60 0.25 75` ; do	
+	    ../build/prtdirc -o b_l$i.root \
+			     -p 7 -h 1 -l 3 -a 125 -gz 378 -gx 85 -gsx ${j} -gsy ${i} -z 10  -g 2015 -c 2015 \
+			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 \
+			     > l_b$i.log && \
+		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}${j}.root\")" && \
+		../build/prtdirc -s 2 -u b_l${i}_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}.root -t1 1.5 -f -1 -e 2000 -v 0 -b 1 -t2 $j  -t3 $i > /dev/null 2> /dev/null &
+	done
+    done
+    waitForMe "1"
+
+    hadd -f r_step_scan.root b_r_*.root
+    printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]         \n"
+fi
+
 if [ ${1} == "1" ]; then
     statusline="Y step scan "
-    for i in `seq 10 0.5 25` ; do
+    for i in `seq 12 0.25 22` ; do
 	../build/prtdirc -o b_l$i.root \
 			 -p 7 -h 1 -l 3 -a 125 -gz 378 -gx 85 -gsx 67.5 -gsy ${i} -z 10  -g 2015 -c 2015 \
 			 -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 5000000 -b 1 \
@@ -38,9 +56,9 @@ fi
 
 if [ ${1} == "2" ]; then
     statusline="Divergence scan "
-    for i in `seq -0.02 0.0005 0.02` ; do
-	for j in `seq  -0.02 0.0005 0.02` ; do
-	    ../build/prtdirc -s 2 -u ${path}/lut_beam_15178202056S10M_cs_avr.root -i ${path}/beam_15178202056C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 1000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
+    for i in `seq -0.025 0.0005 0.025` ; do
+	for j in `seq  -0.025 0.0005 0.025` ; do
+	    ../build/prtdirc -s 2 -u ${path}/lut_beam_15177135523S10M_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
 	    waitForMe $threads
 	done
     done
