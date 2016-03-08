@@ -42,8 +42,8 @@ TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#var
 TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",200,-30,30);
 TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",200,-30,30);
 
-TF1 *gF1 = new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/0.01)",0.7,0.9);
-TF1 *gF2= new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/0.01)",0.7,0.9);
+TF1 *gF1 = new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
+TF1 *gF2= new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
 
 Int_t gg_i(0), gg_ind(0);
 TGraph gg_gr;
@@ -199,8 +199,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
       if(fEvent->GetType()==0){
-	momInBar.RotateY(TMath::Pi()-prtangle*rad+test2);
-	momInBar.RotateX(test3);
+	momInBar.RotateY(TMath::Pi()-prtangle*rad-0.0045);
+	momInBar.RotateX(0.0045);
       }else{
 	momInBar.RotateY(TMath::Pi()-prtangle*rad);
       }
@@ -221,8 +221,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};    
     Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.009),range(5*sigma),noise(0.3);
     
-    fAngleP = acos(sqrt(momentum*momentum+ mass[4]*mass[4])/momentum/1.4738); //1.4738 = 370 = 3.35
-    fAnglePi= acos(sqrt(momentum*momentum + mass[2]*mass[2])/momentum/1.4738);
+    fAngleP = acos(sqrt(momentum*momentum+ mass[4]*mass[4])/momentum/1.4738)-0.002; //1.4738 = 370 = 3.35
+    fAnglePi= acos(sqrt(momentum*momentum + mass[2]*mass[2])/momentum/1.4738)-0.002;
 
     gF1->SetParameter(0,1);
     gF2->SetParameter(0,1);
@@ -303,17 +303,17 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(badcannel(ch)) continue;
       //      if(cluster[mcpid][pixid]>8) continue;
   
-      Int_t x(0),y(0), piid(pixid+1) , nedge(0);
+      Int_t x(0),y(0), piid(pixid) , nedge(0);
       for(Int_t h=0; h<nHits; h++) {
 	Int_t pid=fEvent->GetHit(h).GetPixelId();
 	Int_t mid=fEvent->GetHit(h).GetMcpId();
 	Double_t tdif=fabs(hitTime-fEvent->GetHit(h).GetLeadTime());
 	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
-	if(pid==piid-1 && piid%8!=1) x-=1;
-	if(pid==piid+1 && piid%8!=0) x+=1;
+	if(pid==piid-1 && piid%8!=0) y-=1;
+	if(pid==piid+1 && piid%8!=7) y+=1;
 
-	if(pid==piid+8 && piid<57) y-=1;
-	if(pid==piid-8 && piid>8)  y+=1;
+	if(pid==piid+8 && piid<57) x-=1;
+	if(pid==piid-8 && piid>8)  x+=1;
       }
       
       if(x== 0 && y== 0) nedge=0;
@@ -326,6 +326,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(x== 0 && y==-1) nedge=7;
       if(x==-1 && y==-1) nedge=8;
 
+      //std::cout<< pixid << " nedge "<<nedge <<" x " <<x << "  y  "<<y<<std::endl;
+      
+
       Int_t sensorId = 100*mcpid+fHit.GetPixelId();
       if(sensorId==1) continue;
 
@@ -334,8 +337,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        //dird   = fLutNode[sensorId]->GetEntry(i);
+	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
+        dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -494,8 +497,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     separation = (fabs(m2-m1))/(0.5*(s1+s2));
     std::cout<<"separation "<< separation <<std::endl;
 
-    gStyle->SetOptFit(0);
-    gStyle->SetOptStat(0);
+    //gStyle->SetOptFit(0);
+    //gStyle->SetOptStat(0);
     
     hLnDiffP->SetName(Form("s_%2.2f",separation));
     hLnDiffP->Draw();
