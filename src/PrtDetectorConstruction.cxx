@@ -736,7 +736,7 @@ void PrtDetectorConstruction::SetVisualization(){
   lExpHall->SetVisAttributes(waExpHall);
 
   G4VisAttributes *waDirc = new G4VisAttributes(DircColour);
-  //waDirc->SetVisibility(false);
+  waDirc->SetVisibility(false);
   lDirc->SetVisAttributes(waDirc);
 
   G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
