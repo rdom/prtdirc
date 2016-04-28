@@ -166,7 +166,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
 
-  Bool_t charge_sharing(true);
+  Bool_t charge_sharing(false);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()==2015 && charge_sharing){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) PrtManager::Instance()->AddHit(hit);
     else charge_sharing=false;
