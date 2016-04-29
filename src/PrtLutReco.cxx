@@ -390,7 +390,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
-	      if(studyId<160 && fabs(tangle-0.815)<0.07) isGoodHit=true; //test2
+	      if(studyId<160 && fabs(tangle-0.815)<0.04) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
 	    }
 	    
@@ -540,8 +540,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     // fFit->FixParameter(3,0); 
     // fFit->FixParameter(4,0); 
     Int_t status(0);
-    // if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
-    // else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
+    if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
+    else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
     
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
@@ -553,10 +553,10 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
-      fHist->Scale(1/fHist->GetMaximum());
+      //fHist->Scale(1/fHist->GetMaximum());
       fHist->Draw();
-      gF1->Draw("same");
-      gF2->Draw("same");
+      // gF1->Draw("same");
+      // gF2->Draw("same");
       fHisti->SetLineColor(kRed+2);
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
