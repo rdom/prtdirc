@@ -198,9 +198,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
+      Double_t beam_corr(0);
+      if(studyId==151) beam_corr = 0.0045;
       if(fEvent->GetType()==0){
-	momInBar.RotateY(TMath::Pi()-prtangle*rad-0.0045);
-	momInBar.RotateX(0.0045);
+	momInBar.RotateY(TMath::Pi()-prtangle*rad-beam_corr);
+	momInBar.RotateX(beam_corr);
       }else{
 	momInBar.RotateY(TMath::Pi()-prtangle*rad);
       }
@@ -276,8 +278,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       	if(prtangle<=80){
       	  if(hitTime<11 || hitTime>45) continue;
       	  reflected = kTRUE;
-      	}else if(prtangle>=95){
-      	  if(hitTime<3 || hitTime>30) continue;
+      	}else if(prtangle>94){
+      	  if(hitTime<3 || hitTime>20) continue;
       	  reflected = kFALSE;
       	}else{
       	  if(hitTime<14)  reflected = kFALSE; //13.5
@@ -287,10 +289,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       if(studyId==159){	
 	if(prtangle < 80) test1=1.5;
-	if(prtangle > 100) test1=1;
+	if(prtangle > 100) test1=0.8;
 	if(prtangle > 80 and prtangle<100) test1=2;	
       }
-
+ 
       //==================================================
       
       Double_t radiatorL = 1250; //bar
@@ -565,7 +567,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     // fFit->FixParameter(4,0); 
     Int_t status(0);
     if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
-    else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
+    else status =fHist->Fit("fgaus","M","",cangle-0.08,cangle+0.08); //0.05
     
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
