@@ -416,7 +416,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
-	      if(studyId<160 && fabs(tangle-0.815)<0.04) isGoodHit=true; //test2
+	      if(studyId<160 && fabs(tangle-0.815)<0.03) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
 	    }
 	    
