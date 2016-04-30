@@ -289,7 +289,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       if(studyId==159){	
 	if(prtangle < 80) test1=1.5;
-	if(prtangle > 100) test1=1;
+	if(prtangle > 100) test1=0.8;
 	if(prtangle > 80 and prtangle<100) test1=2;	
       }
  
@@ -567,7 +567,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     // fFit->FixParameter(4,0); 
     Int_t status(0);
     if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
-    else status =fHist->Fit("fgaus","M","",cangle-0.08,cangle+0.08); //0.05
+    else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
     
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
