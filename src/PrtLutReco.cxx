@@ -270,6 +270,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       	}
       }
       
+      if(studyId==159){ // dynamic cuts
+	if(prtangle < 80) test1=1.5;
+	if(prtangle > 100) test1=1;
+	if(prtangle > 80 and prtangle<100) test1=2;	
+      }
+      
       Double_t radiatorL = 1250; //bar
 
       if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==175 || studyId==176 || studyId==177 || studyId==178){
@@ -370,7 +376,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
-	  if(fabs(totaltime-hitTime)>test1) continue;
+	  if(fabs(totaltime-hitTime)>test1) continue;	  
+	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
