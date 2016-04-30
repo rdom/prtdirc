@@ -256,25 +256,42 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      
+
+      //======================================== dynamic cuts
+
+      // { //time cuts
+      // 	if(prtangle<=80){
+      // 	  if(hitTime<11 || hitTime>35) continue;
+      // 	  reflected = kTRUE;
+      // 	}else if(prtangle>=95){
+      // 	  if(hitTime<3 || hitTime>20) continue;
+      // 	  reflected = kFALSE;
+      // 	}else{
+      // 	  if(hitTime<13.5)  reflected = kFALSE; //13.5
+      // 	  else reflected = kTRUE;
+      // 	}
+      // }
+
       { //time cuts
       	if(prtangle<=80){
-      	  if(hitTime<11 || hitTime>35) continue;
+      	  if(hitTime<11 || hitTime>45) continue;
       	  reflected = kTRUE;
       	}else if(prtangle>=95){
-      	  if(hitTime<3 || hitTime>20) continue;
+      	  if(hitTime<3 || hitTime>30) continue;
       	  reflected = kFALSE;
       	}else{
-      	  if(hitTime<13.5)  reflected = kFALSE; //13.5
+      	  if(hitTime<14)  reflected = kFALSE; //13.5
       	  else reflected = kTRUE;
       	}
       }
       
-      if(studyId==159){ // dynamic cuts
+      if(studyId==159){	
 	if(prtangle < 80) test1=1.5;
 	if(prtangle > 100) test1=1;
 	if(prtangle > 80 and prtangle<100) test1=2;	
       }
+
+      //==================================================
       
       Double_t radiatorL = 1250; //bar
 
