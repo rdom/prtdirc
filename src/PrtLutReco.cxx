@@ -567,7 +567,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     // fFit->FixParameter(4,0); 
     Int_t status(0);
     if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
-    else status =fHist->Fit("fgaus","M","",cangle-0.05,cangle+0.05);
+    else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
     
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
