@@ -234,7 +234,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    //if(tofPid!=2212) continue;
+    if(tofPid!=2212) continue;
 
     if( fEvent->GetType()==0){
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
