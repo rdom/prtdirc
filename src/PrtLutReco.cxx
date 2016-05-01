@@ -255,7 +255,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      if(fEvent->GetType()==0) hitTime+=fRand.Gaus(0,2); // time resol. in case it was not simulated
+      if(fEvent->GetType()!=0) hitTime+=fRand.Gaus(0,2); // time resol. in case it was not simulated
 	
       //======================================== dynamic cuts
 
