@@ -362,8 +362,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        dird   = fLutNode[sensorId]->GetEntry(i);
+	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
+        //dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
