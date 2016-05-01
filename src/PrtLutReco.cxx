@@ -287,7 +287,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       	  else reflected = kTRUE;
       	}
       }
-      
+
+      if(studyId==152 || studyId==153){	 //plate
+	test1=100;
+      }
+       
       if(studyId==157){	
 	test1=2.5;
       }
@@ -427,9 +431,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
-	      if(studyId<160 && fabs(tangle-0.815)<0.03) isGoodHit=true; //test2
+	      if(fabs(tangle-0.815)<0.04) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
 	    }
+	    if(studyId==152 || studyId==153) isGoodHit=true;
 	    
 	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
