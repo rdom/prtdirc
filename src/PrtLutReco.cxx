@@ -127,8 +127,6 @@ void getclusters(){
 }
 
 
-
-
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
@@ -238,7 +236,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
     if(tofPid!=2212) continue;
 
-    if( fEvent->GetType()==0){
+    if( studyId==151 && fEvent->GetType()==0){
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
 	if( fEvent->GetParticle()==2212 && fEvent->GetTest1()<175.6 ) continue;
 	if( fEvent->GetParticle()==211  && fEvent->GetTest1()>175.1 ) continue;
@@ -289,7 +287,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       if(studyId==159){	
 	if(prtangle < 80) test1=1.5;
-	if(prtangle > 100) test1=1.0;
+	if(prtangle > 100) test1=0.8;
 	if(prtangle > 80 and prtangle<100) test1=2;	
       }
  
@@ -416,7 +414,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
-	      if(studyId<160 && fabs(tangle-0.815)<0.02) isGoodHit=true; //test2
+	      if(studyId<160 && fabs(tangle-0.815)<0.03) isGoodHit=true; //test2
 	      if(studyId>=160) isGoodHit=true;
 	    }
 	    
@@ -439,12 +437,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     } 
 
-    for(Int_t j=0; j<15; j++){
-      for(Int_t i=0; i<65; i++){
-	mcpdata[j][i]=0;
-	cluster[j][i]=0;
-      }
-    }    
+    // for(Int_t j=0; j<15; j++){
+    //   for(Int_t i=0; i<65; i++){
+    // 	mcpdata[j][i]=0;
+    // 	cluster[j][i]=0;
+    //   }
+    // }      
 
     Double_t sum = sum1-sum2;
 
