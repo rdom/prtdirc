@@ -19,6 +19,8 @@
 #include "TH2.h"
 #include "TF1.h"
 #include "TSpectrum.h"
+#include "TRandom.h"
+
 
 class PrtLutReco{
 
@@ -40,6 +42,7 @@ private:
   void ResetHists();
   Int_t fDetectorID;  
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
+  TRandom fRand;
 
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;

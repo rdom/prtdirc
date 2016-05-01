@@ -147,7 +147,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t maxChangle(1);
   Double_t rad = TMath::Pi()/180.;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
-  TRandom rnd;
 
   SetRootPalette(1);
   CreateMap();
@@ -236,7 +235,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
     if(tofPid!=2212) continue;
 
-    if( studyId==151 && fEvent->GetType()==0){
+    if(fEvent->GetType()==0){
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
 	if( fEvent->GetParticle()==2212 && fEvent->GetTest1()<175.6 ) continue;
 	if( fEvent->GetParticle()==211  && fEvent->GetTest1()>175.1 ) continue;
@@ -256,7 +255,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-
+      if(fEvent->GetType()==0) hitTime+=fRand.Gaus(0,2); // time resol. in case it was not simulated
+	
       //======================================== dynamic cuts
 
       // { //time cuts
