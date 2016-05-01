@@ -296,7 +296,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
       if(studyId==154){	
 	test1=1;
-	if(prtangle > 100) test1=0.8;
+	if(prtangle > 100) test1=0.7;
        }
       if(studyId==159){	
 	if(prtangle < 80) test1=1.5;
