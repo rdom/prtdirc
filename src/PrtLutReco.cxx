@@ -289,7 +289,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
       
       if(studyId==157){	
-	test1=2;
+	test1=2.5;
       }
       if(studyId==150){	
 	test1=2;
