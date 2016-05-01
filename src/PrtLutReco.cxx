@@ -284,7 +284,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       	  else reflected = kTRUE;
       	}
       }
-      
+
+      if(studyId==150){	
+	test1=2;
+      }
       if(studyId==159){	
 	if(prtangle < 80) test1=1.5;
 	if(prtangle > 100) test1=0.8;
