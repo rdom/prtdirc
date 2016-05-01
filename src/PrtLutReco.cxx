@@ -272,9 +272,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // 	}
       // }
 
+
+      Double_t cut1(11);
+      if(studyId==157 || studyId==155) cut1=8;
       { //time cuts
       	if(prtangle<=80){
-      	  if(hitTime<11 || hitTime>45) continue;
+	  if(hitTime<cut1 || hitTime>45) continue;
       	  reflected = kTRUE;
       	}else if(prtangle>94){
       	  if(hitTime<3 || hitTime>20) continue;
@@ -284,7 +287,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       	  else reflected = kTRUE;
       	}
       }
-
+      
+      if(studyId==157){	
+	if(prtangle < 80) test1=1.5;
+	if(prtangle > 100) test1=0.8;
+	if(prtangle > 80 and prtangle<100) test1=1.5;	
+      }
       if(studyId==150){	
 	test1=2;
       }
