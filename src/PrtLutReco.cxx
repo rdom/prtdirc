@@ -52,7 +52,6 @@ PrtLutNode *fLutNode[5000];
 // -----   Default constructor   -------------------------------------------
 PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fVerbose = verbose;
-  fLoopoverAll = false;
   fChain = new TChain("data");
   fChain->Add(infile);
   fChain->SetBranchAddress("PrtEvent", &fEvent);
@@ -130,7 +129,7 @@ void getclusters(){
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
-  Double_t cangle,spr,tangle,likelihood(0),boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
+  Double_t mom, cangle,spr,tangle,likelihood(0),boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
   Int_t  tofPid(0),distPid(0),likePid(0),pdgcode, evpointcount=0;
   Bool_t reflected = kFALSE;
   gStyle->SetOptFit(111);
@@ -154,6 +153,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   
   TFile file(outFile,"recreate");
   TTree tree("dirc","SPR");
+  tree.Branch("mom", &mom,"mom/D");
   tree.Branch("tofPid", &tofPid,"tofPid/I");
   tree.Branch("distPid", &distPid,"distPid/I");
   tree.Branch("likePid", &likePid,"likePid/I");
@@ -174,15 +174,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
   test3 = PrtManager::Instance()->GetTest3();
+  fMethod = PrtManager::Instance()->GetRunType();
   
   Int_t nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
   
   std::cout<<"Run started for ["<<start<<","<<end <<"]"<<std::endl;
-  Int_t nsHits(0),nsEvents(0),studyId(0), nHits(0), ninfit(0);
+  Int_t nsHits(0),nsEvents(0),studyId(0), nHits(0), ninfit(1);
 
   if(start<0) {
-    fLoopoverAll=true;
     ninfit=abs(start);
     start=0;
   }
@@ -195,6 +195,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
+      mom=fEvent->GetMomentum().Mag();
       Double_t beam_corr(0);
       if(studyId==151) beam_corr = 0.0045;
       if(fEvent->GetType()==0){
@@ -233,7 +234,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    if(tofPid!=2212) continue;
+    if(fMethod==2 && tofPid!=2212) continue;
 
     if(fEvent->GetType()==0){
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
@@ -271,7 +272,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // 	  else reflected = kTRUE;
       // 	}
       // }
-
 
       Double_t cut1(11);
       if(studyId==157 || studyId==155) cut1=8;
@@ -481,12 +481,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //   //canvasDel(Form("lh_%d",gg_ind));
     // }
 	
-    if(fVerbose &&  fLoopoverAll && nsEvents%ninfit==0){
+    if(fVerbose==2 &&  fMethod==3 && nsEvents%ninfit==0){
       if(nsHits>5){
-        if(tofPid==2212 && sum > 0) {
+        if(tofPid==2212 && sum > 0){
 	  std::cout<<"p  "<<sum1 << "   pi "<<sum2 << "  s "<< sum<<std::endl;
-	  if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;
+	  if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;	  
 	}
+
 	// likelihood = fillLnDiffPPi(cangle,tofPid,momentum);
 	// if(tofPid==2212) hLnDiffP->Fill(likelihood);
 	// if(tofPid==211) hLnDiffPi->Fill(likelihood);
@@ -497,7 +498,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	trr = spr/sqrt(nph);
 	theta = fEvent->GetAngle();
 	par3 = fEvent->GetTest1();
-	if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl; 
 	tree.Fill();
       }
       ResetHists();
@@ -507,7 +507,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(++nsEvents>=end) break;
   }
 
-  if(!fLoopoverAll){
+  if(fMethod==2){
     FindPeak(cangle,spr, prtangle);
     nph = nsHits/(Double_t)nsEvents;
     spr = spr*1000;
@@ -572,7 +572,6 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     if(cangle>0.85) cangle=0.82;
     fFit->SetParameters(100,cangle,0.010);
     fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");
-
       
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
@@ -582,7 +581,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     // fFit->FixParameter(3,0); 
     // fFit->FixParameter(4,0); 
     Int_t status(0);
-    if(fLoopoverAll) status = fHist->Fit("fgaus","lq","",0.6,1);
+    if(fMethod==3) status = fHist->Fit("fgaus","lq","",0.6,1);
     else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
     
     cangle = fFit->GetParameter(1);
@@ -591,7 +590,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     if(fVerbose>1) gROOT->SetBatch(0);
     
     Bool_t storePics(true);
-    if(storePics && (!fLoopoverAll || fVerbose==2)){
+    if(storePics && (fMethod==2 || fVerbose==2)){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);

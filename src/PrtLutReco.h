@@ -43,6 +43,7 @@ private:
   Int_t fDetectorID;  
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
   TRandom fRand;
+  Int_t fMethod;
 
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
@@ -62,7 +63,6 @@ private:
   TH1F *fHisti;
   TF1 *fFit;
   TSpectrum *fSpect;
-  Bool_t fLoopoverAll;
   Double_t fAngleP;
   Double_t fAnglePi;
 

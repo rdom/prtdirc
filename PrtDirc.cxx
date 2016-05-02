@@ -94,7 +94,7 @@ int main(int argc,char** argv)
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
   if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = "../data/lut.root";  // lookup table generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
-  if(outfile=="" && runtype == 2) outfile = "reco.root"; // reconstruction
+  if(outfile=="" && (runtype == 2 || runtype == 3)) outfile = "reco.root"; // reconstruction
 
   if(batchmode.size()) gROOT->SetBatch(kTRUE);
   if(!events.size()) events = "1";
@@ -120,7 +120,7 @@ int main(int argc,char** argv)
 
   //if(beamDimension.size())PrtManager::Instance()->SetTest1(atoi(beamDimension));
 
-  if(runtype == 2){
+  if(runtype == 2 || runtype == 3){
     PrtLutReco * reco = new PrtLutReco(infile.c_str(),lutfile.c_str(),verbose); 
     reco->Run(firstevent, atoi(events));
     return 0;
