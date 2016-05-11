@@ -1,6 +1,7 @@
 #define prt__sim
 #include "../src/PrtHit.h"
 #include "../src/PrtEvent.h"
+#include "../../prttools/datainfo.C"
 #include "../../prttools/prttools.C"
 
 const Double_t prismangle = 45;

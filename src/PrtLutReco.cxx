@@ -95,7 +95,6 @@ PrtLutReco::~PrtLutReco(){
 
 }
 
-
 Int_t mcpdata[15][65];
 Int_t cluster[15][65];
 Int_t lneighbours[65];
@@ -124,7 +123,6 @@ void getclusters(){
     }
   }
 }
-
 
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
@@ -174,6 +172,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
   test3 = PrtManager::Instance()->GetTest3();
+  Double_t timeRes = PrtManager::Instance()->GetTimeRes();
   fMethod = PrtManager::Instance()->GetRunType();
   
   Int_t nEvents = fChain->GetEntries();
@@ -289,23 +288,23 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
 
       if(studyId==152 || studyId==153){	 //plate
-	test1=100;
+	timeRes=100;
       }
        
       if(studyId==157){	
-	test1=2.5;
+	timeRes=2.5;
       }
       if(studyId==150){	
-	test1=2;
+	timeRes=2;
       }
       if(studyId==154){	
-	test1=1;
-	if(prtangle > 100) test1=0.7;
+	timeRes=1;
+	if(prtangle > 100) timeRes=0.7;
        }
       if(studyId==159){	
-	if(prtangle < 80) test1=1.5;
-	if(prtangle > 100) test1=0.8;
-	if(prtangle > 80 and prtangle<100) test1=2;	
+	if(prtangle < 80) timeRes=1.5;
+	if(prtangle > 100) timeRes=0.8;
+	if(prtangle > 80 and prtangle<100) timeRes=2;	
       }
  
       //==================================================
@@ -410,10 +409,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
-	  if(fabs(totaltime-hitTime)>test1) continue;	  
+	  if(fabs(totaltime-hitTime)>timeRes) continue;	  
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
-	  tangle = momInBar.Angle(dir);	  
+	  tangle = momInBar.Angle(dir);
+	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(fVerbose) fHist->Fill(tangle ,weight);
 
@@ -482,12 +482,14 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     // }
 	
     if(fVerbose==2 &&  fMethod==3 && nsEvents%ninfit==0){
-      if(nsHits>5){
-        if(tofPid==2212 && sum > 0){
-	  std::cout<<"p  "<<sum1 << "   pi "<<sum2 << "  s "<< sum<<std::endl;
-	  if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;	  
-	}
+      if(nsHits>10){
+        // if(tofPid==2212 && sum > 0){
+	//   std::cout<<"p  "<<sum1 << "   pi "<<sum2 << "  s "<< sum<<std::endl;
+	//   if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;	  
+	// }
 
+	FindPeak(cangle,spr, prtangle, tofPid);
+	
 	// likelihood = fillLnDiffPPi(cangle,tofPid,momentum);
 	// if(tofPid==2212) hLnDiffP->Fill(likelihood);
 	// if(tofPid==211) hLnDiffPi->Fill(likelihood);
@@ -562,7 +564,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
   cangle=0;
   spr=0;
   //  gStyle->SetCanvasPreferGL(kTRUE);
-  if(fHist->GetEntries()>20 ){
+  if(fHist->GetEntries()>20){
     gROOT->SetBatch(1);
     Int_t nfound = fSpect->Search(fHist,1,"",0.9); //0.6
     if(nfound>0) cangle = fSpect->GetPositionX()[0];
@@ -575,21 +577,28 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-    fFit->SetParLimits(2,0.005,0.030); // width
+    fFit->SetParLimits(2,0.007,0.010); // width
     
     // fFit->FixParameter(2,0.01); 
     // fFit->FixParameter(3,0); 
     // fFit->FixParameter(4,0); 
     Int_t status(0);
+    
     if(fMethod==3) status = fHist->Fit("fgaus","lq","",0.6,1);
     else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
+
+    if(fFit->GetParError(1)<0.0005 || fFit->GetParError(1)>0.0025){
+      spr=0;
+      cangle=0;
+      return false;
+    }
     
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
  
     if(fVerbose>1) gROOT->SetBatch(0);
     
-    Bool_t storePics(true);
+    Bool_t storePics(false);
     if(storePics && (fMethod==2 || fVerbose==2)){
       canvasAdd("r_tangle",800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
