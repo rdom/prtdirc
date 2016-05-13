@@ -1,5 +1,13 @@
+#include <../src/PrtLutNode.h>
+#include <TTree.h>
+#include <TFile.h>
+#include <TVector3.h>
+#include <TInterpreter.h>
+#include <TClonesArray.h>
+
+
 void lutmean_cs(TString baseFile = "../data/lut.root"){
-  gROOT->ProcessLine(".L ../src/PrtLutNode.cxx+");
+  //gROOT->ProcessLine(".L ../src/PrtLutNode.cxx+");
   gInterpreter->GenerateDictionary("vector<TVector3>","TVector3.h"); 
   
   TString inFile =baseFile;
@@ -7,7 +15,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
 
   TFile* f = new TFile(inFile);
   TTree *t=(TTree *) f->Get("prtlut") ;
-  TClonesArray* fLut;
+  TClonesArray* fLut=new TClonesArray("PrtLutNode");
   t->SetBranchAddress("LUT",&fLut); 
   t->GetEntry(0);
 
@@ -24,7 +32,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
   for (Long64_t n=0; n<Nnodes; n++) {
     new((fLutaNew)[n]) PrtLutNode(-1);
   }
-
+  
   std::vector<TVector3> vArray[100];
   std::vector<TVector3> lArray[100];
   std::vector<Double_t> tArray[100];

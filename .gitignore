@@ -7,3 +7,5 @@
 AutoDict*
 *.root
 *~
+/macro/mcpload.C
+/macro/neighbour/
