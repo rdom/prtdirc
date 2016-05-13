@@ -67,6 +67,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->GetEntry(0);
 
   fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
+  fHistPi = new TH1F("chrenkov_angle_hist_Pi",  "chrenkov angle pi;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
@@ -246,7 +247,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    if(fMethod==2 && tofPid!=2212) continue;
+    //if(fMethod==2 && tofPid!=2212) continue;
 
     if(fEvent->GetType()==0){
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
@@ -476,7 +477,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
      	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
-	    fHist->Fill(tangle ,weight);
+	    if(tofPid==2212) fHist->Fill(tangle ,weight);
+	    else fHistPi->Fill(tangle ,weight);
 	    fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 	    
@@ -683,7 +685,12 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
       //fHist->Scale(1/fHist->GetMaximum());
+
+      prt_normalize(fHist,fHistPi);
+      fHistPi->SetLineColor(2);
+      
       fHist->Draw();
+      fHistPi->Draw("same");
       // gF1->Draw("same");
       // gF2->Draw("same");
       fHisti->SetLineColor(kRed+2);
