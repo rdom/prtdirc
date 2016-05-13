@@ -677,8 +677,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // 	std::cout<<"if(ch=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
       // 	fHistCh[i]->Draw();
       // }
-      
-      canvasAdd(Form("r_tangle_%f",PrtManager::Instance()->GetTest3()),800,400);
+
+      TString name = Form("r_tangle_%3.1f",PrtManager::Instance()->GetTest3());
+      canvasAdd(name,800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
       //fHist->Scale(1/fHist->GetMaximum());
@@ -688,7 +689,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       fHisti->SetLineColor(kRed+2);
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
-      canvasGet("r_tangle")->Update();
+      canvasGet(name)->Update();
       TLine *line = new TLine(0,0,0,1000);
       line->SetX1(fAngleP);
       line->SetX2(fAngleP);
