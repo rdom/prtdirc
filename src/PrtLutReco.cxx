@@ -663,13 +663,13 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     
     if(fMethod==2 && fVerbose>0){
 
-      fFit->SetParLimits(2,0.004,0.008); // width 7-10
-      for(Int_t i=0; i<15; i++){
-      	canvasAdd(Form("r_tangle_%d",i),800,400);
-      	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
-      	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
-      	fHistMcp[i]->Draw();
-      }
+      // fFit->SetParLimits(2,0.004,0.008); // width 7-10
+      // for(Int_t i=0; i<15; i++){
+      // 	canvasAdd(Form("r_tangle_%d",i),800,400);
+      // 	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
+      // 	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
+      // 	fHistMcp[i]->Draw();
+      // }
 
       // for(Int_t i=0; i<960; i++){
       // 	canvasAdd(Form("r_tangle_ch_%d",i),800,400);
@@ -678,7 +678,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // 	fHistCh[i]->Draw();
       // }
       
-      canvasAdd("r_tangle",800,400);
+      canvasAdd(Form("r_tangle_%f",PrtManager::Instance()->GetTest3()),800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
       //fHist->Scale(1/fHist->GetMaximum());
