@@ -29,6 +29,7 @@ void da_cangle(TString inFile = "../build/reco_spr.root"){
     if(tofPid==2212) hCangle3->Fill(cangle);
   }
 
+  prt_normalize(hCangle2,hCangle3);
   gStyle->SetOptFit(1);
   canvasAdd("hCangle");
 

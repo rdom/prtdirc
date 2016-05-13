@@ -16,7 +16,7 @@ example:
                 0    simulation
                 1    look-up table generation
                 2    geometrical reconstruction
-		3    likelihood calculation 
+                3    likelihood calculation 
                 5    calibration
                 6    focal plane measurements
 

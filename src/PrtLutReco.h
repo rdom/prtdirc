@@ -65,7 +65,7 @@ private:
   TSpectrum *fSpect;
   Double_t fAngleP;
   Double_t fAnglePi;
-
+  Double_t fTest;
 };
 
 #endif
