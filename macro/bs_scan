@@ -1,8 +1,8 @@
 #!/bin/bash
 
 threads=30
-path="/d/proc/jun15/151"
-#path="/data.local/data/jun15/"
+jpath="/d/proc/jun15/151"
+#jpath="/data.local/data/jun15/"
 
 waitForMe (){
     while : 
@@ -29,7 +29,7 @@ if [ ${1} == "0" ]; then
 			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 \
 			     > l_b$i.log && \
 		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}_${j}.root\")" && \
-		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -b 1 -t2 $i  -t3 $j > /dev/null 2> /dev/null &
+		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${jpath}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -b 1 -t2 $i  -t3 $j > /dev/null 2> /dev/null &
 	done
     done
     waitForMe "1"
@@ -46,7 +46,7 @@ if [ ${1} == "1" ]; then
 			 -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 5000000 -b 1 \
 			 > l_b$i.log && \
 	    root -q -b loadlib.C lutmean_cs.C"(\"b_l$i.root\")" && \
-	    ../build/prtdirc -s 3 -u b_l${i}_cs_avr.root -i ${path}/beam_15177040631.root -o b_r_${i}.root -tr 1.5 -f 0 -e 5000 -v 1 -b 1 -t3 $i > /dev/null 2> /dev/null &
+	    ../build/prtdirc -s 3 -u b_l${i}_cs_avr.root -i ${jpath}/beam_15177040631.root -o b_r_${i}.root -tr 1.5 -f 0 -e 5000 -v 1 -b 1 -t3 $i > /dev/null 2> /dev/null &
     done
     waitForMe "1"
 
@@ -58,7 +58,7 @@ if [ ${1} == "2" ]; then
     statusline="Divergence scan "
     for i in `seq -0.025 0.0005 0.025` ; do
 	for j in `seq  -0.025 0.0005 0.025` ; do
-	    ../build/prtdirc -s 2 -u ${path}/lut_beam_15177135523S10M_cs_avr.root -i ${path}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
+	    ../build/prtdirc -s 2 -u ${jpath}/lut_beam_15177135523S10M_cs_avr.root -i ${jpath}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -t2 ${i} -t3 ${j} -b 1  > /dev/null 2> /dev/null &
 	    waitForMe $threads
 	done
     done

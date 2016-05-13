@@ -116,7 +116,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
 	sum[s] *= 1/weight[s];
       }
       
-      sumt[s] *= 1/weight[0];
+      sumt[0] *= 1/weight[0];
       
       ((PrtLutNode*)(fLutNew->At(inode)))->AddEntry(node->GetDetectorId(), sum[0],pArray[j],node->GetNRefl(0),sumt, node->GetDigiPos(),node->GetDigiPos(),vArray[j].size()/(Double_t)size,
 						    sum[1],sum[2],sum[3],sum[4],sum[5],sum[6],sum[7],sum[8]); 
