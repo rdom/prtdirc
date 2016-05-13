@@ -40,7 +40,7 @@ fi
 
 if [ ${1} == "1" ]; then
     statusline="Y step scan "
-    for i in `seq 8 0.25 15` ; do
+    for i in `seq 8 0.25 18` ; do
 	../build/prtdirc -o b_l$i.root \
 			 -p 7 -h 1 -l 3 -a 25 -gz 378 -gx 85 -gsx 67.5 -gsy ${i} -z 10 -g 2015 -c 2015 \
 			 -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 5000000 -b 1 \
