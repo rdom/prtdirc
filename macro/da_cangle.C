@@ -19,7 +19,7 @@ void da_cangle(TString inFile = "../build/reco_spr.root"){
   ch.SetBranchAddress("phi",&phi);
   
   TH1F *hCangle2 = new TH1F("hCangle2",";#theta_{c} [degree];entries [#]",100,0.8,0.84);
-  TH1F *hCangle3 = new TH1F("hCangle2",";#theta_{c} [degree];entries [#]",100,0.8,0.84);
+  TH1F *hCangle3 = new TH1F("hCangle3",";#theta_{c} [degree];entries [#]",100,0.8,0.84);
 
   Int_t nent = ch.GetEntries();
   std::cout<<"# entries  "<< nent <<std::endl;
@@ -27,6 +27,8 @@ void da_cangle(TString inFile = "../build/reco_spr.root"){
     ch.GetEvent(i);
     if(tofPid==211) hCangle2->Fill(cangle);
     if(tofPid==2212) hCangle3->Fill(cangle);
+    if(tofPid==211)std::cout<<"cangle "<< cangle<<std::endl;
+    
   }
 
   prt_normalize(hCangle2,hCangle3);

@@ -118,7 +118,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
 	sumt += tArray[j][v]; 
       }
       
-      //if(weight[0]<10) continue;      
+      if(weight[0]<10) continue;      
       for(Int_t s=0; s<9; s++) {
 	//std::cout<<s<<" "<<weight[s] <<std::endl;
 	sum[s] *= 1/weight[s];

@@ -204,6 +204,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
+    if(nHits<5) continue;
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle();
@@ -229,7 +230,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     tofPid=fEvent->GetParticle();
     if(tofPid==212) tofPid=211;
 
-
     Int_t pdg[]={11,13,211,321,2212};
     Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};    
     Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.009),range(5*sigma),noise(0.3);
@@ -248,17 +248,37 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     
     //if(fMethod==2 && tofPid!=2212) continue;
-
+	
     if(fEvent->GetType()==0){
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
 	if( fEvent->GetParticle()==2212 && fEvent->GetTest1()<175.6 ) continue;
 	if( fEvent->GetParticle()==211  && fEvent->GetTest1()>175.1 ) continue;
       }
+
+      Bool_t tof1(false), tof2(false);
+      Bool_t hodo1(false), hodo2(false);
+      for(Int_t h=0; h<nHits; h++) {
+	fHit = fEvent->GetHit(h);
+	Int_t gch=fHit.GetChannel();
+	//if(gch==1065)
+	tof1=true;
+	if(gch>1169 && gch<1171) tof2=true;
+	// if(gch>1300 && gch<1306) hodo1=true;
+	// if(gch>1315 && gch<1318) hodo2=true;
+
+	if(gch>1300 && gch<1307) hodo1=true;
+	//	  if(gch>1315 && gch<1318) hodo2=true;
+	hodo2=true;
+      
+	if(tof1 && tof2 && hodo1 && hodo2) goto goodch;
+      }
+ 
+      // continue;
     }
+    
+  goodch:
 
-    if(nHits<5) continue;
-
-  //   //clusters search
+    //   //clusters search
   //   for(Int_t h=0; h<nHits; h++) {
   //     Int_t mid=fEvent->GetHit(h).GetMcpId();
   //     Int_t pid=fEvent->GetHit(h).GetPixelId()-1;
@@ -414,8 +434,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        //dird   = fLutNode[sensorId]->GetEntry(i);
+	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
+        dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -452,10 +472,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);
 
-	  // 151 125 deg
+	  // // 151 125 deg
 	  // if(mcpid/3==4) tangle += 0.005;
-	  // if(mcpid/3==3) tangle += 0.001;
-	  // if(mcpid/3==2) tangle += 0.000;
+	  // if(mcpid/3==3) tangle += 0.002;
+	  // if(mcpid/3==2) tangle += 0.001;
 	  // if(mcpid/3==1) tangle -= 0.001;
 
 
@@ -477,16 +497,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
      	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
-	    if(tofPid==2212) fHist->Fill(tangle ,weight);
-	    else fHistPi->Fill(tangle ,weight);
+	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
+	    else fHist->Fill(tangle ,weight);
+	    
 	    fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 	    
 	    if(true && tangle>0.4 && tangle<0.9 ){
-	      Double_t f1 = gF1->Eval(tangle);
-	      Double_t f2 = gF2->Eval(tangle);
-	      sum1 += -TMath::Log(f1+noise);
-	      sum2 += -TMath::Log(f2+noise);
+	      sum1 += -TMath::Log(gF1->Eval(tangle)+noise);
+	      sum2 += -TMath::Log(gF2->Eval(tangle)+noise);
 	    }
 	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
@@ -549,10 +568,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
 	FindPeak(cangle,spr, prtangle, tofPid);
 	
-	// likelihood = fillLnDiffPPi(cangle,tofPid,momentum);
-	// if(tofPid==2212) hLnDiffP->Fill(likelihood);
-	// if(tofPid==211) hLnDiffPi->Fill(likelihood);
-
 	test1 = fTest;
 	distPid = FindPdg(momentum,cangle);	 
 	nph = nsHits/(Double_t)ninfit;
@@ -665,13 +680,13 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     
     if(fMethod==2 && fVerbose>0){
 
-      // fFit->SetParLimits(2,0.004,0.008); // width 7-10
-      // for(Int_t i=0; i<15; i++){
-      // 	canvasAdd(Form("r_tangle_%d",i),800,400);
-      // 	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
-      // 	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
-      // 	fHistMcp[i]->Draw();
-      // }
+      fFit->SetParLimits(2,0.004,0.008); // width 7-10
+      for(Int_t i=0; i<15; i++){
+      	canvasAdd(Form("r_tangle_%d",i),800,400);
+      	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
+      	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
+      	fHistMcp[i]->Draw();
+      }
 
       // for(Int_t i=0; i<960; i++){
       // 	canvasAdd(Form("r_tangle_ch_%d",i),800,400);
