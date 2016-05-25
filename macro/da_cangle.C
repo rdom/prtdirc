@@ -27,8 +27,6 @@ void da_cangle(TString inFile = "../build/reco_spr.root"){
     ch.GetEvent(i);
     if(tofPid==211) hCangle2->Fill(cangle);
     if(tofPid==2212) hCangle3->Fill(cangle);
-    if(tofPid==211)std::cout<<"cangle "<< cangle<<std::endl;
-    
   }
 
   prt_normalize(hCangle2,hCangle3);
