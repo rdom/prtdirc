@@ -66,7 +66,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
+  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 1000,0.6,1); //150  //80
   fHistPi = new TH1F("chrenkov_angle_hist_Pi",  "chrenkov angle pi;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
@@ -200,7 +200,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     start=0;
   }
   
-  for (Int_t ievent=start; ievent<nEvents; ievent++){ //&& ievent<end
+  for (Int_t ievent=start; ievent<start+end; ievent++){ //&& ievent<end
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
@@ -210,8 +210,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       prtangle = fEvent->GetAngle();
       studyId = fEvent->GetGeometry();
       mom=fEvent->GetMomentum().Mag();
-      Double_t beam_corr(0);
-      if(studyId==151) beam_corr = 0.0045;
+      Double_t beam_corr(0); 
+      //if(studyId==151) beam_corr = 0.0045; //125 deg //!
+      // if(studyId==151) beam_corr = 0.001; // 20 deg
+      // if(studyId==151) beam_corr = -0.003; // 25 deg
+      //beam_corr = 0.002; // 125 deg s160
+      
       if(fEvent->GetType()==0){
 	momInBar.RotateY(TMath::Pi()-prtangle*rad-beam_corr);
 	momInBar.RotateX(beam_corr);
@@ -235,7 +239,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.009),range(5*sigma),noise(0.3);
     
     fAngleP = acos(sqrt(momentum*momentum+ mass[4]*mass[4])/momentum/1.4738)-0.00; //1.4738 = 370 = 3.35
-    fAnglePi= acos(sqrt(momentum*momentum + mass[2]*mass[2])/momentum/1.4738)-0.00;
+    fAnglePi= acos(sqrt(momentum*momentum + mass[2]*mass[2])/momentum/1.4738)-0.00; //-0.0014 for 160 25deg
 
     gF1->SetParameter(0,1);
     gF2->SetParameter(0,1);
@@ -258,22 +262,23 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Bool_t tof1(false), tof2(false);
       Bool_t hodo1(false), hodo2(false);
       for(Int_t h=0; h<nHits; h++) {
-	fHit = fEvent->GetHit(h);
-	Int_t gch=fHit.GetChannel();
-	//if(gch==1065)
+      	fHit = fEvent->GetHit(h);
+      	Int_t gch=fHit.GetChannel();
+	//if(gch>1031 && gch<1034)
 	tof1=true;
-	if(gch>1169 && gch<1171) tof2=true;
-	// if(gch>1300 && gch<1306) hodo1=true;
-	// if(gch>1315 && gch<1318) hodo2=true;
+	
+	if(gch>1169 && gch<1171)
+	  tof2=true;
 
-	if(gch>1300 && gch<1307) hodo1=true;
-	//	  if(gch>1315 && gch<1318) hodo2=true;
-	hodo2=true;
+	if(gch>1300 && gch<1307)
+	  hodo1=true;
+	// if(gch>1313 && gch<1316)
+	  hodo2=true;
       
-	if(tof1 && tof2 && hodo1 && hodo2) goto goodch;
+      	if(tof1 && tof2 && hodo1 && hodo2) goto goodch;
       }
  
-      // continue;
+      continue;
     }
     
   goodch:
@@ -312,7 +317,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
-      hitTime = fHit.GetLeadTime();
+      hitTime = fHit.GetLeadTime()-0.5;
       if(fEvent->GetType()!=0) hitTime+=fRand.Gaus(0,0.2); // time resol. in case it was not simulated
 	
       //======================================== dynamic cuts
@@ -400,17 +405,29 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(badcannel(ch)) continue;
       //if(cluster[mcpid][pixid]>8) continue;
   
-      Int_t x(0),y(0), piid(pixid) , nedge(0);
-      for(Int_t h=0; h<nHits; h++) {
-	Int_t pid=fEvent->GetHit(h).GetPixelId();
-	Int_t mid=fEvent->GetHit(h).GetMcpId();
-	Double_t tdif=fabs(hitTime-fEvent->GetHit(h).GetLeadTime());
-	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
-	if(pid==piid-1 && piid%8!=0) y-=1;
-	if(pid==piid+1 && piid%8!=7) y+=1;
+      // Int_t x(0),y(0), piid(pixid) , nedge(0); //new
+      // for(Int_t h=0; h<nHits; h++) {
+      // 	Int_t pid=fEvent->GetHit(h).GetPixelId();
+      // 	Int_t mid=fEvent->GetHit(h).GetMcpId();
+      // 	Double_t tdif=fabs(hitTime-fEvent->GetHit(h).GetLeadTime());
+      // 	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
+      // 	if(pid==piid-1 && piid%8!=0) y-=1;
+      // 	if(pid==piid+1 && piid%8!=7) y+=1;
 
-	if(pid==piid+8 && piid<57) x-=1;
-	if(pid==piid-8 && piid>8)  x+=1;
+      // 	if(pid==piid+8 && piid<57) x-=1;
+      // 	if(pid==piid-8 && piid>8)  x+=1;
+      // }
+
+      Int_t x(0),y(0), piid(pixid+1) , nedge(0); //old
+      for(Int_t h=0; h<nHits; h++) {
+      	Int_t pid=fEvent->GetHit(h).GetPixelId();
+      	Int_t mid=fEvent->GetHit(h).GetMcpId();
+      	if(mid!=mcpid || pid==piid) continue;
+      	if(pid==piid-1 && piid%8!=1) x-=1;
+      	if(pid==piid+1 && piid%8!=0) x+=1;
+
+      	if(pid==piid+8 && piid<57) y+=1;
+      	if(pid==piid-8 && piid>8)  y-=1;
       }
       
       if(x== 0 && y== 0) nedge=0;
@@ -434,8 +451,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        dird   = fLutNode[sensorId]->GetEntry(i);
+	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
+        //dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -478,34 +495,108 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  // if(mcpid/3==2) tangle += 0.001;
 	  // if(mcpid/3==1) tangle -= 0.001;
 
+	  
+	  // if(mcpid==0) tangle += 0.00139066;
+	  // if(mcpid==1) tangle += 0.00119448;
+	  // if(mcpid==2) tangle += 0.00164041;
+	  // if(mcpid==3) tangle += 0.00387281;
+	  // if(mcpid==4) tangle += 0.00150349;
+	  // if(mcpid==5) tangle += -0.00110365;
+	  // if(mcpid==6) tangle += 0.00222708;
+	  // if(mcpid==7) tangle += -0.00319795;
+	  // if(mcpid==8) tangle += 0.00215669;
+	  // if(mcpid==9) tangle += 0.00909303;
+	  // if(mcpid==10) tangle += 0.00374635;
+	  // if(mcpid==11) tangle += 0.00407815;
+	  // if(mcpid==12) tangle += 0.00905419;
+	  // if(mcpid==14) tangle += 0.00905419;
 
-	  // if(mcpid==0) tangle += 0.00586279;
-	  // if(mcpid==1) tangle += 0.00831412;
-	  // if(mcpid==2) tangle += 0.003;
-	  // if(mcpid==3) tangle += 0.00375899;
-	  // if(mcpid==4) tangle += 0.00209761;
-	  // if(mcpid==5) tangle += 0.000803605;
-	  // if(mcpid==6) tangle += 0.00580209;
-	  // if(mcpid==7) tangle += 0.00357395;
-	  // if(mcpid==8) tangle += 0.00465904;
-	  // if(mcpid==9) tangle += 0.00588098;
-	  // if(mcpid==10) tangle += 0.00325978;
-	  // if(mcpid==11) tangle += 0.004;
-	  // if(mcpid==12) tangle += 0.005;
-	  // if(mcpid==13) tangle += 0.004;
-	  // if(mcpid==14) tangle += 0.004;
 
+
+	  // // 151 20 deg
+	  // if(mcpid==0) tangle += 0.0091789;
+	  // if(mcpid==2) tangle += 0.00248956;
+	  // if(mcpid==3) tangle += 0.00577506;
+	  // if(mcpid==4) tangle += 0.00565085;
+	  // if(mcpid==5) tangle += 0.00578859;
+	  // if(mcpid==6) tangle += 0.0024891;
+	  // if(mcpid==7) tangle += 0.00901885;
+	  // if(mcpid==8) tangle += 0.00447518;
+	  
+
+
+	  // // 151 25 deg
+	  // if(mcpid==0) tangle += 0.0084747;
+	  // if(mcpid==1) tangle += 0.00861239;
+	  // if(mcpid==2) tangle += -0.000539254;
+	  // if(mcpid==3) tangle += 0.00483392;
+	  // if(mcpid==4) tangle += 0.00417729;
+	  // if(mcpid==5) tangle += 0.00744091;
+
+	  // if(mcpid==7) tangle += 0.00417729;
+	  // if(mcpid==8) tangle += 0.0041712;
+	  // if(mcpid==10) tangle += 0.0123394;
+	  // if(mcpid==12) tangle += 0.0123394;
+	  // if(mcpid==13) tangle += 0.0123394;
+	  // if(mcpid==14) tangle += 0.0123394;
+	  
+
+	  // if(mcpid==0) tangle += 0.00158126;
+	  // if(mcpid==1) tangle += 0.00288879;
+	  // if(mcpid==2) tangle += 0.00162897;
+	  // if(mcpid==3) tangle += 0.00335866;
+	  // if(mcpid==4) tangle += 0.00265215;
+	  // if(mcpid==5) tangle += 0.00399116;
+	  // if(mcpid==6) tangle += -0.00312601;
+	  // if(mcpid==7) tangle += 0.00219149;
+	  // if(mcpid==8) tangle += 0.00185951;
+	  // if(mcpid==10) tangle += 0.00191814;
+	  // if(mcpid==12) tangle += -0.00364448;
+	  // if(mcpid==13) tangle += 0.00191814;
+	  // if(mcpid==14) tangle += -0.00364448;
+
+// 	  // 160 125 deg
+// 	  if(mcpid==0) tangle += -0.004;
+// 	  if(mcpid==1) tangle += -0.00306989;
+// 	  if(mcpid==2) tangle += -0.00103916;
+// 	  if(mcpid==3) tangle += -0.002;
+// 	  if(mcpid==4) tangle += -0.004;
+// 	  if(mcpid==5) tangle += -0.00365203;
+// 	  if(mcpid==6) tangle += 0.00261752;
+// 	  if(mcpid==7) tangle += -0.00306989;
+// 	  if(mcpid==8) tangle += -0.00306989;
+// 	  if(mcpid==9) tangle += 0.00261752;
+
+// 	  if(mcpid==10) tangle += 0.00261752;
+// 	  if(mcpid==11) tangle += 0.00261752;
+// 	  if(mcpid==12) tangle += 0.00261752;
+	     
+// 	  if(mcpid==14) tangle += 0.01;
+
+// if(mcpid==0) tangle += 0.00122269;
+// if(mcpid==1) tangle += 0.000399832;
+// if(mcpid==2) tangle += -0.000206061;
+// if(mcpid==3) tangle += 0.00360337;
+// if(mcpid==4) tangle += 0.0001;
+// if(mcpid==5) tangle += -0.000346234;
+// if(mcpid==6) tangle += -0.00211489;
+
+//  if(mcpid==12) tangle += 0.00232183;
+// if(mcpid==13) tangle += 0.00760167;
+// if(mcpid==14) tangle += -0.0031577;
+
+ 
      	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle ,weight);
 	    
-	    fHistMcp[mcpid]->Fill(tangle ,weight);
+	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 	    
 	    if(true && tangle>0.4 && tangle<0.9 ){
-	      sum1 += -TMath::Log(gF1->Eval(tangle)+noise);
-	      sum2 += -TMath::Log(gF2->Eval(tangle)+noise);
+	      sum1 += TMath::Log(gF1->Eval(tangle)+noise);
+	      sum2 += TMath::Log(gF2->Eval(tangle)+noise);
 	    }
 	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
@@ -545,6 +636,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(sum!=0){
       if(tofPid==2212) hLnDiffP->Fill(sum);
       if(tofPid==211) hLnDiffPi->Fill(sum);
+      likelihood=sum;
     }
 
     // if(fVerbose==1){
@@ -593,7 +685,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl; 
     tree.Fill();
   }else{
-    //if(!fVerbose) gROOT->SetBatch(1);
+    if(fVerbose<2) gROOT->SetBatch(1);
     canvasAdd("r_lhood",800,400);
     prt_normalize(hLnDiffP,hLnDiffPi);
     hLnDiffP->SetLineColor(2);
@@ -651,7 +743,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-    fFit->SetParLimits(2,0.007,0.010); // width 7-10
+    fFit->SetParLimits(2,0.007,0.014); // width 7-10
     
     // fFit->FixParameter(2,0.01); 
     // fFit->FixParameter(3,0); 
@@ -769,7 +861,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       canvasAdd(cDigi);  
 
       waitPrimitive("r_cm");
-      canvasSave(1,0);
+      canvasSave(0,0);
       canvasDel("*");
       
       if(fVerbose==3){

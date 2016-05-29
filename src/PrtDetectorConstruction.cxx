@@ -135,7 +135,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 
   // The DIRC cover box
   G4Box* gCover = new G4Box("gCover",1,150,fBar[2]/2.);
-  G4LogicalVolume *lCover = new G4LogicalVolume(gCover, MirrorMaterial ,"lCover",0,0,0);
+  lCover = new G4LogicalVolume(gCover, MirrorMaterial ,"lCover",0,0,0);
 
   if(fGeomId == 3 || fGeomId == 2015){
     new G4PVPlacement(0,G4ThreeVector(-100,0,0),lCover,"wCover",lDirc,false,0);
@@ -730,6 +730,8 @@ void PrtDetectorConstruction::SetVisualization(){
   G4Colour green = G4Colour(0.0,1.0,.0);
   G4Colour red = G4Colour(1.0,0.0,.0); 
   G4Colour DircColour = G4Colour(1.,1.0,0.);
+  //G4Colour Dark = G4Colour(0.,0.05,0.05,0.15);
+  G4Colour Dark = G4Colour(0.,0.85,0.85,0.15);
 
   G4VisAttributes *waExpHall = new G4VisAttributes(DircColour);
   waExpHall->SetVisibility(false);
@@ -738,8 +740,10 @@ void PrtDetectorConstruction::SetVisualization(){
   G4VisAttributes *waDirc = new G4VisAttributes(DircColour);
   waDirc->SetVisibility(false);
   lDirc->SetVisAttributes(waDirc);
+  lCover->SetVisAttributes(waDirc);
 
-  G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
+  // G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
+  G4VisAttributes *waBar = new G4VisAttributes(Dark);
   waBar->SetVisibility(true);
   lBar->SetVisAttributes(waBar);
 
@@ -758,7 +762,8 @@ void PrtDetectorConstruction::SetVisualization(){
     if(PrtManager::Instance()->GetLens()==3) lLens3->SetVisAttributes(vaLens);
   }
 
-  G4VisAttributes *waPrizm = new G4VisAttributes(G4Colour(0.,0.9,0.9,0.2));
+  //  G4VisAttributes *waPrizm = new G4VisAttributes(G4Colour(0.,0.9,0.9,0.2));
+  G4VisAttributes *waPrizm = new G4VisAttributes(Dark);
   waPrizm->SetVisibility(true);
   //waPrizm->SetForceAuxEdgeVisible(true);
   //waPrizm->SetForceSolid(true);

@@ -46,6 +46,7 @@ private:
   G4LogicalVolume* lMcp;
   G4LogicalVolume* lPixel;
   G4LogicalVolume* lPrizmC;
+  G4LogicalVolume* lCover;
 
   G4VPhysicalVolume* wBar;
   G4VPhysicalVolume* wMirror;
