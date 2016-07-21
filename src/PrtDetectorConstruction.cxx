@@ -32,6 +32,8 @@
 PrtDetectorConstruction::PrtDetectorConstruction()
   : G4VUserDetectorConstruction(){
 
+  std::cout<<"m "<<m<<" cm "<< cm<<"  mm "<<mm<< "  GeV "<<GeV<< std::endl;
+  
   fGeomId = PrtManager::Instance()->GetGeometry();
   fMcpLayout = PrtManager::Instance()->GetMcpLayout();
  
@@ -64,6 +66,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   
   }
 
+  if(fMcpLayout == 2016){
+    fNCol = 4;
+    fPrizm[2] = 30+fPrizm[1]*tan(30*deg); fPrizm[3] = 30;
+  }
+
   if(PrtManager::Instance()->GetRadiator()==2){
     fBar[0] = 17.1;
     fBar[1] = 174.8;
@@ -81,6 +88,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     //fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.   +30.6;   
     //fCenterShift =  G4ThreeVector(fBar[2]/2.,0,-132);
    
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
+  }
+
+  if(fGeomId == 2016){
+    fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(30*deg);
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
   }
   
@@ -145,7 +157,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   G4Box* gBar = new G4Box("gBar",fBar[0]/2.,fBar[1]/2.,fBar[2]/2.);
   lBar = new G4LogicalVolume(gBar,BarMaterial,"lBar",0,0,0);
   G4double xshift = -(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX();
-  if(fGeomId==2015 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
+  if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
 
   // The Mirror
@@ -372,6 +384,15 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  if(j==1) shiftx -= (3/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
+
+	if(fMcpLayout==2016){
+	  Double_t ms = 3;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
+	  if(j==1) shiftx -= (3/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
+	  shifty = (fMcpTotal[0]+3)*(j-1);
+	}
+	
 	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,fBar[2]/2.+fPrizm[1]+fMcpActive[2]/2.+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+j);
       }
     }
