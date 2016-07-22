@@ -91,12 +91,15 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
   }
 
-  if(fGeomId == 2016){
+  if(fGeomId == 2016){ 
     fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(30*deg);
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
   }
   
-  
+  if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+    fPrizm[1] = 30; fPrizm[3] = 300;  fPrizm[2]=500;  
+  }
+    
   PrtManager::Instance()->SetRadiatorL(fBar[2]);
   PrtManager::Instance()->SetRadiatorW(fBar[1]);
   PrtManager::Instance()->SetRadiatorH(fBar[0]);			  
@@ -229,7 +232,12 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
-  
+
+    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+       r1 = PrtManager::Instance()->GetTest1();
+       r2 = PrtManager::Instance()->GetTest2();
+    }
+    
     r1 = (r1==0)? 47.8: r1;
     r2 = (r2==0)? 29.1: r2;
     G4double shight = 40;

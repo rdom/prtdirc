@@ -6,15 +6,7 @@
 #include "TRandom.h"
 
 void drawScan(TString infile="hits.root"){
-  // infile="/SAT/hera/had1/dervish/data/prt/study/151/beam*Sx*.root";
-  // infile="/SAT/hera/had1/dirc/testbeam/2015/proc/151/beam*C.root";
 
-  // infile="/data.local/data/jun15/beam_15177135523C.root";
-  // infile="$HOME/proc/152/beam_15183022858S.root";
-  // infile="$HOME/proc/160/beam_15178041202S.root"; //for p/pi hp
-  // infile="$HOME/proc/151/beam_15177050804C.root";
-  infile="$HOME/proc/152/beam_15183032354C.root";
-  //infile="$HOME/pros/160/s160_55.root";
   fSavePath = "scan3";
   CreateMap();
   PrtInit(infile,1); //digi
@@ -41,8 +33,9 @@ void drawScan(TString infile="hits.root"){
       Int_t ch = map_mpc[mcpid][pixid];
       if(badcannel(ch)) continue;
       if(fHit.GetChannel()>960 || ch==0) continue;
-
-      if(prt_event->GetParticle() ==211) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
+ 
+      //if(prt_event->GetParticle() ==211)
+	fhDigi[mcpid]->Fill(pixid%8, pixid/8);
 
       Double_t time = fHit.GetLeadTime();//+ rand.Gaus(0,0.4);
       if(time<10)continue;

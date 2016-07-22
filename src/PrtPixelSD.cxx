@@ -107,7 +107,11 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4ThreeVector g4pos = track->GetVertexPosition();
  
   TVector3 globalPos(inPrismpos.x(),inPrismpos.y(),inPrismpos.z());
-  //TVector3 globalPos(globalpos.x(),globalpos.y(),globalpos.z());
+  
+  if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+    globalPos = TVector3(globalpos.x(),globalpos.y(),globalpos.z());
+  }
+  
   TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
   translation=touchable->GetHistory()->GetTransform( 1 ).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());

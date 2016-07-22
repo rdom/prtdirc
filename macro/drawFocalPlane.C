@@ -2,7 +2,7 @@
 
 #include "../src/PrtEvent.h"
 #include "../src/PrtHit.h"
-
+#include "../../prttools/datainfo.C"
 #include "../../prttools/prttools.C"
 
 double findVertex(TVector3 v1,TVector3 m1, TVector3 v2,TVector3 m2, TVector3* newvertex){
@@ -42,29 +42,31 @@ double findVertex(TVector3 v1,TVector3 m1, TVector3 v2,TVector3 m2, TVector3* ne
 }
 
 
-void drawFocalPlane(TString infile="../build/hits.root", Double_t r1 = 48.8, Double_t r2 = 29.1, Int_t it1=0, Int_t it2=0, Double_t energy=-1){
-  gSystem->Load("../build/libprtdirclib.so");
+void drawFocalPlane(TString infile="../build/focalplane.root", Double_t r1 = 48.8, Double_t r2 = 29.1, Int_t it1=0, Int_t it2=0, Double_t energy=-1){
+  fSavePath = "data/fp";
+  CreateMap();
   PrtInit(infile,0);
   gStyle->SetOptStat(0);
 
   Double_t radiatorL(1250); //bar
   // Double_t radiatorL(1224.9); //plate
   TVector3 res;
-  TH2F *hFp1 = new TH2F("hFp1",Form("r_{1}=%2.2f    r_{2}=%2.2f;x, [cm];y, [cm]",r1,r2),500,0,50,500,0,30 );
-  TH2F *hFp2 = new TH2F("hFp2",Form("r_{1}=%2.2f    r_{2}=%2.2f;z, [cm];y, [cm]",r1,r2),500,-30,30,500,-30,50 );
-
+  TH2F *hFp1 = new TH2F("hFp1",Form("r_{1}=%2.2f    r_{2}=%2.2f;x [cm];y [cm]",r1,r2),500,0,60,500,-30,30 );
+  TH2F *hFp2 = new TH2F("hFp2",Form("r_{1}=%2.2f    r_{2}=%2.2f;z [cm];y [cm]",r1,r2),500,-30,30,500,-30,50 );
+  
   PrtHit hit[2];
   Int_t nevents = fCh->GetEntries();
   Int_t count(0);
   for (Int_t ievent=0; ievent<nevents; ievent++){
     PrtNextEvent(ievent,1000);
-    Int_t nhits = fEvent->GetHitSize();
+    Int_t nhits = prt_event->GetHitSize();
     if(nhits!=2) continue;
-    for(Int_t h=0; h<nhits; h++) hit[h] = fEvent->GetHit(h);
+    for(Int_t h=0; h<nhits; h++) hit[h] = prt_event->GetHit(h);
+    
     Double_t d = findVertex(hit[0].GetGlobalPos(),hit[0].GetMomentum().Unit(),hit[1].GetGlobalPos(),hit[1].GetMomentum().Unit(), &res);
     if(d<1){
       Double_t x = -(res.X()+radiatorL/2.)/10.;
-      if(x>6){
+      if(x>1){
 	hFp1->Fill(x,res.Z()/10.);
 	hFp2->Fill(res.Y()/10.,res.Z()/10.);
       }
@@ -86,7 +88,8 @@ void drawFocalPlane(TString infile="../build/hits.root", Double_t r1 = 48.8, Dou
   hFp1->Draw("colz");
   canvasAdd(Form("fp2_%d_%d",it1,it2),600,800);
   hFp2->Draw("colz");
-  canvasSave(0,"drawFocalPlane.C",1,"fp");
+  //  canvasSave(0,"drawFocalPlane.C",1,"fp");
+  canvasSave(1,1);
   
 }
 
