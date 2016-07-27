@@ -5,7 +5,7 @@
 #include "../../prttools/prttools.C"
 #include "TRandom.h"
 
-void drawScan(TString infile="hits.root"){
+void drawScan(TString infile="../build/hits.root"){
 
   fSavePath = "scan3";
   CreateMap();

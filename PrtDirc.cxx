@@ -192,7 +192,7 @@ int main(int argc,char** argv)
   }else{  // UI session for interactive mode
 
 #ifdef G4UI_USE
-    G4UIExecutive * ui = new G4UIExecutive(argc,argv,session);
+    G4UIExecutive * ui = new G4UIExecutive(argc,argv,"Qt");
 #ifdef G4VIS_USE
     UImanager->ApplyCommand("/control/execute ../vis.mac");
 #endif

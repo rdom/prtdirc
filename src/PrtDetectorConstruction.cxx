@@ -67,7 +67,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
 
   if(fMcpLayout == 2016){
-    fNCol = 4;
+    fNCol = 3;
     fPrizm[2] = 30+fPrizm[1]*tan(30*deg); fPrizm[3] = 30;
   }
 
@@ -92,7 +92,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
 
   if(fGeomId == 2016){ 
-    fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(30*deg);
+    fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 30;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(30*deg);
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
   }
   
@@ -394,10 +394,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	}
 
 	if(fMcpLayout==2016){
-	  Double_t ms = 3;//(fPrizm[2]-5*fMcpTotal[0])/4.;
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	  Double_t ms = 13;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = 3+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
-	  if(j==1) shiftx -= (3/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
+	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 	
