@@ -86,7 +86,7 @@ printf "====== Run PRTDIRC with $tseed seed base ======\n"
 simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 85 -gsx 67.5 -gsy 0  -g 2016 -c 2016 -e 100 -b 1 "
 
 if [ ${run} == "0" ]; then
-    ../build/prtdirc  $simopt -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 100000  
+    ../build/prtdirc  $simopt -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 1000000  
     exit
 fi
 
@@ -118,7 +118,7 @@ if [ ${run} == "2" ] || [ ${run} == "3" ] || [ ${run} == "4" ]; then
     start_time=$(date +%s)
     statusline="Reco"
     for i in $(eval echo {20..150..$astep}); do 
-	../build/prtdirc -i hdata/h_b$i.root -o r_b${tseed}_$i.root -s 2 -t1 $test1 -v $verbose > /dev/null 2> /dev/null &
+	../build/prtdirc -i ~/simo/dirc/prtdirc/macro/hdata/h_b$i.root -u ../data/lut_cs_avr.root -o r_b${tseed}_$i.root -s 2 -f 0 -e 0 -t1 $test1 -v $verbose > /dev/null 2> /dev/null &
 	waitForMe $threads
     done
     waitForMe "1"

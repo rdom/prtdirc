@@ -14,7 +14,7 @@ void da_scan(TString inFile = "r_spr.root", TString outFile="c_spr.root"){
   ch.SetBranchAddress("trr",&trr);
   ch.SetBranchAddress("nph",&nph);
   ch.SetBranchAddress("cangle",&cangle);
-  ch.SetBranchAddress("par4",&par4);
+  //  ch.SetBranchAddress("par4",&par4);
   ch.SetBranchAddress("par5",&par5);
   ch.SetBranchAddress("par6",&par6);
   ch.SetBranchAddress("test1",&test1);

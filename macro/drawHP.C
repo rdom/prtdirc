@@ -10,7 +10,6 @@ void drawHP(TString infile="../build/hits.root"){
   fSavePath = "data/hit_pattern";
   CreateMap();
   PrtInit(infile,1);
-  TGaxis::SetMaxDigits(3);
 
   PrtHit fHit;
   Int_t nEvents=fCh->GetEntries();
