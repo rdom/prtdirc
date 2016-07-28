@@ -10,15 +10,18 @@ show_help(){
   DESCRIPTION 
      -r 
         run type
-        0 - run sim + reco
-        1 - run lut + sim + reco
-        2 - run only reco
+        0 - run lut
+        1 - run sim
+        2 - run reco
+        3 - run sim + reco
+        4 - run lut + sim + reco
+
      -j
         number of threads 
      -q 
         run -a option on claster 
         one needs to be logged in on hera 
-        no implemented 
+        not implemented 
      -e 
         # of events per thread
      -s 
@@ -77,10 +80,12 @@ tseed=$(($(date +%s%N)/1000000-1393400000000))
 printf "====== Run PRTDIRC with $tseed seed base ======\n"
 
 #simopt="-w 0 -g 3 -h 2 -c 2015 -l 0 -b 1"
-simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 0 -gs 15.5 -g 2015 -c 2015 -e 100 -b 1 "
+#simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 0 -gs 15.5 -g 2015 -c 2015 -e 100 -b 1 "
 #simopt="-p 7 -h 1 -l 3 -a 30 -gz 380 -gx 85 -gsx 67 -gsy 17 -z 10  -g 2015 -c 2015"
 
-if [ ${run} == "1" ]; then
+simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 85 -gsx 67.5 -gsy 0  -g 2016 -c 2016 -e 10 -b 1 "
+
+if [ ${run} == "0" ]; then
     ../build/prtdirc  $simopt -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 100000  
     exit
 fi
@@ -97,7 +102,7 @@ waitForMe (){
     done
 }  
 
-if [ ${run} != "2" ]; then
+if [ ${run} == "1" ] || [ ${run} == "3" ] ||  [ ${run} == "4" ]; then
     mkdir -p hdata
     start_time=$(date +%s)
     statusline="GSim"
@@ -109,19 +114,21 @@ if [ ${run} != "2" ]; then
     printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]     \n"
 fi
 
+if [ ${run} == "2" ] || [ ${run} == "3" ] || [ ${run} == "4" ]; then
+    start_time=$(date +%s)
+    statusline="Reco"
+    for i in $(eval echo {20..150..$astep}); do 
+	../build/prtdirc -i hdata/h_b$i.root -o r_b${tseed}_$i.root -s 2 -t1 $test1 -v $verbose > /dev/null 2> /dev/null &
+	waitForMe $threads
+    done
+    waitForMe "1"
+    printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]         \n"
 
-start_time=$(date +%s)
-statusline="Reco"
-for i in $(eval echo {20..150..$astep}); do 
-    ../build/prtdirc -i hdata/h_b$i.root -o r_b${tseed}_$i.root -s 2 -t1 $test1 -v $verbose > /dev/null 2> /dev/null &
-    waitForMe $threads
-done
-waitForMe "1"
-printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]         \n"
+    sleep 2
+    hadd r_spr${tseed}.root r_b${tseed}_*_spr.root
+    rm r_b${tseed}_*.root 
+fi
 
 
-sleep 2
-hadd r_spr${tseed}.root r_b${tseed}_*_spr.root
-rm r_b${tseed}_*.root 
 
 

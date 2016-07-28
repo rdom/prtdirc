@@ -624,7 +624,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   static const G4double LambdaE = 2.0 * 3.14159265358979323846 * 1.973269602e-16 * m * GeV;
   const G4int num = 36;
   G4double WaveLength[num];
-  G4double Absorption[num]; // default value for absorption
   G4double AirAbsorption[num]; // absorption value for air
   G4double AirRefractiveIndex[num]; // air refractive index
   G4double PhotonEnergy[num]; // energy of photons which correspond to the given 
@@ -670,7 +669,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   G4double EpotekThickness = 0.001*2.54*cm;
   for(int i=0;i<num;i++){
     WaveLength[i]= (300 +i*10)*nanometer;
-    Absorption[i]= 100*m; // not true, just due to definiton -> not absorb any
     AirAbsorption[i] = 4.*cm; // if photon in the air -> kill it immediately
     AirRefractiveIndex[i] = 1.; 
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
