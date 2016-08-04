@@ -45,8 +45,8 @@ void da_scan(TString inFile = "r_spr.root", TString outFile="c_spr.root"){
   gSpr->SetMarkerSize(0.7);
   gNph->SetMarkerSize(0.7);
   gTrr->SetMarkerSize(0.7);
-  gNph->GetYaxis()->SetRangeUser(0,150);
-  gSpr->GetYaxis()->SetRangeUser(0,12);
+  gNph->GetYaxis()->SetRangeUser(0,100);
+  gSpr->GetYaxis()->SetRangeUser(0,14);
   gTrr->GetYaxis()->SetRangeUser(0,2);
 
   gSpr->GetYaxis()->SetTitle("SPR [mrad]");

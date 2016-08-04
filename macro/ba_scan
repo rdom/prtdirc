@@ -118,7 +118,7 @@ if [ ${run} == "2" ] || [ ${run} == "3" ] || [ ${run} == "4" ]; then
     start_time=$(date +%s)
     statusline="Reco"
     for i in $(eval echo {20..150..$astep}); do 
-	../build/prtdirc -i ~/simo/dirc/prtdirc/macro/hdata/h_b$i.root -u ../data/lut_cs_avr.root -o r_b${tseed}_$i.root -s 2 -f 0 -e 0 -t1 $test1 -v $verbose > /dev/null 2> /dev/null &
+	../build/prtdirc -i ~/simo/dirc/prtdirc/macro/hdata/h_b$i.root -u ../data/lut_cs_avr.root -o r_b${tseed}_$i.root -s 2 -f 0 -e 0 -tr $test1 -v $verbose > /dev/null 2> /dev/null &
 	waitForMe $threads
     done
     waitForMe "1"
@@ -126,7 +126,7 @@ if [ ${run} == "2" ] || [ ${run} == "3" ] || [ ${run} == "4" ]; then
 
     sleep 2
     hadd r_spr${tseed}.root r_b${tseed}_*_spr.root
-    rm r_b${tseed}_*.root 
+#    rm r_b${tseed}_*.root 
 fi
 
 

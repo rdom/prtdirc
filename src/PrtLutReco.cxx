@@ -744,7 +744,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-    fFit->SetParLimits(2,0.006,0.014); // width 7-10
+    fFit->SetParLimits(2,0.005,0.014); // width 7-10
     
     // fFit->FixParameter(2,0.01); 
     // fFit->FixParameter(3,0); 
