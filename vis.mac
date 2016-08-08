@@ -41,7 +41,7 @@
 #mcp
 /vis/viewer/set/viewpointVector -1 0 0.00000001
 /vis/viewer/set/upVector 0 1 0
-/vis/viewer/zoomTo 6
+/vis/viewer/zoomTo 12
 
 #lenses
 #/vis/viewer/set/viewpointVector 0.56642 -0.821733 0.0626397
@@ -107,7 +107,7 @@
 /vis/scene/endOfEventAction accumulate
 #
 # Re-establish auto refreshing and verbosity:
-#/vis/viewer/set/autoRefresh true
+/vis/viewer/set/autoRefresh true
 /vis/verbose warnings
 #
 
