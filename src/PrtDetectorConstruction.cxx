@@ -67,7 +67,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
 
   if(fMcpLayout == 2016){
-    fNCol = 3;
+    fNCol = 4;
     fPrizm[2] = 30+fPrizm[1]*tan(30*deg); fPrizm[3] = 30;
   }
 
@@ -393,11 +393,19 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
-	if(fMcpLayout==2016){
-	  Double_t ms = 13;//(fPrizm[2]-5*fMcpTotal[0])/4.;
-	  shiftx = 3+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	// if(fMcpLayout==2016){ //9MCP
+	//   Double_t ms = 13;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	//   shiftx = 3+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	//   //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
+	//   if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
+	//   shifty = (fMcpTotal[0]+3)*(j-1);
+	// }
+	
+	if(fMcpLayout==2016){ //12MCP
+	  Double_t ms = 3;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = 0+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
-	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
+	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 	

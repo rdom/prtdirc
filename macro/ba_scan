@@ -83,7 +83,7 @@ printf "====== Run PRTDIRC with $tseed seed base ======\n"
 #simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 0 -gs 15.5 -g 2015 -c 2015 -e 100 -b 1 "
 #simopt="-p 7 -h 1 -l 3 -a 30 -gz 380 -gx 85 -gsx 67 -gsy 17 -z 10  -g 2015 -c 2015"
 
-simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 85 -gsx 67.5 -gsy 0  -g 2016 -c 2016 -e 100 -b 1 "
+simopt="-p 7 -h 2 -x pi+ -l 0 -gz 378 -gx 85 -gsx 67.5 -gsy 0  -g 2016 -c 2016 -e 100 -b 1 "
 
 if [ ${run} == "0" ]; then
     ../build/prtdirc  $simopt -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 1000000  

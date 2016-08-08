@@ -7,7 +7,7 @@
 
 void drawHP(TString infile="../build/hits.root"){
 
-  fSavePath = "data/hit_pattern";
+  fSavePath = "data/hit_pattern_plate16";
   CreateMap();
   PrtInit(infile,1);
 
