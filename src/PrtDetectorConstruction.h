@@ -38,6 +38,7 @@ private:
   G4LogicalVolume* lTrigger;
   G4LogicalVolume* lDirc;
   G4LogicalVolume* lBar;
+  G4LogicalVolume* lMirrorGap;
   G4LogicalVolume* lMirror;
   G4LogicalVolume* lLens1;
   G4LogicalVolume* lLens2;
@@ -49,6 +50,7 @@ private:
   G4LogicalVolume* lCover;
 
   G4VPhysicalVolume* wBar;
+  G4VPhysicalVolume* wMirrorGap;
   G4VPhysicalVolume* wMirror;
   G4VPhysicalVolume* wDirc;
 

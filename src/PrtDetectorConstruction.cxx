@@ -163,13 +163,18 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
 
+  // The Mirror gap
+  G4double mirrorgap=0.1*mm;
+  G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
+  lMirrorGap = new G4LogicalVolume(gMirrorGap,defaultMaterial,"lMirrorGap",0,0,0);
+  wMirrorGap =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-0.5*mirrorgap),lMirrorGap,"wMirrorGap", lDirc,false,0);
+  
   // The Mirror
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
-  wMirror =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-fMirror[2]/2.),lMirror,"wMirror", lDirc,false,0);
+  wMirror =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-fMirror[2]/2.-mirrorgap),lMirror,"wMirror", lDirc,false,0);
 
-  // The Lens
- 
+  // The Lens 
   G4Box* gfbox = new G4Box("Fbox",fLens[0]/2.,fLens[1]/2.,fLens[2]/2.);
   
   if(PrtManager::Instance()->GetLens() == 1){ // Spherical lens
@@ -397,7 +402,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  Double_t ms = 13;//(fPrizm[2]-5*fMcpTotal[0])/4.;
 	  shiftx = 3+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
-	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
+	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 	
@@ -540,17 +545,53 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   new G4LogicalSkinSurface("HamamatsuPMTSurface",lPixel,HamamatsuPMTOpSurface);
 
   // Mirror
-  G4OpticalSurface* MirrorOpSurface= 
-    new G4OpticalSurface("MirrorOpSurface",glisur,polished,dielectric_metal);
+  G4OpticalSurface* MirrorOpSurface = new G4OpticalSurface("MirrorOpSurface",glisur,polished,dielectric_metal);
+
+  // Mirror
+  const int numPr=44;
+  const int numUv=46;
   
+  double mirrEnPr[]={3.627,3.602,3.58,3.557,3.536,3.514,3.493,3.471,3.448,3.423,
+		     3.397,3.37,3.339,3.301,3.254,3.195,3.118,3.032,2.95,2.873,
+		     2.8,2.73,2.664,2.601,2.541,2.483,2.429,2.376,2.326,2.278,
+		     2.231,2.187,2.144,2.11,2.064,2.019,1.982,1.947,1.913,1.88,
+		     1.849,1.818,1.789,1.772};
+
+  double mirrEnUv[]={5.571,5.458,5.349,5.223,5.07,4.876,4.669,4.478,4.303,4.142,
+		     3.991,3.851,3.72,3.598,3.485,3.378,3.277,3.182,3.092,3.006,
+		     2.927,2.852,2.78,2.711,2.646,2.584,2.524,2.468,2.413,2.361,
+		     2.312,2.264,2.219,2.174,2.132,2.092,2.053,2.015,1.979,1.944,
+		     1.91,1.878,1.846,1.816,1.785,1.771};
+
+  // protected aluminium
+  double mirrReflPr[]={50.82,53.40,55.92,58.50,60.98,63.39,65.72,68.00,70.41,72.86,
+  		       75.12,77.30,79.57,81.77,83.97,86.07,88.07,89.59,90.55,91.14,
+  		       91.53,91.75,91.90,91.93,91.88,91.76,91.58,91.34,91.05,90.72,
+  		       90.20,89.64,89.18,88.75,88.09,87.36,86.69,85.95,85.18,84.36,
+  		       83.49,82.56,81.58,81.02};
+
+  // UV enhanced aluminium mirror
+  double mirrReflUv[]={77.36,79.75,81.90,84.01,86.21,88.36,90.11,91.16,92.10,92.61,
+		       92.75,92.82,92.83,92.70,92.54,92.35,92.10,91.78,91.44,91.08,
+		       90.68,90.27,89.84,89.40,88.96,88.50,88.03,87.55,87.09,86.64,
+		       86.21,85.78,85.36,84.98,84.62,84.26,83.93,83.62,83.29,82.99,
+		       82.71,82.44,82.16,81.88,81.58,81.46};
+
+  // old mirror
   G4double ReflectivityMirrorBar[num]={
     0.8755,0.882,0.889,0.895,0.9,0.9025,0.91,0.913,0.9165,0.92,0.923,
     0.9245,0.9285,0.932,0.934,0.935,0.936,0.9385,0.9395,0.94,
     0.9405,0.9405,0.9405,0.9405,0.94,0.9385,0.936,0.934,
     0.931,0.9295,0.928,0.928,0.921,0.92,0.927,0.9215};
 
+  //G4double ReflectivityMirrorBar[36]={0};
+  
   G4MaterialPropertiesTable *MirrorMPT = new G4MaterialPropertiesTable();
-  MirrorMPT->AddProperty("REFLECTIVITY", PhotonEnergy, ReflectivityMirrorBar, num);
+
+  MirrorMPT->AddProperty("REFLECTIVITY", mirrEnPr, mirrReflPr, numPr);
+  // MirrorMPT->AddProperty("REFLECTIVITY", mirrEnUv, mirrReflUv, numUv);
+  // MirrorMPT->AddProperty("REFLECTIVITY", PhotonEnergy, ReflectivityMirrorBar, num);
+  
   MirrorMPT->AddProperty("EFFICIENCY", PhotonEnergy, EfficiencyMirrors,   num);
   
   MirrorOpSurface->SetMaterialPropertiesTable(MirrorMPT);
@@ -704,11 +745,11 @@ void PrtDetectorConstruction::DefineMaterials(){
 
   G4double EpotekRefractiveIndex[num]={
     1.554034,1.555575,1.55698,1.558266,1.559454,1.56056,1.561604,
-     1.562604,1.563579,1.564547,1.565526,1.566536,1.567595,
-     1.568721,1.569933,1.57125,1.57269,1.574271,1.576012,
-     1.577932,1.580049,1.582381,1.584948,1.587768,1.590859,
-     1.59424,1.597929,1.601946,1.606307,1.611033,1.616141,1.621651,1.62758,
-     1.633947,1.640771,1.64807};
+    1.562604,1.563579,1.564547,1.565526,1.566536,1.567595,
+    1.568721,1.569933,1.57125,1.57269,1.574271,1.576012,
+    1.577932,1.580049,1.582381,1.584948,1.587768,1.590859,
+    1.59424,1.597929,1.601946,1.606307,1.611033,1.616141,1.621651,1.62758,
+    1.633947,1.640771,1.64807};
 
   G4double KamLandOilRefractiveIndex[num]={
     1.433055,1.433369,1.433698,1.434045,1.434409,1.434793,1.435198,
@@ -725,8 +766,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   G4MaterialPropertiesTable* QuartzMPT = new G4MaterialPropertiesTable();
   QuartzMPT->AddProperty("RINDEX",       PhotonEnergy, QuartzRefractiveIndex,num);
   QuartzMPT->AddProperty("ABSLENGTH",    PhotonEnergy, QuartzAbsorption,           num);
-
-  // assign this parameter table to BAR material
   BarMaterial->SetMaterialPropertiesTable(QuartzMPT);
 
   // Air
@@ -741,7 +780,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   G4MaterialPropertiesTable* KamLandOilMPT = new G4MaterialPropertiesTable();
   KamLandOilMPT->AddProperty("RINDEX", PhotonEnergy, KamLandOilRefractiveIndex, num);
   KamLandOilMPT->AddProperty("ABSLENGTH", PhotonEnergy, KamLandOilAbsorption, num);
-  // assing this parameter table  to the KamLandOil
   OilMaterial->SetMaterialPropertiesTable(KamLandOilMPT);  
 
   // N-Lak 33a                                                
@@ -756,7 +794,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   EpotekMPT->AddProperty("ABSLENGTH", PhotonEnergy, EpotekAbsorption, num);
   // assign this parameter table to the epotek
   epotekMaterial->SetMaterialPropertiesTable(EpotekMPT);
-
 }
 
 void PrtDetectorConstruction::SetVisualization(){
