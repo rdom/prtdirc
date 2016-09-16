@@ -47,6 +47,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   fMomentum = TVector3(0,0,0);
   fGeometry = 3;
   fAngle = 0;
+  fRadiator=1;
   fRadiatorL=0;
   fRadiatorW=0;
   fRadiatorH=0;

@@ -186,6 +186,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
   test3 = PrtManager::Instance()->GetTest3();
+  Int_t radiator = PrtManager::Instance()->GetRadiator();
   Double_t timeRes = PrtManager::Instance()->GetTimeRes();
   fMethod = PrtManager::Instance()->GetRunType();
   
@@ -210,6 +211,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       prtangle = fEvent->GetAngle();
       
       studyId = fEvent->GetGeometry();
+      
       mom=fEvent->GetMomentum().Mag();
       Double_t beam_corr(0); 
       //if(studyId==151) beam_corr = 0.0045; //125 deg //!
@@ -373,11 +375,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
       //==================================================
       
-      Double_t radiatorL = 1250; //bar
-
       if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==175 || studyId==176 || studyId==177 || studyId==178){
-	radiatorL = 1224.9; //plate
+	radiator=2;
       }
+ 
+      Double_t radiatorL = (radiator==2)? 1224.9 : 1250; //plate : bar
 
       Double_t z =  fEvent->GetBeamZ()+25;
       if( fEvent->GetType()==1){
@@ -605,7 +607,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	      if(fabs(tangle-0.815)<0.04) isGoodHit=true; //0.04
 	      if(studyId>=160) isGoodHit=true;
 	    }
-	    if(studyId==152 || studyId==153) isGoodHit=true;
+	    if(radiator==2) isGoodHit=true;
 	    
 	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
