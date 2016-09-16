@@ -211,6 +211,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       prtangle = fEvent->GetAngle();
       
       studyId = fEvent->GetGeometry();
+      if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==175 || studyId==176 || studyId==177 || studyId==178){
+	radiator=2;
+      }      
       
       mom=fEvent->GetMomentum().Mag();
       Double_t beam_corr(0); 
@@ -324,7 +327,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(fEvent->GetType()!=0) hitTime+=fRand.Gaus(0,0.2); // time resol. in case it was not simulated
 	
       //======================================== dynamic cuts
-      {
+      if(radiator!=2){
 	// { //time cuts
 	// 	if(prtangle<=80){
 	// 	  if(hitTime<11 || hitTime>35) continue;
@@ -373,12 +376,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(prtangle > 80 and prtangle<100) timeRes=2;	
 	}
       }
-      //==================================================
-      
-      if(studyId==152 || studyId==153 || studyId==161 || studyId==162 || studyId==171 || studyId==172 || studyId==173 || studyId==175 || studyId==176 || studyId==177 || studyId==178){
-	radiator=2;
-      }
- 
+      //================================================== 
       Double_t radiatorL = (radiator==2)? 1224.9 : 1250; //plate : bar
 
       Double_t z =  fEvent->GetBeamZ()+25;
@@ -450,6 +448,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(sensorId==1) continue;
 
       Bool_t isGoodHit(false);
+      if(radiator==2) isGoodHit=true;
       
       Int_t size =fLutNode[sensorId]->Entries();
       for(Int_t i=0; i<size; i++){

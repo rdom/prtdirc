@@ -1,7 +1,7 @@
 #include "../../prttools/prttools.C"
 void da_scan(TString inFile = "r_spr.root", TString outFile="c_spr.root"){
 
-  fSavePath = "data/temp/airgap0";
+  fSavePath = "data/mirror_old";
 
   TChain ch("dirc"); ch.Add(inFile);
   Double_t cangle,spr,trr,nph,par1,par2,par3,par4,par5,par6,test1,test2,theta,phi; 
@@ -45,7 +45,7 @@ void da_scan(TString inFile = "r_spr.root", TString outFile="c_spr.root"){
   gSpr->SetMarkerSize(0.7);
   gNph->SetMarkerSize(0.7);
   gTrr->SetMarkerSize(0.7);
-  gNph->GetYaxis()->SetRangeUser(0,100);
+  gNph->GetYaxis()->SetRangeUser(0,140);
   gSpr->GetYaxis()->SetRangeUser(0,14);
   gTrr->GetYaxis()->SetRangeUser(0,2);
 

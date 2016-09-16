@@ -163,16 +163,16 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
 
-  // The Mirror gap
-  G4double mirrorgap=0.1*mm;
-  G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
-  lMirrorGap = new G4LogicalVolume(gMirrorGap,defaultMaterial,"lMirrorGap",0,0,0);
-  wMirrorGap =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-0.5*mirrorgap),lMirrorGap,"wMirrorGap", lDirc,false,0);
+  // // The Mirror gap
+  // G4double mirrorgap=0.1*mm;
+  // G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
+  // lMirrorGap = new G4LogicalVolume(gMirrorGap,defaultMaterial,"lMirrorGap",0,0,0);
+  // wMirrorGap =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-0.5*mirrorgap),lMirrorGap,"wMirrorGap", lDirc,false,0);
   
   // The Mirror
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
-  wMirror =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-fMirror[2]/2.-mirrorgap),lMirror,"wMirror", lDirc,false,0);
+  wMirror =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-fMirror[2]/2.),lMirror,"wMirror", lDirc,false,0);//-mirrorgap
 
   // The Lens 
   G4Box* gfbox = new G4Box("Fbox",fLens[0]/2.,fLens[1]/2.,fLens[2]/2.);
@@ -463,7 +463,12 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     PMTReflectivity[i]=0.;
     EfficiencyMirrors[i]=0; 
   }
-
+  for(Int_t i=0; i<num; i++){
+    std::cout<<","<<1.24/(PhotonEnergy[i]*1e6); 
+  }
+  std::cout<<std::endl;
+  
+  
   /***************** QUANTUM EFFICIENCY OF BURLE AND HAMAMTSU PMT'S *****/
 
   //ideal pmt quantum efficiency
@@ -564,18 +569,18 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 		     1.91,1.878,1.846,1.816,1.785,1.771};
 
   // protected aluminium
-  double mirrReflPr[]={50.82,53.40,55.92,58.50,60.98,63.39,65.72,68.00,70.41,72.86,
-  		       75.12,77.30,79.57,81.77,83.97,86.07,88.07,89.59,90.55,91.14,
-  		       91.53,91.75,91.90,91.93,91.88,91.76,91.58,91.34,91.05,90.72,
-  		       90.20,89.64,89.18,88.75,88.09,87.36,86.69,85.95,85.18,84.36,
-  		       83.49,82.56,81.58,81.02};
+  double mirrReflPr[]={0.5082,0.5340,0.5592,0.5850,0.6098,0.6339,0.6572,0.6800,0.7041,0.7286,
+  		       0.7512,0.7730,0.7957,0.8177,0.8397,0.8607,0.8807,0.8959,0.9055,0.9114,
+ 		       0.9153,0.9175,0.9190,0.9193,0.9188,0.9176,0.9158,0.9134,0.9105,0.9072,
+  		       0.9020,0.8964,0.8918,0.8875,0.8809,0.8736,0.8669,0.8595,0.8518,0.8436,
+  		       0.8349,0.8256,0.8158,0.8102};
 
   // UV enhanced aluminium mirror
-  double mirrReflUv[]={77.36,79.75,81.90,84.01,86.21,88.36,90.11,91.16,92.10,92.61,
-		       92.75,92.82,92.83,92.70,92.54,92.35,92.10,91.78,91.44,91.08,
-		       90.68,90.27,89.84,89.40,88.96,88.50,88.03,87.55,87.09,86.64,
-		       86.21,85.78,85.36,84.98,84.62,84.26,83.93,83.62,83.29,82.99,
-		       82.71,82.44,82.16,81.88,81.58,81.46};
+  double mirrReflUv[]={0.7736,0.7975,0.8190,0.8401,0.8621,0.8836,0.9011,0.9116,0.9210,0.9261,
+		       0.9275,0.9282,0.9283,0.9270,0.9254,0.9235,0.9210,0.9178,0.9144,0.9108,
+		       0.9068,0.9027,0.8984,0.8940,0.8896,0.8850,0.8803,0.8755,0.8709,0.8664,
+		       0.8621,0.8578,0.8536,0.8498,0.8462,0.8426,0.8393,0.8362,0.8329,0.8299,
+		       0.8271,0.8244,0.8216,0.8188,0.8158,0.8146};
 
   // old mirror
   G4double ReflectivityMirrorBar[num]={
@@ -588,11 +593,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   G4MaterialPropertiesTable *MirrorMPT = new G4MaterialPropertiesTable();
 
-  MirrorMPT->AddProperty("REFLECTIVITY", mirrEnPr, mirrReflPr, numPr);
-  // MirrorMPT->AddProperty("REFLECTIVITY", mirrEnUv, mirrReflUv, numUv);
-  // MirrorMPT->AddProperty("REFLECTIVITY", PhotonEnergy, ReflectivityMirrorBar, num);
+  //MirrorMPT->AddProperty("REFLECTIVITY", mirrEnPr, mirrReflPr, numPr);
+  //MirrorMPT->AddProperty("REFLECTIVITY", mirrEnUv, mirrReflUv, numUv);
+  MirrorMPT->AddProperty("REFLECTIVITY", PhotonEnergy, ReflectivityMirrorBar, num);
   
-  MirrorMPT->AddProperty("EFFICIENCY", PhotonEnergy, EfficiencyMirrors,   num);
+  //MirrorMPT->AddProperty("EFFICIENCY", PhotonEnergy, EfficiencyMirrors,   num);
   
   MirrorOpSurface->SetMaterialPropertiesTable(MirrorMPT);
   new G4LogicalSkinSurface("MirrorSurface", lMirror,MirrorOpSurface);
