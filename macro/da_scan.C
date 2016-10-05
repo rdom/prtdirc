@@ -1,7 +1,7 @@
 #include "../../prttools/prttools.C"
 void da_scan(TString inFile = "r_spr.root", TString outFile="c_spr.root"){
 
-  fSavePath = "data/mirror_old";
+  fSavePath = "data/mirror_old_ng";
 
   TChain ch("dirc"); ch.Add(inFile);
   Double_t cangle,spr,trr,nph,par1,par2,par3,par4,par5,par6,test1,test2,theta,phi; 
