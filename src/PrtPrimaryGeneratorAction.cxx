@@ -96,23 +96,32 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     G4double shifty = radiatorW/2. - G4UniformRand()*radiatorW;
     G4double shiftz = radiatorH/2. - G4UniformRand()*radiatorH;
 
-    //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
-    fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2. +0.1, 0,-5));
-    G4double angle = -G4UniformRand()*M_PI;
+    G4double angle = 0.7*(M_PI/2.-G4UniformRand()*M_PI);
     G4ThreeVector vec(0,0,1);
-    vec.setTheta(M_PI/2.+angle);
+    vec.setTheta(angle);
     ///vec.setTheta(acos(G4UniformRand()));
     //vec.setPhi(2*M_PI*G4UniformRand());
+    //std::cout<<"angle "<<angle*180/M_PI <<std::endl;
+    
+    G4double lensThickness=15;
+    G4double separation=5;
+    G4double rotShiftX=0.5*separation*std::cos(angle)+(0.5*lensThickness+0.1)*std::tan(angle);
+    G4double rotShiftY=-0.5*radiatorL +0.1;
+
+    //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
+    fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY, 0,-rotShiftX));
+  
     
     vec.rotateY(-M_PI/2.);
     fParticleGun->SetParticleMomentumDirection(vec);
 
     fParticleGun->GeneratePrimaryVertex(anEvent);
+    rotShiftX=-0.5*separation*std::cos(angle)+(0.5*lensThickness+0.1)*std::tan(angle);
     shiftx = -radiatorL/2.+0.1;
     shifty = radiatorW/2. - G4UniformRand()*radiatorW;
     shiftz = radiatorH/2. - G4UniformRand()*radiatorH;
     //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
-    fParticleGun->SetParticlePosition(G4ThreeVector(-radiatorL/2. +0.1,0,5));
+    fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY,0,-rotShiftX));
   }
 
   fParticleGun->GeneratePrimaryVertex(anEvent);

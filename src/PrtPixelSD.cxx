@@ -171,14 +171,14 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
 
   Bool_t charge_sharing(true);
-  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()==2015 && charge_sharing){
+  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) PrtManager::Instance()->AddHit(hit);
     else charge_sharing=false;
   }else{
     PrtManager::Instance()->AddHit(hit);
   }
 
-  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()==2015 && charge_sharing){
+  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
     //charge sharing for 8x8 MCP
     Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
     Double_t x(localPos.x()), y(localPos.y());

@@ -42,12 +42,13 @@ double findVertex(TVector3 v1,TVector3 m1, TVector3 v2,TVector3 m2, TVector3* ne
 }
 
 
-void drawFocalPlane(TString infile="../build/focalplane.root", Double_t r1 = 48.8, Double_t r2 = 29.1, Int_t it1=0, Int_t it2=0, Double_t energy=-1){
+void drawFocalPlane(TString infile="../build/focalplane.root", Double_t r1 = 47.8, Double_t r2 = 29.1, Int_t it1=0, Int_t it2=0, Double_t energy=-1){
   fSavePath = "data/fp";
   CreateMap();
   PrtInit(infile,0);
   gStyle->SetOptStat(0);
 
+  Double_t lensThickness(15);
   Double_t radiatorL(1250); //bar
   // Double_t radiatorL(1224.9); //plate
   TVector3 res;
@@ -65,7 +66,7 @@ void drawFocalPlane(TString infile="../build/focalplane.root", Double_t r1 = 48.
     
     Double_t d = findVertex(hit[0].GetGlobalPos(),hit[0].GetMomentum().Unit(),hit[1].GetGlobalPos(),hit[1].GetMomentum().Unit(), &res);
     if(d<1){
-      Double_t x = -(res.X()+radiatorL/2.)/10.;
+      Double_t x = -(res.X()+0.5*radiatorL+0.5*lensThickness)/10.;
       if(x>1){
 	hFp1->Fill(x,res.Z()/10.);
 	hFp2->Fill(res.Y()/10.,res.Z()/10.);
@@ -86,10 +87,10 @@ void drawFocalPlane(TString infile="../build/focalplane.root", Double_t r1 = 48.
   hFp1->SetTitle(Form("r_{1}=%2.2f    r_{2}=%2.2f   #varepsilon=%2.0f",r1,r2,eff)+senergy);
   canvasAdd(Form("fp_%d_%d",it1,it2),800,500);
   hFp1->Draw("colz");
-  canvasAdd(Form("fp2_%d_%d",it1,it2),600,800);
-  hFp2->Draw("colz");
+  // canvasAdd(Form("fp2_%d_%d",it1,it2),600,800);
+  // hFp2->Draw("colz");
   //  canvasSave(0,"drawFocalPlane.C",1,"fp");
-  canvasSave(1,1);
+  canvasSave(0,0);
   
 }
 

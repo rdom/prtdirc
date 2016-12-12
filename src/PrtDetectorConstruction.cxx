@@ -97,7 +97,8 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
   
   if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-    fPrizm[1] = 30; fPrizm[3] = 300;  fPrizm[2]=500;  
+    fPrizm[1] = 30; fPrizm[3] = 300;  fPrizm[2]=500;
+    fBar[0] = 40;
   }
     
   PrtManager::Instance()->SetRadiatorL(fBar[2]);
@@ -158,7 +159,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   // The Bar
   G4Box* gBar = new G4Box("gBar",fBar[0]/2.,fBar[1]/2.,fBar[2]/2.);
-  lBar = new G4LogicalVolume(gBar,BarMaterial,"lBar",0,0,0);
+
+  if(PrtManager::Instance()->GetRunType() == 6) lBar = new G4LogicalVolume(gBar,OilMaterial,"lBar",0,0,0);
+  else lBar = new G4LogicalVolume(gBar,BarMaterial,"lBar",0,0,0);
+
+  
   G4double xshift = -(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX();
   if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
@@ -233,7 +238,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
 
   if(PrtManager::Instance()->GetLens() == 3){ // 3-component spherical lens
-    G4double lensMinThikness = 2; 
+    G4double lensMinThikness = 2.0; 
   
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
@@ -243,8 +248,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
        r2 = PrtManager::Instance()->GetTest2();
     }
     
-    r1 = (r1==0)? 47.8: r1;
-    r2 = (r2==0)? 29.1: r2;
+    r1 = (r1==0)? 47.80: r1;
+    r2 = (r2==0)? 29.12: r2;
     G4double shight = 40;
     G4double bwidth = fLens[2]-lensMinThikness*2;
 
@@ -313,7 +318,9 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 
   // The Prizm
   G4Trap* gPrizm = new G4Trap("gPrizm",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
-  lPrizm = new G4LogicalVolume(gPrizm, BarMaterial,"lPrizm",0,0,0);
+  if(PrtManager::Instance()->GetRunType() == 6)  lPrizm = new G4LogicalVolume(gPrizm, OilMaterial,"lPrizm",0,0,0);
+  else   lPrizm = new G4LogicalVolume(gPrizm, BarMaterial,"lPrizm",0,0,0);
+  
   G4RotationMatrix* xRot = new G4RotationMatrix();
   xRot->rotateX(M_PI/2.*rad);
   fPrismShift = G4ThreeVector((fPrizm[2]+fPrizm[3])/4.-fPrizm[3]/2.,0,fBar[2]/2.+fPrizm[1]/2.+fLens[2]);
