@@ -94,7 +94,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   }
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
 
-  for(Int_t i=0; i<15; i++){
+  for(Int_t i=0; i<nmcp; i++){
     fHistMcp[i] = new TH1F(Form("fHistMcp_%d",i),Form("fHistMcp_%d;#theta_{C} [rad];entries [#]",i), 80,0.6,1); //150
   }
 
@@ -129,7 +129,7 @@ Int_t getneighbours(Int_t m, Int_t p){
 }
 
 void getclusters(){
-  for(Int_t m=0; m<15; m++){
+  for(Int_t m=0; m<nmcp; m++){
     for(Int_t p=0; p<65; p++){
       if(mcpdata[m][p])  cluster[m][p] = getneighbours(m,p);
       lsize=0;
@@ -451,6 +451,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(radiator==2) isGoodHit=true;
       
       Int_t size =fLutNode[sensorId]->Entries();
+
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
 	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
@@ -462,7 +463,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//if(fLutNode[sensorId]->GetNRefl(i)!=1 ) continue;
 	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
-
 	
 	for(int u=0; u<2; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
@@ -587,7 +587,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 //  if(mcpid==12) tangle += 0.00232183;
 // if(mcpid==13) tangle += 0.00760167;
 // if(mcpid==14) tangle += -0.0031577;
-     	  
+	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    // if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    // else
@@ -600,7 +600,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	      sum1 += TMath::Log(gF1->Eval(tangle)+noise);
 	      sum2 += TMath::Log(gF2->Eval(tangle)+noise);
 	    }
-	    
+
 	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
 	      if(fabs(tangle-0.815)<0.04) isGoodHit=true; //0.04
@@ -622,7 +622,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  }
 	}
       }
-
+ 
       if(isGoodHit) nsHits++;
       if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     } 
@@ -842,7 +842,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
       if(false){
 	Int_t tmax, max=0;
-	for(Int_t m=0; m<15;m++){
+	for(Int_t m=0; m<nmcp;m++){
 	  fhDigi[m]->Rebin2D(8,8);
 	  fhDigi[m]->GetXaxis()->SetNdivisions(0);
 	  fhDigi[m]->GetYaxis()->SetNdivisions(0);
@@ -854,7 +854,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	  tmax = fhDigi[m]->GetMaximum();
 	  if(max<tmax) max = tmax;
 	}
-	for(Int_t m=0; m<15;m++){
+	for(Int_t m=0; m<nmcp;m++){	  
 	  fhDigi[m]->Scale(1/(Double_t)max);
 	}
       }
@@ -926,7 +926,7 @@ void PrtLutReco::ResetHists(){
   fHist2->Reset();
   fHist3->Reset();
   fHist4->Reset();
-  for(Int_t m=0; m<15;m++) fhDigi[m]->Reset();
+  for(Int_t m=0; m<nmcp;m++) fhDigi[m]->Reset();
 }
 
 TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);

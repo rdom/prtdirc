@@ -131,7 +131,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   G4Box* gTrigger = new G4Box("gTrigger",20.,20.,5);
   lTrigger = new G4LogicalVolume(gTrigger,frontMaterial,"lTrigger",0,0,0);
   
-  if(fGeomId == 3 || fGeomId == 2015){
+  if(fGeomId == 3 || fGeomId == 2015 || fGeomId == 2016){
     new G4PVPlacement(0,G4ThreeVector(0,0,-1200),lFront,"wFront",lExpHall,false,0);
     new G4PVPlacement(0,G4ThreeVector(0,0,1500),lTrigger,"wTrigger",lExpHall,false,0); 
   }
@@ -150,10 +150,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   wDirc  = new G4PVPlacement(fPrtRot,dircpos+G4ThreeVector(-zshift,0,0),lDirc,"wDirc",lExpHall,false,0);
 
   // The DIRC cover box
-  G4Box* gCover = new G4Box("gCover",1,150,fBar[2]/2.);
+  G4Box* gCover = new G4Box("gCover",5,150,fBar[2]/2.);
   lCover = new G4LogicalVolume(gCover, MirrorMaterial ,"lCover",0,0,0);
 
-  if(fGeomId == 3 || fGeomId == 2015){
+  if(fGeomId == 3 || fGeomId == 2015 || fGeomId == 2016){
     new G4PVPlacement(0,G4ThreeVector(-100,0,0),lCover,"wCover",lDirc,false,0);
   }
   

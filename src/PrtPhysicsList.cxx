@@ -175,9 +175,9 @@ void PrtPhysicsList::ConstructOp()
   fMieHGScatteringProcess    = new G4OpMieHG();
   fBoundaryProcess           = new PrtOpBoundaryProcess();
 
-//  fCerenkovProcess->DumpPhysicsTable();
-//  fScintillationProcess->DumpPhysicsTable();
-//  fRayleighScatteringProcess->DumpPhysicsTable();
+  //  fCerenkovProcess->DumpPhysicsTable();
+  //  fScintillationProcess->DumpPhysicsTable();
+  //  fRayleighScatteringProcess->DumpPhysicsTable();
 
   SetVerbose(0);
   
@@ -191,7 +191,7 @@ void PrtPhysicsList::ConstructOp()
   
   fScintillationProcess->SetScintillationYieldFactor(1.);
   fScintillationProcess->SetTrackSecondariesFirst(true);
-
+ 
   // Use Birks Correction in the Scintillation process
 
   G4EmSaturation* emSaturation =

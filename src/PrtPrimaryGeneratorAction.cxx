@@ -54,16 +54,22 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   if(PrtManager::Instance()->GetBeamDinsion() > 0){ // smearing and divergence
     G4double sigma = PrtManager::Instance()->GetBeamDinsion()*mm;
     z = fParticleGun->GetParticlePosition().z();
-    x = G4RandGauss::shoot(0,sigma);
-    y = G4RandGauss::shoot(0,sigma);
-    
+
+    // gaussian smearing
+    // x = G4RandGauss::shoot(0,sigma);
+    // y = G4RandGauss::shoot(0,sigma);
+
+    // box smearing
+    x = (0.5-G4UniformRand())*sigma;
+    y = (0.5-G4UniformRand())*sigma;
+
     fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
     PrtManager::Instance()->Event()->SetPosition(TVector3(x,y,z));
 
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
-    //vec.setTheta(G4RandGauss::shoot(0,0.001)); //beam divergence  
-    //vec.setPhi(2*M_PI*G4UniformRand());
+    vec.setTheta(G4RandGauss::shoot(0,0.0015)); //beam divergence  
+    vec.setPhi(2*M_PI*G4UniformRand());
 
     fParticleGun->SetParticleMomentumDirection(vec);
     
