@@ -194,7 +194,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     if(ok) {
       std::cout<<"p "<<p <<std::endl;
       
-      hit.SetPixelId(p);
+      //hit.SetPixelId(p);
       //PrtManager::Instance()->AddHit(hit);
     }
     
