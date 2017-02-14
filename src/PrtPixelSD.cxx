@@ -179,24 +179,24 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
     //charge sharing for 8x8 MCP
-    Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
-    Double_t x(localPos.x()), y(localPos.y());
-    Int_t p(pixid);
-    Bool_t ok(false);
-    Double_t expd = exp(-(pixdim-fabs(x))/chargesig);
+    // Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
+    // Double_t x(localPos.x()), y(localPos.y());
+    // Int_t p(pixid);
+    // Bool_t ok(false);
+    // Double_t expd = exp(-(pixdim-fabs(x))/chargesig);
     
-    if(x<0 && pixid%8!=1 && expd>G4UniformRand() && expd<threshold){ok=true; p-=1;}
-    if(x>0 && pixid%8!=0 && expd>G4UniformRand() && expd<threshold){ok=true; p+=1;}
-    expd = exp(-(pixdim-fabs(y))/chargesig);
-    if(y<0 && pixid>8    && expd>G4UniformRand() && expd<threshold){ok=true; p-=8;}
-    if(y>0 && pixid<57   && expd>G4UniformRand() && expd<threshold){ok=true; p+=8;}
+    // if(x<0 && pixid%8!=1 && expd>G4UniformRand() && expd<threshold){ok=true; p-=1;}
+    // if(x>0 && pixid%8!=0 && expd>G4UniformRand() && expd<threshold){ok=true; p+=1;}
+    // expd = exp(-(pixdim-fabs(y))/chargesig);
+    // if(y<0 && pixid>8    && expd>G4UniformRand() && expd<threshold){ok=true; p-=8;}
+    // if(y>0 && pixid<57   && expd>G4UniformRand() && expd<threshold){ok=true; p+=8;}
  
-    if(ok) {
-      std::cout<<"p "<<p <<std::endl;
+    // if(ok) {
+    //   std::cout<<"p "<<p <<std::endl;
       
-      //hit.SetPixelId(p);
-      //PrtManager::Instance()->AddHit(hit);
-    }
+    //   //hit.SetPixelId(p);
+    //   //PrtManager::Instance()->AddHit(hit);
+    // }
     
   }
       
