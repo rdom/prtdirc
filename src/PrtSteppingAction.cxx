@@ -42,8 +42,8 @@ void PrtSteppingAction::UserSteppingAction(const G4Step* step)
   // std::cout<<"parentId   "<<parentId <<std::endl;
  
 
-  //  G4cout<<step->GetPreStepPoint()->GetPhysicalVolume()->GetName()  <<" - "
-  // 	<<step->GetPostStepPoint()->GetPhysicalVolume()->GetName() <<"  "<< G4endl;
+   G4cout<<step->GetPreStepPoint()->GetPhysicalVolume()->GetName()  <<" - "
+  	<<step->GetPostStepPoint()->GetPhysicalVolume()->GetName() <<"  "<< G4endl;
   //if(step->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="Bar" && step->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="ExpHall" ) track->SetTrackStatus(fStopAndKill);
   //if(step->GetPreStepPoint()->GetPosition().x()>10 ) track->SetTrackStatus(fStopAndKill);
 

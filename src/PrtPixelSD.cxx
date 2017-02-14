@@ -183,8 +183,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     Double_t x(localPos.x()), y(localPos.y());
     Int_t p(pixid);
     Bool_t ok(false);
-    std::cout<<"x "<<x <<"  y "<< y<<std::endl;
-    
     Double_t expd = exp(-(pixdim-fabs(x))/chargesig);
     
     if(x<0 && pixid%8!=1 && expd>G4UniformRand() && expd<threshold){ok=true; p-=1;}
@@ -193,10 +191,10 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     if(y<0 && pixid>8    && expd>G4UniformRand() && expd<threshold){ok=true; p-=8;}
     if(y>0 && pixid<57   && expd>G4UniformRand() && expd<threshold){ok=true; p+=8;}
  
-    // if(ok) {
-    //   hit.SetPixelId(p);
-    //   PrtManager::Instance()->AddHit(hit);
-    // }
+    if(ok) {
+      hit.SetPixelId(p);
+      PrtManager::Instance()->AddHit(hit);
+    }
     
   }
       
