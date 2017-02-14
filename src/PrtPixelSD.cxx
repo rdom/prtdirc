@@ -168,7 +168,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetTotTime(wavelength); //set photon wavelength
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
-  std::cout<<"time "<<time <<std::endl;
   
   Bool_t charge_sharing(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
@@ -178,7 +177,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     PrtManager::Instance()->AddHit(hit);
   }
 
-  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
+  if(false){//PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
     //charge sharing for 8x8 MCP
     Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
     Double_t x(localPos.x()), y(localPos.y());
