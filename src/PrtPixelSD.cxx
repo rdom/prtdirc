@@ -168,8 +168,8 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetTotTime(wavelength); //set photon wavelength
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
-
-  return true;
+  std::cout<<"time "<<time <<std::endl;
+  
   Bool_t charge_sharing(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) PrtManager::Instance()->AddHit(hit);
