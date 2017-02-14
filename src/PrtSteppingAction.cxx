@@ -40,6 +40,7 @@ void PrtSteppingAction::UserSteppingAction(const G4Step* step)
   int parentId = track->GetParentID();
 
   // std::cout<<"parentId   "<<parentId <<std::endl;
+ std::cout<<"length  "<<track->GetTrackLength() <<std::endl;
  
 
    // G4cout<<step->GetPreStepPoint()->GetPhysicalVolume()->GetName()  <<" - "
