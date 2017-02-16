@@ -93,7 +93,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
 
   if(fGeomId == 2016){ 
     fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 30;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(30*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-122);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
   }
   
   if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
