@@ -72,6 +72,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fPrizm[2] = 30+fPrizm[1]*tan(30*deg); fPrizm[3] = 30;
   }
 
+  if(fMcpLayout == 2021){ // Barrel DIRC layout
+    fNCol = 4;
+    fPrizm[2] = 40+fPrizm[1]*tan(33*deg); fPrizm[3] = 40;
+  }
+
   if(PrtManager::Instance()->GetRadiator()==2){
     fBar[0] = 17.1;
     fBar[1] = 174.8;
@@ -478,6 +483,18 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
 	  if(j==1) shiftx += (3/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
+	}
+
+	if(fMcpLayout==2021){
+	  Double_t ms = 0;
+	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  shifty = (fMcpTotal[0]+1)*(j-1);
+	  if(i==0){	   
+	    if(j==0) continue;
+	    shifty = (fMcpTotal[0]+1)*(j-1)-0.5*fMcpTotal[0]-0.5;
+	  }
+	  new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,fBar[2]/2.+fPrizm[1]+fMcpActive[2]/2.+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+(j-1));
+	  continue;
 	}
 	
 	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,fBar[2]/2.+fPrizm[1]+fMcpActive[2]/2.+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+j);

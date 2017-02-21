@@ -85,7 +85,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
 	fQe_space[m][i]=qe_m2016[m][i];
       }
     }
-  }else if(layout==2017){
+  }else{
     for(Int_t m=0; m<15; m++){
       for(Int_t i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2017[m][i];
