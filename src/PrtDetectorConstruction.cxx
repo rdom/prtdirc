@@ -36,7 +36,8 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   
   fGeomId = PrtManager::Instance()->GetGeometry();
   fMcpLayout = PrtManager::Instance()->GetMcpLayout();
- 
+  fLensId = PrtManager::Instance()->GetLens();
+  
   fNRow = 3;
   fNCol = 5;
   
@@ -47,16 +48,16 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   fMcpTotal[0] = fMcpTotal[1] = 53+6; fMcpTotal[2]=1;
   fMcpActive[0] = fMcpActive[1] = 53; fMcpActive[2]=1;
   fLens[0] = fLens[1] = 40; fLens[2]=10;
-  if(PrtManager::Instance()->GetLens() == 2){
+  if(fLensId == 2){
     fLens[0] = 50; fLens[1] = 175; fLens[2]=14.4;
-  }
-  if(PrtManager::Instance()->GetLens() == 3){
+  }else if(fLensId == 3){
     fLens[0] = 60; fLens[1] = 60; fLens[2]=15;
-  }
-  if(PrtManager::Instance()->GetLens() == 4 || PrtManager::Instance()->GetLens() == 5){
+  }else if(fLensId == 4 ||fLensId == 5){
     fLens[0] = 50; fLens[1] = 50; fLens[2]=5.7;
+  }else if(fLensId == 6){
+    fLens[0] = 26; fLens[1] = 175; fLens[2]=9;
   }
-
+  
   if(fMcpLayout == 2012){
     fNCol = 3;
     fPrizm[2] = 30+fPrizm[1]*tan(30*deg); fPrizm[3] = 30;
@@ -93,6 +94,10 @@ PrtDetectorConstruction::PrtDetectorConstruction()
 
   if(fGeomId == 2016){ 
     fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 30;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(30*deg);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
+  }
+
+  if(fGeomId == 2017){ 
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
   }
   
@@ -179,10 +184,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
   wMirror =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-fMirror[2]/2.),lMirror,"wMirror", lDirc,false,0);//-mirrorgap
 
-  // The Lens 
+  // The Lens
   G4Box* gfbox = new G4Box("Fbox",fLens[0]/2.,fLens[1]/2.,fLens[2]/2.);
   
-  if(PrtManager::Instance()->GetLens() == 1){ // Spherical lens
+  if(fLensId == 1){ // 2-layer spherical lens
     G4double r1 = 0; // PrtManager::Instance()->GetTest1(); 
     G4double lensrad1 = (r1==0)? 73.58: r1;
     G4double lensMinThikness = 2; 
@@ -196,7 +201,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens2 = new G4LogicalVolume(gLens2,BarMaterial,"lLens2",0,0,0);
   }
 
-  if(PrtManager::Instance()->GetLens() == 2){ // Cylindrical lens
+  if(fLensId == 2){ // 2-layer cylindrical lens
     G4double lensrad = 73.58;
     G4double lensMinThikness = 8;
     G4ThreeVector zTrans(0, 0, -lensrad+fLens[2]/2.-lensMinThikness);
@@ -209,7 +214,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens2 = new G4LogicalVolume(gLens2,BarMaterial,"lLens2",0,0,0);
   }
 
-  if(PrtManager::Instance()->GetLens() == 334){ // 3-component spherical lens
+  if(fLensId == 334){ // 3-component spherical lens
     G4double lensMinThikness = 2; 
   
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
@@ -237,7 +242,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens3 = new G4LogicalVolume(gLens3,BarMaterial,"lLens3",0,0,0);
   }
 
-  if(PrtManager::Instance()->GetLens() == 3){ // 3-component spherical lens
+  if(fLensId == 3){ // 3-component spherical lens
     G4double lensMinThikness = 2.0; 
   
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
@@ -256,10 +261,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +lensMinThikness);
     G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +lensMinThikness*2);
 
-    G4Box* gfbox0 = new G4Box("Fbox0",fLens[0]/2+1.,fLens[1]/2.+1,fLens[2]/2.);
-    G4Tubs* gfbox = new G4Tubs("Fbox",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
-    G4Box* gfsbox = new G4Box("Fsbox",shight/2.,fLens[1]/2.,fLens[2]/2.);
-    G4Tubs* gfstube = new G4Tubs("ftube",0,shight/2.,fLens[2]/2.,0.*deg,360.*deg);
+    G4Box* gfbox0 = new G4Box("Fbox0",0.5*fLens[0]+1,0.5*fLens[1]+1,0.5*fLens[2]);
+    G4Tubs* gfbox = new G4Tubs("Fbox",0,0.5*fLens[0],0.5*fLens[2],0.*deg,360.*deg);
+    G4Box* gfsbox = new G4Box("Fsbox",0.5*shight,0.5*fLens[1],0.5*fLens[2]);
+    G4Tubs* gfstube = new G4Tubs("ftube",0,0.5*shight,0.5*fLens[2],0.*deg,360.*deg);
 
     G4Sphere* gsphere1 = new G4Sphere("Sphere1",0,r1,0,360*deg,0,360*deg);
     G4Sphere* gsphere2 = new G4Sphere("Sphere2",0,r2,0,360*deg,0,360*deg);
@@ -281,7 +286,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens3 = new G4LogicalVolume(gLens3,BarMaterial,"lLens3",0,0,0);
   }
 
-  if(PrtManager::Instance()->GetLens() == 4){ // Spherical lens with air gap // f =250 , d = , w = 5.7
+  if(fLensId == 4){ // Spherical lens with air gap // f =250 , d = , w = 5.7
     G4double r1 = 0; // PrtManager::Instance()->GetTest1(); 
     G4double lensrad1 = (r1==0)? 250: r1;
     G4double lensMinThikness = 2; 
@@ -293,7 +298,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0); //Nlak33aMaterial
   }
 
-  if(PrtManager::Instance()->GetLens() == 5){ // Spherical lens with air gap // f =250 , d = , w = 5.7 // black edges
+  if(fLensId == 5){ // Spherical lens with air gap // f =250 , d = , w = 5.7 // black edges
     G4double r1 = 0; // PrtManager::Instance()->GetTest1(); 
     G4double lensrad1 = (r1==0)? 250: r1;
     G4double lensMinThikness = 2; 
@@ -308,10 +313,56 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
 
   
-  if(PrtManager::Instance()->GetLens() != 0 && PrtManager::Instance()->GetLens() != 10){
+  if(fLensId == 6){ // 3-component cylindrical lens
+    G4double lensMinThikness = 2.0; 
+  
+    G4double r1 = 0; //PrtManager::Instance()->GetTest1();
+    G4double r2 = 0; //PrtManager::Instance()->GetTest2();
+
+    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+       r1 = PrtManager::Instance()->GetTest1();
+       r2 = PrtManager::Instance()->GetTest2();
+    }
+    
+    r1 = (r1==0)? 27.45: r1;
+    r2 = (r2==0)? 20.02: r2;
+    G4double shight = 19;
+
+    G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +lensMinThikness);
+    G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +lensMinThikness*2);
+
+    G4Box* gfbox =  new G4Box("Fbox", 0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
+    G4Box* gfbox0 = new G4Box("Fbox0",0.5*fLens[0]+1,0.5*fLens[1]+1,0.5*fLens[2]);
+    G4Box* gfsbox = new G4Box("Fsbox",0.5*shight,  0.5*fLens[1],0.5*fLens[2]);
+ 
+    G4Tubs* gcylinder1 = new G4Tubs("Cylinder1",0,r1,0.5*fLens[1],0*deg,360*deg);
+    G4Tubs* gcylinder2 = new G4Tubs("Cylinder2",0,r2,0.5*fLens[1]-0.1,0*deg,360*deg);
+    G4Tubs* gcylinder1c = new G4Tubs("Cylinder1c",0,r1,0.5*fLens[1]+1,0*deg,360*deg);
+    G4Tubs* gcylinder2c = new G4Tubs("Cylinder2c",0,r2,0.5*fLens[1]+1,0*deg,360*deg);
+    G4RotationMatrix* xRot = new G4RotationMatrix();
+    xRot->rotateX(M_PI/2.*rad);
+    
+    G4IntersectionSolid* gbbox = new G4IntersectionSolid("bbox", gfbox0,gfbox,new G4RotationMatrix(),G4ThreeVector(0,0, lensMinThikness*2)); 
+    G4IntersectionSolid* gsbox = new G4IntersectionSolid("sbox", gfbox0,gfsbox,new G4RotationMatrix(),G4ThreeVector(0,0,-lensMinThikness*2)); 
+
+    G4UnionSolid* gubox = new G4UnionSolid("unionboxt", gbbox, gsbox,new G4RotationMatrix(),G4ThreeVector(0,0,0));
+    
+    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Lens1", gubox, gcylinder1,xRot,zTrans1); 
+    G4SubtractionSolid*  gLenst = new G4SubtractionSolid("temp", gubox, gcylinder1c, xRot,zTrans1);
+
+    G4IntersectionSolid* gLens2 = new G4IntersectionSolid("Lens2", gLenst, gcylinder2, xRot,zTrans2);
+    G4SubtractionSolid*  gLens3 = new G4SubtractionSolid("Lens3", gLenst, gcylinder2c, xRot,zTrans2);
+    
+    lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0);
+    lLens2 = new G4LogicalVolume(gLens2,Nlak33aMaterial,"lLens2",0,0,0);
+    lLens3 = new G4LogicalVolume(gLens3,BarMaterial,"lLens3",0,0,0);
+  }
+
+  if(fLensId != 0 && fLensId != 10){
     new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens1,"wLens1", lDirc,false,0);
-    if(PrtManager::Instance()->GetLens() != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens2,"wLens2", lDirc,false,0);
-    if(PrtManager::Instance()->GetLens() == 3)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens3,"wLens3", lDirc,false,0);
+    if(fLensId != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens2,"wLens2", lDirc,false,0);
+    if(fLensId == 3 || fLensId==6)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens3,"wLens3", lDirc,false,0);
+
   }else{
     fLens[2]=0; 
   }
@@ -420,6 +471,14 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	//   if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	//   shifty = (fMcpTotal[0]+3)*(j-1);
 	// }
+
+	if(fMcpLayout==2017){
+	  Double_t ms = 11.2;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
+	  if(j==1) shiftx += (3/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
+	  shifty = (fMcpTotal[0]+3)*(j-1);
+	}
 	
 	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,fBar[2]/2.+fPrizm[1]+fMcpActive[2]/2.+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+j);
       }
@@ -836,14 +895,14 @@ void PrtDetectorConstruction::SetVisualization(){
   lMirror->SetVisAttributes(waMirror);
 
   G4double transp = 0.15;
-  if(PrtManager::Instance()->GetLens()!=0 && PrtManager::Instance()->GetLens()!=10){
+  if(fLensId!=0 && fLensId!=10){
     G4VisAttributes * vaLens = new G4VisAttributes(G4Colour(0.,1.,1.,transp));
     //vaLens->SetForceWireframe(true);
     //vaLens->SetForceAuxEdgeVisible(true);
     lLens1->SetVisAttributes(vaLens);
     G4VisAttributes * vaLens1 = new G4VisAttributes(G4Colour(0.,0.5,1.0,transp));
-    if(PrtManager::Instance()->GetLens()!=4) lLens2->SetVisAttributes(vaLens1);
-    if(PrtManager::Instance()->GetLens()==3) lLens3->SetVisAttributes(vaLens);
+    if(fLensId!=4) lLens2->SetVisAttributes(vaLens1);
+    if(fLensId==3 || fLensId==6 ) lLens3->SetVisAttributes(vaLens);
   }
 
   //  G4VisAttributes *waPrizm = new G4VisAttributes(G4Colour(0.,0.9,0.9,0.2));

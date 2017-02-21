@@ -65,6 +65,7 @@ private:
   G4int fNRow;
   G4int fNCol;
   G4int fGeomId;
+  G4int fLensId;
   G4int fMcpLayout;
   G4double fHall[3];
   G4double fBar[3];

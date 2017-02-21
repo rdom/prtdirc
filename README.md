@@ -54,10 +54,10 @@ example:
 -l    focusing system
                 0    no lens
                 1    2-layer spherical lens
-		2    2-layer cylindrical lens
-		3    3-layer spherical lens
-		4    1-layer spherical lens (with air-gap)
-		5    test lens
+                2    2-layer cylindrical lens
+                3    3-layer spherical lens
+                4    1-layer spherical lens (with air-gap)
+                5    test lens
                 6    3-layer cylindrical lens		
                 10   ideal lens (thickness = 0, ideal focusing)
 
