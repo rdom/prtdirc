@@ -43,7 +43,7 @@ void PrtSteppingAction::UserSteppingAction(const G4Step* step)
   //std::cout<<"length  "<<track->GetTrackLength() << " step num "<< track->GetCurrentStepNumber() <<std::endl;
 
   if(track->GetCurrentStepNumber()>50000 || track->GetTrackLength() > 10000) {
-    std::cout<<"WRN: too many steps or track length > 10m " <<std::endl;    
+    std::cout<<"WRN: too many steps or track length > 10m  N=" <<track->GetCurrentStepNumber()<<" Len="<<track->GetTrackLength()/1000. <<std::endl;    
     track->SetTrackStatus(fStopAndKill);
   }
    // G4cout<<step->GetPreStepPoint()->GetPhysicalVolume()->GetName()  <<" - "

@@ -24,7 +24,7 @@ void drawHP(TString infile="../build/hits.root"){
       fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     }
   }
-    
+
   drawDigi("m,p,v\n",7,0,0);
   cDigi->cd();
   cDigi->SetName(Form("hp_%d",(Int_t)fAngle));

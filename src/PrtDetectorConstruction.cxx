@@ -106,6 +106,10 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
   }
   
+  if(fGeomId == 2021){ 
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
+  }
+  
   if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
     fPrizm[1] = 30; fPrizm[3] = 300;  fPrizm[2]=500;
     fBar[0] = 40;
@@ -141,7 +145,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   G4Box* gTrigger = new G4Box("gTrigger",20.,20.,5);
   lTrigger = new G4LogicalVolume(gTrigger,frontMaterial,"lTrigger",0,0,0);
   
-  if(fGeomId == 3 || fGeomId == 2015 || fGeomId == 2016){
+  if(fGeomId == 3 || fGeomId >= 2015){
     new G4PVPlacement(0,G4ThreeVector(0,0,-1200),lFront,"wFront",lExpHall,false,0);
     new G4PVPlacement(0,G4ThreeVector(0,0,1500),lTrigger,"wTrigger",lExpHall,false,0); 
   }
@@ -163,7 +167,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   G4Box* gCover = new G4Box("gCover",5,150,fBar[2]/2.);
   lCover = new G4LogicalVolume(gCover, MirrorMaterial ,"lCover",0,0,0);
 
-  if(fGeomId == 3 || fGeomId == 2015 || fGeomId == 2016){
+  if(fGeomId == 3 || fGeomId >= 2015){
     new G4PVPlacement(0,G4ThreeVector(-100,0,0),lCover,"wCover",lDirc,false,0);
   }
   
@@ -172,12 +176,17 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 
   if(PrtManager::Instance()->GetRunType() == 6) lBar = new G4LogicalVolume(gBar,OilMaterial,"lBar",0,0,0);
   else lBar = new G4LogicalVolume(gBar,BarMaterial,"lBar",0,0,0);
-
   
   G4double xshift = -(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX();
   if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
-
+  
+  // Optical grease
+  G4double greased=0.015*mm;
+  G4Box* gOpticalGrease = new G4Box("gOpticalgrease",fBar[0]/2.,fBar[1]/2.,greased);
+  lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
+  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
+   
   // // The Mirror gap
   // G4double mirrorgap=0.1*mm;
   // G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
@@ -364,9 +373,9 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
 
   if(fLensId != 0 && fLensId != 10){
-    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens1,"wLens1", lDirc,false,0);
-    if(fLensId != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens2,"wLens2", lDirc,false,0);
-    if(fLensId == 3 || fLensId==6)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+fLens[2]/2.),lLens3,"wLens3", lDirc,false,0);
+    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+2*greased+fLens[2]/2.),lLens1,"wLens1", lDirc,false,0);
+    if(fLensId != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+2*greased+fLens[2]/2.),lLens2,"wLens2", lDirc,false,0);
+    if(fLensId == 3 || fLensId==6)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,fBar[2]/2.+2*greased+fLens[2]/2.),lLens3,"wLens3", lDirc,false,0);
 
   }else{
     fLens[2]=0; 
@@ -379,8 +388,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   G4RotationMatrix* xRot = new G4RotationMatrix();
   xRot->rotateX(M_PI/2.*rad);
-  fPrismShift = G4ThreeVector((fPrizm[2]+fPrizm[3])/4.-fPrizm[3]/2.,0,fBar[2]/2.+fPrizm[1]/2.+fLens[2]);
-  fPrismShift = G4ThreeVector((fPrizm[2]+fPrizm[3])/4.-fPrizm[3]/2.,0,fBar[2]/2.+fPrizm[1]/2.+fLens[2]);
+  fPrismShift = G4ThreeVector((fPrizm[2]+fPrizm[3])/4.-fPrizm[3]/2.,0,fBar[2]/2.+2*greased+fPrizm[1]/2.+fLens[2]);
+  fPrismShift = G4ThreeVector((fPrizm[2]+fPrizm[3])/4.-fPrizm[3]/2.,0,fBar[2]/2.+2*greased+fPrizm[1]/2.+fLens[2]);
   new G4PVPlacement(xRot,fPrismShift,lPrizm,"wPrizm", lDirc,false,0);
 
   if(fGeomId==5){ // calibration
@@ -846,7 +855,7 @@ void PrtDetectorConstruction::DefineMaterials(){
     1.450428,1.451976,1.453666,1.455513,1.45754,1.45977,1.462231,1.464958,
     1.467991,1.471377,1.475174};
 
-  double Nlak33aRefractiveIndex[76]={1.73816,1.73836,1.73858,1.73881,1.73904,1.73928,1.73952,1.73976,1.74001,1.74026,1.74052,1.74078,1.74105,1.74132,1.7416,1.74189,1.74218,1.74249,1.74279,1.74311,1.74344,1.74378,1.74412,1.74448,1.74485,1.74522,1.74562,1.74602,1.74644,1.74687,1.74732,1.74779,1.74827,1.74878,1.7493,1.74985,1.75042,1.75101,1.75163,1.75228,1.75296,1.75368,1.75443,1.75521,1.75604,1.75692,1.75784,1.75882,1.75985,1.76095,1.76211,1.76335,1.76467,1.76608,1.76758,1.7692,1.77093,1.77279,1.7748,1.77698,1.77934,1.7819,1.7847,1.78775,1.79111,1.79481,1.79889,1.80343,1.8085,1.81419,1.82061,1.8279,1.83625,1.84589,1.85713,1.87039};
+  G4double Nlak33aRefractiveIndex[76]={1.73816,1.73836,1.73858,1.73881,1.73904,1.73928,1.73952,1.73976,1.74001,1.74026,1.74052,1.74078,1.74105,1.74132,1.7416,1.74189,1.74218,1.74249,1.74279,1.74311,1.74344,1.74378,1.74412,1.74448,1.74485,1.74522,1.74562,1.74602,1.74644,1.74687,1.74732,1.74779,1.74827,1.74878,1.7493,1.74985,1.75042,1.75101,1.75163,1.75228,1.75296,1.75368,1.75443,1.75521,1.75604,1.75692,1.75784,1.75882,1.75985,1.76095,1.76211,1.76335,1.76467,1.76608,1.76758,1.7692,1.77093,1.77279,1.7748,1.77698,1.77934,1.7819,1.7847,1.78775,1.79111,1.79481,1.79889,1.80343,1.8085,1.81419,1.82061,1.8279,1.83625,1.84589,1.85713,1.87039};
 
   /* ASSIGNING REFRACTIVE AND ABSORPTION PROPERTIES TO THE GIVEN MATERIALS */
 
@@ -871,10 +880,26 @@ void PrtDetectorConstruction::DefineMaterials(){
   OilMaterial->SetMaterialPropertiesTable(KamLandOilMPT);  
 
   // N-Lak 33a                                                
+  for(Int_t i=0; i<76; i++){
+    PhotonEnergyNlak33a[i]*=eV;
+  }
   G4MaterialPropertiesTable* Nlak33aMPT = new G4MaterialPropertiesTable();
   Nlak33aMPT->AddProperty("RINDEX", PhotonEnergyNlak33a, Nlak33aRefractiveIndex, 76);
   Nlak33aMPT->AddProperty("ABSLENGTH",PhotonEnergyNlak33a, Nlak33aAbsorption, 76);
-  Nlak33aMaterial->SetMaterialPropertiesTable(Nlak33aMPT);  
+  Nlak33aMaterial->SetMaterialPropertiesTable(Nlak33aMPT);
+
+  // Optical grease                                                
+  G4MaterialPropertiesTable* opticalGreaseMPT = new G4MaterialPropertiesTable();
+  G4double og_en[5]={1*eV,2*eV,3*eV,4,10*eV};
+  G4double og_ab[5]={0.66*cm,0.66*cm,0.47*cm,0.14*cm,0.02*cm};
+  G4double og_re[5]={1.55,1.56,1.59,1.64,1.64};
+  opticalGreaseMPT->AddProperty("RINDEX", og_en, og_re, 5);
+  opticalGreaseMPT->AddProperty("ABSLENGTH",og_en, og_ab, 5);
+
+  opticalGreaseMaterial = new G4Material("opticalGreaseMaterial",density= 2.200*g/cm3, ncomponents=2);
+  opticalGreaseMaterial->AddElement(Si, natoms=1);
+  opticalGreaseMaterial->AddElement(O , natoms=2);
+  opticalGreaseMaterial->SetMaterialPropertiesTable(opticalGreaseMPT);  
 
   // Epotek Glue                                        
   G4MaterialPropertiesTable* EpotekMPT = new G4MaterialPropertiesTable();
@@ -919,6 +944,10 @@ void PrtDetectorConstruction::SetVisualization(){
     lLens1->SetVisAttributes(vaLens);
     G4VisAttributes * vaLens1 = new G4VisAttributes(G4Colour(0.,0.5,1.0,transp));
     if(fLensId!=4) lLens2->SetVisAttributes(vaLens1);
+    if(fLensId==2) {
+      lLens1->SetVisAttributes(vaLens1);
+      lLens2->SetVisAttributes(vaLens);
+    }
     if(fLensId==3 || fLensId==6 ) lLens3->SetVisAttributes(vaLens);
   }
 

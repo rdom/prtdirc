@@ -94,7 +94,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   }
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
 
-  for(Int_t i=0; i<nmcp; i++){
+  for(Int_t i=0; i<prt_nmcp; i++){
     fHistMcp[i] = new TH1F(Form("fHistMcp_%d",i),Form("fHistMcp_%d;#theta_{C} [rad];entries [#]",i), 80,0.6,1); //150
   }
 
@@ -129,7 +129,7 @@ Int_t getneighbours(Int_t m, Int_t p){
 }
 
 void getclusters(){
-  for(Int_t m=0; m<nmcp; m++){
+  for(Int_t m=0; m<prt_nmcp; m++){
     for(Int_t p=0; p<65; p++){
       if(mcpdata[m][p])  cluster[m][p] = getneighbours(m,p);
       lsize=0;
@@ -260,10 +260,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     //if(fMethod==2 && tofPid!=2212) continue;
 	
     if(fEvent->GetType()==0){
-      if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-	if( fEvent->GetParticle()==2212 && fEvent->GetTest1()<175.6 ) continue;
-	if( fEvent->GetParticle()==211  && fEvent->GetTest1()>175.1 ) continue;
-      }
 
       Bool_t tof1(false), tof2(false);
       Bool_t hodo1(false), hodo2(false);
@@ -283,11 +279,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       	if(tof1 && tof2 && hodo1 && hodo2) goto goodch;
       }
- 
+ goto goodch;
       continue;
     }
     
   goodch:
+    
     
     //   //clusters search
   //   for(Int_t h=0; h<nHits; h++) {
@@ -298,7 +295,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   //   getclusters();
 
   //   Int_t bad(0);
-  //   for(Int_t j=0; j<15; j++){
+  //   for(Int_t j=0; j<prt_nmcp; j++){
   //     for(Int_t i=0; i<65; i++){
   //   	if(cluster[j][i]>7){
   // 	  bad=cluster[j][i];
@@ -311,7 +308,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   //   std::cout<<"bad  "<<bad <<std::endl;
     
   //   if(bad){
-  //     for(Int_t j=0; j<15; j++){
+  //     for(Int_t j=0; j<prt_nmcp; j++){
   //   	for(Int_t i=0; i<65; i++){
   //   	  mcpdata[j][i]=0;
   //   	  cluster[j][i]=0;
@@ -323,26 +320,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
-      hitTime = fHit.GetLeadTime()-0.5;
+      hitTime = fHit.GetLeadTime();
       if(fEvent->GetType()!=0) hitTime+=fRand.Gaus(0,0.2); // time resol. in case it was not simulated
 	
       //======================================== dynamic cuts
-      if(radiator!=2){
-	// { //time cuts
-	// 	if(prtangle<=80){
-	// 	  if(hitTime<11 || hitTime>35) continue;
-	// 	  reflected = kTRUE;
-	// 	}else if(prtangle>=95){
-	// 	  if(hitTime<3 || hitTime>20) continue;
-	// 	  reflected = kFALSE;
-	// 	}else{
-	// 	  if(hitTime<13.5)  reflected = kFALSE; //13.5
-	// 	  else reflected = kTRUE;
-	// 	}
-	// }
-
-	Double_t cut1(11);
-	if(studyId==157 || studyId==155) cut1=8;
+      {
+	Double_t cut1(7);
 	{ //time cuts
 	  if(prtangle<=80){
 	    if(hitTime<cut1 || hitTime>45) continue;
@@ -354,26 +337,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    if(hitTime<14)  reflected = kFALSE; //13.5
 	    else reflected = kTRUE;
 	  }
-	}
-
-	if(studyId==152 || studyId==153){	 //plate
-	  timeRes=100;
-	}
-       
-	if(studyId==157){	
-	  timeRes=2.5;
-	}
-	if(studyId==150){	
-	  timeRes=2;
-	}
-	if(studyId==154){	
-	  timeRes=1;
-	  if(prtangle > 100) timeRes=0.7;
-	}
-	if(studyId==159){	
-	  if(prtangle < 80) timeRes=1.5;
-	  if(prtangle > 100) timeRes=0.8;
-	  if(prtangle > 80 and prtangle<100) timeRes=2;	
 	}
       }
       //================================================== 
@@ -387,7 +350,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	// Double_t b = 122*tan(0.5*((prtangle-90)*rad)); 
 	// Double_t lenz = (z-96+b)/cos((prtangle-90)*rad)+b+96;     
       }
-
+      
       if(fVerbose==3){
 	TVector3 cd = fHit.GetMomentum();
 	fHist5->Fill(cd.Theta()*TMath::Sin(cd.Phi()),cd.Theta()*TMath::Cos(cd.Phi()));
@@ -448,7 +411,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(sensorId==1) continue;
 
       Bool_t isGoodHit(false);
-      if(radiator==2) isGoodHit=true;
+      //if(radiator==2) isGoodHit=true;
       
       Int_t size =fLutNode[sensorId]->Entries();
 
@@ -490,7 +453,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);
-
 	  
 	  // // 151 125 deg
 	  // if(mcpid/3==4) tangle += 0.005;
@@ -513,80 +475,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  // if(mcpid==11) tangle += 0.00407815;
 	  // if(mcpid==12) tangle += 0.00905419;
 	  // if(mcpid==14) tangle += 0.00905419;
-
-
-
-	  // // 151 20 deg
-	  // if(mcpid==0) tangle += 0.0091789;
-	  // if(mcpid==2) tangle += 0.00248956;
-	  // if(mcpid==3) tangle += 0.00577506;
-	  // if(mcpid==4) tangle += 0.00565085;
-	  // if(mcpid==5) tangle += 0.00578859;
-	  // if(mcpid==6) tangle += 0.0024891;
-	  // if(mcpid==7) tangle += 0.00901885;
-	  // if(mcpid==8) tangle += 0.00447518;
-	  
-
-
-	  // // 151 25 deg
-	  // if(mcpid==0) tangle += 0.0084747;
-	  // if(mcpid==1) tangle += 0.00861239;
-	  // if(mcpid==2) tangle += -0.000539254;
-	  // if(mcpid==3) tangle += 0.00483392;
-	  // if(mcpid==4) tangle += 0.00417729;
-	  // if(mcpid==5) tangle += 0.00744091;
-
-	  // if(mcpid==7) tangle += 0.00417729;
-	  // if(mcpid==8) tangle += 0.0041712;
-	  // if(mcpid==10) tangle += 0.0123394;
-	  // if(mcpid==12) tangle += 0.0123394;
-	  // if(mcpid==13) tangle += 0.0123394;
-	  // if(mcpid==14) tangle += 0.0123394;
-	  
-
-	  // if(mcpid==0) tangle += 0.00158126;
-	  // if(mcpid==1) tangle += 0.00288879;
-	  // if(mcpid==2) tangle += 0.00162897;
-	  // if(mcpid==3) tangle += 0.00335866;
-	  // if(mcpid==4) tangle += 0.00265215;
-	  // if(mcpid==5) tangle += 0.00399116;
-	  // if(mcpid==6) tangle += -0.00312601;
-	  // if(mcpid==7) tangle += 0.00219149;
-	  // if(mcpid==8) tangle += 0.00185951;
-	  // if(mcpid==10) tangle += 0.00191814;
-	  // if(mcpid==12) tangle += -0.00364448;
-	  // if(mcpid==13) tangle += 0.00191814;
-	  // if(mcpid==14) tangle += -0.00364448;
-
-// 	  // 160 125 deg
-// 	  if(mcpid==0) tangle += -0.004;
-// 	  if(mcpid==1) tangle += -0.00306989;
-// 	  if(mcpid==2) tangle += -0.00103916;
-// 	  if(mcpid==3) tangle += -0.002;
-// 	  if(mcpid==4) tangle += -0.004;
-// 	  if(mcpid==5) tangle += -0.00365203;
-// 	  if(mcpid==6) tangle += 0.00261752;
-// 	  if(mcpid==7) tangle += -0.00306989;
-// 	  if(mcpid==8) tangle += -0.00306989;
-// 	  if(mcpid==9) tangle += 0.00261752;
-
-// 	  if(mcpid==10) tangle += 0.00261752;
-// 	  if(mcpid==11) tangle += 0.00261752;
-// 	  if(mcpid==12) tangle += 0.00261752;
-	     
-// 	  if(mcpid==14) tangle += 0.01;
-
-// if(mcpid==0) tangle += 0.00122269;
-// if(mcpid==1) tangle += 0.000399832;
-// if(mcpid==2) tangle += -0.000206061;
-// if(mcpid==3) tangle += 0.00360337;
-// if(mcpid==4) tangle += 0.0001;
-// if(mcpid==5) tangle += -0.000346234;
-// if(mcpid==6) tangle += -0.00211489;
-
-//  if(mcpid==12) tangle += 0.00232183;
-// if(mcpid==13) tangle += 0.00760167;
-// if(mcpid==14) tangle += -0.0031577;
 	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    // if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
@@ -600,13 +488,16 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	      sum1 += TMath::Log(gF1->Eval(tangle)+noise);
 	      sum2 += TMath::Log(gF2->Eval(tangle)+noise);
 	    }
-
+	    
 	    //if(samepath) fHist->Fill(tangle ,weight);
 	    if(0.7<tangle && tangle<0.9){
 	      if(fabs(tangle-0.815)<0.04) isGoodHit=true; //0.04
-	      if(studyId>=160) isGoodHit=true;
+	      //if(studyId>=160) isGoodHit=true;
+	      if(radiator==2){
+		if(fabs(tangle-0.815)<0.2) isGoodHit=true;
+	      }
+		  
 	    }
-	    if(radiator==2) isGoodHit=true;
 	    
 	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
@@ -627,7 +518,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     } 
 
-    // for(Int_t j=0; j<15; j++){
+    // for(Int_t j=0; j<prt_nmcp; j++){
     //   for(Int_t i=0; i<65; i++){
     // 	mcpdata[j][i]=0;
     // 	cluster[j][i]=0;
@@ -775,7 +666,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     if(fMethod==2 && fVerbose>0){
 
       // fFit->SetParLimits(2,0.004,0.008); // width 7-10
-      // for(Int_t i=0; i<15; i++){
+      // for(Int_t i=0; i<prt_nmcp; i++){
       // 	canvasAdd(Form("r_tangle_%d",i),800,400);
       // 	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
       // 	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
@@ -842,7 +733,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
       if(false){
 	Int_t tmax, max=0;
-	for(Int_t m=0; m<nmcp;m++){
+	for(Int_t m=0; m<prt_nmcp;m++){
 	  fhDigi[m]->Rebin2D(8,8);
 	  fhDigi[m]->GetXaxis()->SetNdivisions(0);
 	  fhDigi[m]->GetYaxis()->SetNdivisions(0);
@@ -854,7 +745,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	  tmax = fhDigi[m]->GetMaximum();
 	  if(max<tmax) max = tmax;
 	}
-	for(Int_t m=0; m<nmcp;m++){	  
+	for(Int_t m=0; m<prt_nmcp;m++){	  
 	  fhDigi[m]->Scale(1/(Double_t)max);
 	}
       }
@@ -863,7 +754,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       cDigi->SetName("r_hits"+nid);
       canvasAdd(cDigi);  
 
-      waitPrimitive("r_cm");
+      waitPrimitive("r_cm"+nid);
       canvasSave(1,0);
       canvasDel("*");
       
@@ -926,7 +817,7 @@ void PrtLutReco::ResetHists(){
   fHist2->Reset();
   fHist3->Reset();
   fHist4->Reset();
-  for(Int_t m=0; m<nmcp;m++) fhDigi[m]->Reset();
+  for(Int_t m=0; m<prt_nmcp;m++) fhDigi[m]->Reset();
 }
 
 TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
