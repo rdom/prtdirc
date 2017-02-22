@@ -24,8 +24,9 @@ PrtPixelSD::~PrtPixelSD(){
 }
 
 void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
-
-
+  
+  memset(fMultHit, 0, sizeof(fMultHit[0][0])*960);
+  
   Double_t qe_m2015[15][64]={{0.63,0.78,0.73,0.69,0.67,0.67,0.69,0.60,0.73,0.82,0.78,0.76,0.75,0.77,0.82,0.78,0.79,0.85,0.78,0.76,0.75,0.77,0.82,0.79,0.81,0.85,0.78,0.76,0.75,0.77,0.83,0.80,0.81,0.84,0.77,0.74,0.74,0.77,0.83,0.79,0.80,0.81,0.76,0.73,0.74,0.76,0.82,0.78,0.80,0.79,0.75,0.74,0.76,0.78,0.83,0.79,0.60,0.76,0.73,0.72,0.73,0.76,0.79,0.70}, //765
 			     {0.61,0.69,0.70,0.70,0.70,0.69,0.69,0.61,0.77,0.82,0.83,0.83,0.83,0.82,0.81,0.76,0.77,0.83,0.84,0.84,0.84,0.84,0.82,0.77,0.78,0.84,0.85,0.85,0.85,0.84,0.83,0.78,0.78,0.84,0.85,0.85,0.85,0.84,0.83,0.79,0.77,0.83,0.85,0.85,0.85,0.85,0.83,0.80,0.76,0.83,0.84,0.85,0.85,0.84,0.83,0.81,0.71,0.82,0.84,0.84,0.84,0.84,0.83,0.80}, //1352
 			     {0.66,0.66,0.66,0.67,0.66,0.66,0.67,0.62,0.72,0.71,0.72,0.77,0.77,0.77,0.79,0.77,0.72,0.71,0.71,0.74,0.77,0.77,0.79,0.76,0.71,0.71,0.70,0.70,0.75,0.76,0.79,0.75,0.71,0.70,0.70,0.69,0.70,0.73,0.77,0.74,0.71,0.70,0.70,0.69,0.69,0.69,0.72,0.72,0.71,0.71,0.70,0.69,0.69,0.68,0.69,0.68,0.68,0.71,0.70,0.69,0.68,0.68,0.69,0.65}, //1358
@@ -211,16 +212,26 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetTotTime(wavelength); //set photon wavelength
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
+
+  Bool_t quantum_efficiency(true);
+  Bool_t charge_sharing(false);
+  Bool_t dead_time(true);
   
-  Bool_t charge_sharing(true);
-  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
-    if(fQe_space[mcpid][pixid]>G4UniformRand()) PrtManager::Instance()->AddHit(hit);
-    else charge_sharing=false;
+  Bool_t is_hit(true);
+  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
+    if(fQe_space[mcpid][pixid]>G4UniformRand()) {
+      if(fMultHit[mcpid][pixid]==0 || !dead_time) PrtManager::Instance()->AddHit(hit);
+      else std::cout<<"fMultHit["<<mcpid<<"]["<<pixid<<"] "<<fMultHit[mcpid][pixid] <<std::endl;
+      
+      fMultHit[mcpid][pixid]++;
+    }else is_hit=false;
+    
   }else{
-    PrtManager::Instance()->AddHit(hit);
+    if(fMultHit[mcpid][pixid]==0 || !dead_time)PrtManager::Instance()->AddHit(hit);
+    fMultHit[mcpid][pixid]++;
   }
 
-  if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && charge_sharing){
+  if(is_hit && charge_sharing){
     //charge sharing for 8x8 MCP
     Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
     Double_t x(localPos.x()), y(localPos.y());
@@ -236,7 +247,8 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
  
     if(ok) {
       hit.SetPixelId(p);
-      PrtManager::Instance()->AddHit(hit);
+      if(fMultHit[mcpid][p]==0 || !dead_time) PrtManager::Instance()->AddHit(hit);
+      fMultHit[mcpid][p]++;
     }
     
   }
@@ -244,7 +256,8 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   return true;
 }
 
-void PrtPixelSD::EndOfEvent(G4HCofThisEvent*){ 
+void PrtPixelSD::EndOfEvent(G4HCofThisEvent*){
+  memset(fMultHit, 0, sizeof(fMultHit[0][0])*960);
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
   if(eventNumber%1==0 && PrtManager::Instance()->GetRunType()==0) std::cout<<"Event # "<<eventNumber <<std::endl;
   if(eventNumber%1000==0 && PrtManager::Instance()->GetRunType()!=0) std::cout<<"Event # "<<eventNumber <<std::endl;
