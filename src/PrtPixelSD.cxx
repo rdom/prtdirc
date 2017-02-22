@@ -214,8 +214,9 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
   Bool_t quantum_efficiency(true);
-  Bool_t charge_sharing(false);
+  Bool_t charge_sharing(true);
   Bool_t dead_time(true);
+  Bool_t dark_counts(true);
   
   Bool_t is_hit(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
@@ -233,7 +234,9 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
   if(is_hit && charge_sharing){
     //charge sharing for 8x8 MCP
-    Double_t pixdim(53/16.),chargesig(1),threshold(0.3);
+    Double_t pixdim(53/16.);
+    // Double_t chargesig(1),threshold(0.3);
+    Double_t chargesig(1.5),threshold(0.7); //high cs
     Double_t x(localPos.x()), y(localPos.y());
     Int_t p(pixid);
     Bool_t ok(false);
@@ -250,7 +253,9 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
       if(fMultHit[mcpid][p]==0 || !dead_time) PrtManager::Instance()->AddHit(hit);
       fMultHit[mcpid][p]++;
     }
-    
+  }
+
+  if(dark_counts){
   }
       
   return true;
