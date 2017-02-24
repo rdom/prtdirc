@@ -64,13 +64,11 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track * a
     // if(aTrack->GetParentID() == 1 && ParticleName == "opticalphoton" ) 	  return fKill;
     
     if(ParticleName == "opticalphoton") {
+      Double_t lambda = 197.0*2.0*pi/(aTrack->GetMomentum().mag()*1.0E6);          
       // apply detector efficiency at the production stage:    
       if(true){
-	Double_t lambda = 197.0*2.0*pi/(aTrack->GetMomentum().mag()*1.0E6);          
 	Double_t ra = fRand->Uniform(0., 1.);
-	if(ra > fDetEff->Eval(lambda)){ 
-	  return fKill;
-	}
+	if(ra > fDetEff->Eval(lambda))return fKill;	
       }
     }
   }

@@ -146,7 +146,11 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4ThreeVector globalpos = step->GetPostStepPoint()->GetPosition();
   G4ThreeVector localpos = touchable->GetHistory()->GetTopTransform().TransformPoint(globalpos);
   G4ThreeVector translation = touchable->GetHistory()->GetTopTransform().Inverse().TransformPoint(G4ThreeVector(0,0,0));
-  G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform( 1 ).TransformPoint(globalpos);
+  G4ThreeVector inPrismpos = touchable->GetHistory()->GetTransform(1).TransformPoint(globalpos);
+
+  G4ThreeVector globalvec = track->GetVertexMomentumDirection();
+  G4ThreeVector localvec = touchable->GetHistory()->GetTopTransform().TransformAxis(globalvec);
+
   G4ThreeVector g4mom = track->GetMomentum(); //track->GetVertexMomentumDirection(); //
   G4ThreeVector g4pos = track->GetVertexPosition();
  
@@ -157,13 +161,13 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   }
   
   TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
-  translation=touchable->GetHistory()->GetTransform( 1 ).TransformPoint(translation);
+  translation=touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
   TVector3 momentum(g4mom.x(),g4mom.y(),g4mom.z());
   G4ThreeVector lp = touchable->GetHistory()->GetTransform(1).TransformPoint(g4pos); //pos in wDirc
   TVector3 position(lp.x(),lp.y(),lp.z());
   
-  // information form prizm
+  // information from prizm
   G4SDManager* fSDM = G4SDManager::GetSDMpointer();
   G4RunManager* fRM = G4RunManager::GetRunManager();
   G4int collectionID = fSDM->GetCollectionID("PrizmHitsCollection");
@@ -217,6 +221,34 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   Bool_t charge_sharing(true);
   Bool_t dead_time(true);
   Bool_t dark_counts(true);
+  Bool_t transport_efficiency(true);
+
+  if(transport_efficiency){
+    Double_t pi(4*atan(1));
+    Double_t roughness(1); //nm
+    std::cout<<"vec  "<<localvec.x()<<" "<<localvec.y() << " " <<localvec.z() <<std::endl;
+    
+    Double_t angleX = localvec.angle(G4ThreeVector(1,0,0));
+    Double_t angleY = localvec.angle(G4ThreeVector(0,1,0));
+    Double_t length = track->GetTrackLength()-400;
+    Double_t lengthx = fabs(length*localvec.x());
+    Double_t lengthy = fabs(length*localvec.y());
+      
+    Int_t nBouncesX=(Int_t)(lengthx)/17.; // 17 bar height
+    Int_t nBouncesY=(Int_t)(lengthy)/32.; // 32 bar width
+  
+    //std::cout<<" angleX  "<< angleX <<"   angleY "<< angleY << " nBouncesX " << nBouncesX << " nBouncesY " << nBouncesY  << "  length "<< length<<std::endl;
+    
+    
+    Double_t ll = wavelength*wavelength;
+    Double_t n_quartz = sqrt(1. + (0.696*ll/(ll-pow(0.068,2))) + (0.407*ll/(ll-pow(0.116,2))) + 0.897*ll/(ll-pow(9.896,2)));
+    Double_t bounce_probX = 1 - pow(4*pi*cos(angleX)*roughness*n_quartz/wavelength,2);
+    Double_t bounce_probY = 1 - pow(4*pi*cos(angleY)*roughness*n_quartz/wavelength,2);
+
+    Double_t totalProb = pow(bounce_probX, nBouncesX)*pow(bounce_probY, nBouncesY);	
+    if(G4UniformRand() > totalProb) return true; 
+  }
+
   
   Bool_t is_hit(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
@@ -236,7 +268,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     //charge sharing for 8x8 MCP
     Double_t pixdim(53/16.);
     // Double_t chargesig(1),threshold(0.3);
-    Double_t chargesig(1.5),threshold(0.7); //high cs
+    Double_t chargesig(2),threshold(0.7); //high cs
     Double_t x(localPos.x()), y(localPos.y());
     Int_t p(pixid);
     Bool_t ok(false);
