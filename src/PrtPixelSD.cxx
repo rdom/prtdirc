@@ -226,7 +226,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   if(transport_efficiency){
     Double_t pi(4*atan(1));
     Double_t roughness(1); //nm
-    std::cout<<"vec  "<<localvec.x()<<" "<<localvec.y() << " " <<localvec.z() <<std::endl;
+    //std::cout<<"vec  "<<localvec.x()<<" "<<localvec.y() << " " <<localvec.z() <<std::endl;
     
     Double_t angleX = localvec.angle(G4ThreeVector(1,0,0));
     Double_t angleY = localvec.angle(G4ThreeVector(0,1,0));
@@ -246,7 +246,11 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     Double_t bounce_probY = 1 - pow(4*pi*cos(angleY)*roughness*n_quartz/wavelength,2);
 
     Double_t totalProb = pow(bounce_probX, nBouncesX)*pow(bounce_probY, nBouncesY);	
-    if(G4UniformRand() > totalProb) return true; 
+    if(G4UniformRand() > totalProb) {
+      std::cout<<"photon lost in the radiator. n_bounces = ["<<nBouncesX<<" "<<nBouncesY<<"] with prob= "<<totalProb<<std::endl;
+      
+      return true;
+    }
   }
 
   
@@ -254,8 +258,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) {
       if(fMultHit[mcpid][pixid]==0 || !dead_time) PrtManager::Instance()->AddHit(hit);
-      else std::cout<<"fMultHit["<<mcpid<<"]["<<pixid<<"] "<<fMultHit[mcpid][pixid] <<std::endl;
-      
+      //else std::cout<<"fMultHit["<<mcpid<<"]["<<pixid<<"] "<<fMultHit[mcpid][pixid] <<std::endl;      
       fMultHit[mcpid][pixid]++;
     }else is_hit=false;
     

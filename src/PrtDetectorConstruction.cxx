@@ -811,8 +811,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   //N-Lak 33a
   G4double Nlak33aAbsorption[76]={371813,352095,331021,310814,291458,272937,255238,238342,222234,206897,192313,178463,165331,152896,141140,130043,119585,109747,100507,91846.3,83743.1,76176.7,69126.1,62570.2,56488,50858.3,45660.1,40872.4,36474.6,32445.8,28765.9,25414.6,22372.2,19619.3,17136.9,14906.5,12910.2,11130.3,9550.13,8153.3,6924.25,5848.04,4910.46,4098.04,3398.06,2798.54,2288.32,1856.99,1494.92,1193.28,943.973,739.657,573.715,440.228,333.94,250.229,185.064,134.967,96.9664,68.5529,47.6343,32.4882,21.7174,14.2056,9.07612,5.65267,3.4241,2.01226,1.14403,0.62722,0.330414,0.166558,0.0799649,0.0363677,0.0155708,0.00623089};
   
-
-  G4double EpotekThickness = 0.001*2.54*cm;
   for(int i=0;i<num;i++){
     WaveLength[i]= (300 +i*10)*nanometer;
     AirAbsorption[i] = 4.*cm; // if photon in the air -> kill it immediately
@@ -824,7 +822,7 @@ void PrtDetectorConstruction::DefineMaterials(){
        mean free path length - taken as probability equal 1/e
        that the photon will be absorbed */
       
-    EpotekAbsorption[i] = (-1)/log(EpotekAbsorption[i])*EpotekThickness;
+    EpotekAbsorption[i] = (-1)/log(EpotekAbsorption[i])*0.001*2.54*cm;
     QuartzAbsorption[i] = (-1)/log(QuartzAbsorption[i])*100*cm;
     KamLandOilAbsorption[i] = (-1)/log(KamLandOilAbsorption[i])*50*cm;
   }
@@ -882,6 +880,7 @@ void PrtDetectorConstruction::DefineMaterials(){
   // N-Lak 33a                                                
   for(Int_t i=0; i<76; i++){
     PhotonEnergyNlak33a[i]*=eV;
+    Nlak33aAbsorption[i]*=10; // cm to mm
   }
   G4MaterialPropertiesTable* Nlak33aMPT = new G4MaterialPropertiesTable();
   Nlak33aMPT->AddProperty("RINDEX", PhotonEnergyNlak33a, Nlak33aRefractiveIndex, 76);
