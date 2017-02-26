@@ -39,6 +39,7 @@ private:
   G4LogicalVolume* lDirc;
   G4LogicalVolume* lBar;
   G4LogicalVolume* lOpticalGrease;
+  G4LogicalVolume* lOpticalGreased;
   G4LogicalVolume* lMirrorGap;
   G4LogicalVolume* lMirror;
   G4LogicalVolume* lLens1;

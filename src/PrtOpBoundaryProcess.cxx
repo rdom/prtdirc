@@ -66,6 +66,12 @@ G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
     if(PrtManager::Instance()->GetLens()!=4) particleChange->ProposeTrackStatus(fStopAndKill);
   }
 
+  if((aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wOpticalGreased"
+      || aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wOpticalGrease")
+     &&  aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wDirc"){
+    if(PrtManager::Instance()->GetLens()==2) particleChange->ProposeTrackStatus(fStopAndKill);
+  }
+
   return particleChange;
 
 }
