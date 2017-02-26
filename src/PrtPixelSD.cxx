@@ -218,10 +218,12 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
   Bool_t quantum_efficiency(true);
-  Bool_t charge_sharing(true);
+  Bool_t charge_sharing(false);
   Bool_t dead_time(true);
   Bool_t dark_counts(true);
   Bool_t transport_efficiency(true);
+
+  if(PrtManager::Instance()->GetGeometry()==2021) charge_sharing=false; //no cs in mfield 
 
   if(transport_efficiency){
     Double_t pi(4*atan(1));

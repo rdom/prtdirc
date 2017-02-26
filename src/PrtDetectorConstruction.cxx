@@ -182,12 +182,15 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
   
   // radiator covered with grease
-  G4double greased=1.5*mm;
-  if(fLensId==0) greased=0.5*mm;
-  G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
-  lOpticalGreased = new G4LogicalVolume(gOpticalGreased,BarMaterial,"lOpticalGreased",0,0,0);
-  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+0.5*greased),lOpticalGreased,"wOpticalGreased", lDirc,false,0);
-
+  G4double greased=0*mm;
+  if(fGeomId<2020){
+    greased=1.5*mm;
+    if(fLensId==0) greased=0.5*mm;
+    G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
+    lOpticalGreased = new G4LogicalVolume(gOpticalGreased,BarMaterial,"lOpticalGreased",0,0,0);
+    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+0.5*greased),lOpticalGreased,"wOpticalGreased", lDirc,false,0);
+  }
+  
   // Optical grease
   G4double greasew=0.2*mm;
   if(fLensId==0) greasew=0.1*mm;
