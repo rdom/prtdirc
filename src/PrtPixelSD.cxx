@@ -247,8 +247,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
     Double_t totalProb = pow(bounce_probX, nBouncesX)*pow(bounce_probY, nBouncesY);	
     if(G4UniformRand() > totalProb) {
-      std::cout<<"photon lost in the radiator. n_bounces = ["<<nBouncesX<<" "<<nBouncesY<<"] with prob= "<<totalProb<<std::endl;
-      
+      // std::cout<<"photon lost in the radiator. n_bounces = ["<<nBouncesX<<" "<<nBouncesY<<"] with prob= "<<totalProb<<std::endl;      
       return true;
     }
   }
@@ -271,7 +270,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     //charge sharing for 8x8 MCP
     Double_t pixdim(53/16.);
     // Double_t chargesig(1),threshold(0.3);
-    Double_t chargesig(1.5),threshold(0.7); //high cs / ct
+    Double_t chargesig(1.5),threshold(0.8); //high cs / ct
     Double_t x(localPos.x()), y(localPos.y());
     Int_t p(pixid);
     Bool_t ok(false);
