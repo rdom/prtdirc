@@ -48,8 +48,11 @@ example:
 
 -c   MCP layout
                 0    MCP covers all FD plain
-                2012 
-                2014 (default) 
+                2012
+		2014 (default) 
+		2015
+		2016
+                2021 - Barrel DIRC baseline design 
 
 -l    focusing system
                 0    no lens
