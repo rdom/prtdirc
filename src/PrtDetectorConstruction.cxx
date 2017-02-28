@@ -183,7 +183,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   // radiator covered with grease
   G4double greased=0*mm;
-  if(fGeomId<2020){
+  if(fGeomId<2017){
     greased=1.5*mm;
     if(fLensId==0) greased=0.5*mm;
     G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
@@ -345,10 +345,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
 
-    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+    //    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
        r1 = PrtManager::Instance()->GetTest1();
        r2 = PrtManager::Instance()->GetTest2();
-    }
+       //    }
     
     r1 = (r1==0)? 27.45: r1;
     r2 = (r2==0)? 20.02: r2;
