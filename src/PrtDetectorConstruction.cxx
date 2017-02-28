@@ -55,7 +55,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }else if(fLensId == 4 ||fLensId == 5){
     fLens[0] = 50; fLens[1] = 50; fLens[2]=5.7;
   }else if(fLensId == 6){
-    fLens[0] = 26; fLens[1] = 175; fLens[2]=9;
+    fLens[0] = 40; fLens[1] = 175; fLens[2]=9;
   }
   
   if(fMcpLayout == 2012){
@@ -352,33 +352,34 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     
     r1 = (r1==0)? 27.45: r1;
     r2 = (r2==0)? 20.02: r2;
-    G4double shight = 19;
+
+    // r1 = (r1==0)? 80: r1;
+    // r2 = (r2==0)? 35: r2;
+    G4double shight = 20;
 
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +lensMinThikness);
     G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +lensMinThikness*2);
 
-    G4Box* gfbox =  new G4Box("Fbox", 0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
-    G4Box* gfbox0 = new G4Box("Fbox0",0.5*fLens[0]+1,0.5*fLens[1]+1,0.5*fLens[2]);
-    G4Box* gfsbox = new G4Box("Fsbox",0.5*shight,  0.5*fLens[1],0.5*fLens[2]);
- 
-    G4Tubs* gcylinder1 = new G4Tubs("Cylinder1",0,r1,0.5*fLens[1],0*deg,360*deg);
-    G4Tubs* gcylinder2 = new G4Tubs("Cylinder2",0,r2,0.5*fLens[1]-0.1,0*deg,360*deg);
-    G4Tubs* gcylinder1c = new G4Tubs("Cylinder1c",0,r1,0.5*fLens[1]+1,0*deg,360*deg);
-    G4Tubs* gcylinder2c = new G4Tubs("Cylinder2c",0,r2,0.5*fLens[1]+1,0*deg,360*deg);
+    G4Box* gfbox = new G4Box("fbox",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
+    G4Box* gcbox = new G4Box("cbox",0.5*fLens[0],0.5*fLens[1]+1,0.5*fLens[2]);
+    G4ThreeVector tTrans1( 0.5*(fLens[0]+shight),0,-fLens[2]+2*lensMinThikness);
+    G4ThreeVector tTrans0(-0.5*(fLens[0]+shight),0,-fLens[2]+2*lensMinThikness);
+    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfbox, gcbox,new G4RotationMatrix(),tTrans1);
+    G4SubtractionSolid*  gubox = new G4SubtractionSolid("gubox", tubox, gcbox,new G4RotationMatrix(),tTrans0);
+
+    G4Tubs* gcylinder1  = new G4Tubs("Cylinder1",0,r1,0.5*fLens[1],0*deg,360*deg);
+    G4Tubs* gcylinder2  = new G4Tubs("Cylinder2",0,r2,0.5*fLens[1]-0.5,0*deg,360*deg);
+    G4Tubs* gcylinder1c = new G4Tubs("Cylinder1c",0,r1,0.5*fLens[1]+0.5,0*deg,360*deg);
+    G4Tubs* gcylinder2c = new G4Tubs("Cylinder2c",0,r2,0.5*fLens[1]+0.5,0*deg,360*deg);
     G4RotationMatrix* xRot = new G4RotationMatrix();
     xRot->rotateX(M_PI/2.*rad);
-    
-    G4IntersectionSolid* gbbox = new G4IntersectionSolid("bbox", gfbox0,gfbox,new G4RotationMatrix(),G4ThreeVector(0,0, lensMinThikness*2)); 
-    G4IntersectionSolid* gsbox = new G4IntersectionSolid("sbox", gfbox0,gfsbox,new G4RotationMatrix(),G4ThreeVector(0,0,-lensMinThikness*2)); 
-
-    G4UnionSolid* gubox = new G4UnionSolid("unionboxt", gbbox, gsbox,new G4RotationMatrix(),G4ThreeVector(0,0,0));
     
     G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Lens1", gubox, gcylinder1,xRot,zTrans1); 
     G4SubtractionSolid*  gLenst = new G4SubtractionSolid("temp", gubox, gcylinder1c, xRot,zTrans1);
 
     G4IntersectionSolid* gLens2 = new G4IntersectionSolid("Lens2", gLenst, gcylinder2, xRot,zTrans2);
     G4SubtractionSolid*  gLens3 = new G4SubtractionSolid("Lens3", gLenst, gcylinder2c, xRot,zTrans2);
-    
+     
     lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0);
     lLens2 = new G4LogicalVolume(gLens2,Nlak33aMaterial,"lLens2",0,0,0);
     lLens3 = new G4LogicalVolume(gLens3,BarMaterial,"lLens3",0,0,0);
