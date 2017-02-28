@@ -6,16 +6,12 @@
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
-#include "G4ParticleDefinition.hh"
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
 
 #include "PrtManager.h"
 
-PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction()
- : G4VUserPrimaryGeneratorAction(), 
-   fParticleGun(0)
-{
+PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction():G4VUserPrimaryGeneratorAction(),fParticleGun(0){
   G4int n_particle = 1;
   fParticleGun = new G4ParticleGun(n_particle);
 
@@ -23,19 +19,18 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction()
   fGunMessenger = new PrtPrimaryGeneratorMessenger(this);
 
   //default kinematic
-  //
   G4ParticleTable* particleTable = G4ParticleTable::GetParticleTable();
-  G4ParticleDefinition* particle = particleTable->FindParticle("e+");
+  fParticleP = particleTable->FindParticle("proton");
+  fParticlePi = particleTable->FindParticle("pi+");
 
-  fParticleGun->SetParticleDefinition(particle);
+  fParticleGun->SetParticleDefinition(fParticleP);
   fParticleGun->SetParticleTime(0.0*ns);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0*cm,0.0*cm,0.0*cm));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
-  fParticleGun->SetParticleEnergy(500.0*keV);
+  fParticleGun->SetParticleEnergy(7*MeV);
 }
 
-PrtPrimaryGeneratorAction::~PrtPrimaryGeneratorAction()
-{
+PrtPrimaryGeneratorAction::~PrtPrimaryGeneratorAction(){
   delete fParticleGun;
   delete fGunMessenger;
 }
@@ -46,11 +41,21 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   G4double radiatorW = PrtManager::Instance()->GetRadiatorW();
   G4double radiatorH = PrtManager::Instance()->GetRadiatorH();
 
+  if(PrtManager::Instance()->GetMixPiP()){
+    if(PrtManager::Instance()->GetParticle()==211 || PrtManager::Instance()->GetParticle()==0){
+       fParticleGun->SetParticleDefinition(fParticleP);
+       PrtManager::Instance()->SetParticle(2212);
+    }else{
+      fParticleGun->SetParticleDefinition(fParticlePi);
+      PrtManager::Instance()->SetParticle(211);
+    }
+  }
+
   PrtManager::Instance()->AddEvent(PrtEvent());
+  
   if(PrtManager::Instance()->GetBeamDinsion() == -1){ // random momentum
     fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0*GeV*G4UniformRand()));
   }
-
   if(PrtManager::Instance()->GetBeamDinsion() > 0){ // smearing and divergence
     G4double sigma = PrtManager::Instance()->GetBeamDinsion()*mm;
     z = fParticleGun->GetParticlePosition().z();
@@ -137,16 +142,13 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   PrtManager::Instance()->SetMomentum(TVector3(dir.x(),dir.y(),dir.z()));
 }
 
-void PrtPrimaryGeneratorAction::SetOptPhotonPolar()
-{
+void PrtPrimaryGeneratorAction::SetOptPhotonPolar(){
  G4double angle = G4UniformRand() * 360.0*deg;
  SetOptPhotonPolar(angle);
 }
 
-void PrtPrimaryGeneratorAction::SetOptPhotonPolar(G4double angle)
-{
- if (fParticleGun->GetParticleDefinition()->GetParticleName()!="opticalphoton")
-   {
+void PrtPrimaryGeneratorAction::SetOptPhotonPolar(G4double angle){
+ if (fParticleGun->GetParticleDefinition()->GetParticleName()!="opticalphoton"){
      G4cout << "--> warning from PrimaryGeneratorAction::SetOptPhotonPolar() :"
        "the particleGun is not an opticalphoton " << 
        fParticleGun->GetParticleDefinition()->GetParticleName()<< G4endl;

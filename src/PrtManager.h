@@ -67,7 +67,8 @@ public:
   void SetTimeRes(double val){ fTimeRes = val; }
   void SetInfo(TString val){ fInfo = val; }
   void AddInfo(TString val){ fInfo += val + "\n"; }
-
+  void SetMixPiP(bool val){fMixPiP = val;}
+  
   // Accessors
   int GetRunType(){ return fRunType; }
   int GetPhysList(){ return fPhysList; }
@@ -92,8 +93,9 @@ public:
   double GetBeamX(){ return fBeamX; }
   double GetBeamZ(){ return fBeamZ; }
   double GetTimeRes(){ return fTimeRes; }
-  TString GetOutName(){return fOutName;}
+  TString GetOutName(){return fOutName; }
   TString GetInfo() { return fInfo; }
+  bool GetMixPiP(){ return fMixPiP; }
 
 private: 
   int fRunType;
@@ -123,6 +125,7 @@ private:
   double fTimeRes;
   TString fOutName;
   TString fInfo;
+  bool fMixPiP;
 
   TVector3 fnX1;
   TVector3 fnY1;

@@ -71,7 +71,8 @@ example:
               "proton"
               "kaon"
                  ...
-              "opticalphoton"   
+              "opticalphoton"
+	      "mix" - (mix protons and pions) 
 
 -p    particle momentum [GeV/c]
 
