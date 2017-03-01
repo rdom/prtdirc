@@ -1,0 +1,44 @@
+#!/bin/bash
+
+rm b_h*.root 
+rm b_l*.log
+
+tseed=$(($(date +%s%N)/1000000-1393400000000))
+
+echo $tseed
+
+if [ "$1" == "0" ] ; then 
+    for i in {0..4}; do ../build/prtdirc -o b_h$i.root \
+					 -p 7 -h 2 -l 0 -a 20 -gz 364 -gx 85 -gsx 0 -gsy 0 -z 10 -g 2016 -c 2016 \
+					 -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 500000 -b 1 \
+					 -r $tseed$i > b_l$i.log & done
+    
+else
+    for i in {0..30}; do ../build/prtdirc -o b_h$i.root \
+					 -p 7 -h 2 -l 0 -a 25 -gz 364 -gx 85 -gsx 0 -gsy 0 -z 10 -g 2016 -c 2016 \
+					 -b 1 -e 10000 -x "mix" -b 1 -r $tseed$i > b_l$i.log & done
+fi
+
+#   -p 5 -h 1 -l 3 -a 125.5 -gz 378 -gx 85 -gsx 67.5 -gsy 16.5 -z 10  -g 2015 -c 2015
+#					 -p 7 -h 1 -l 3 -a 125 -gz 378 -gx 85 -gsx 67.5 -gsy 0 -z 10  -g 2015 -c 2015 
+
+sleep 1
+  
+while : 
+do
+    activth=$(ps aux | grep "[p]rt" | grep "b_h" | wc -l)
+    diffth=$(($maxnthr-$activth))
+    echo "We have $activth active prt simulations " 
+    if [ "$activth" -eq 0 ]; then 
+      break  
+    fi
+    sleep 2
+done
+
+sleep 2
+
+if [ "$1" == "0" ] ; then 
+    hadd -f lut.root b_h*.root
+else
+    hadd -f hits.root b_h*.root
+fi
