@@ -241,7 +241,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     Double_t lengthx = fabs(length*localvec.x());
     Double_t lengthy = fabs(length*localvec.y());
       
-    Int_t nBouncesX=(Int_t)(lengthx)/17.1.; // 17 bar height
+    Int_t nBouncesX=(Int_t)(lengthx)/17.1; // 17 bar height
     Int_t nBouncesY=(Int_t)(lengthy)/35.9; // 36 bar width
   
     //std::cout<<" angleX  "<< angleX <<"   angleY "<< angleY << " nBouncesX " << nBouncesX << " nBouncesY " << nBouncesY  << "  length "<< length<<std::endl;
