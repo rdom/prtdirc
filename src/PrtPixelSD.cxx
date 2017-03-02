@@ -217,6 +217,11 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
+  if(PrtManager::Instance()->GetRunType()==0){
+    PrtManager::Instance()->AddHit(hit);
+    return true;
+  }
+  
   Bool_t quantum_efficiency(true);
   Bool_t charge_sharing(true);
   Bool_t dead_time(true);
@@ -236,8 +241,8 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     Double_t lengthx = fabs(length*localvec.x());
     Double_t lengthy = fabs(length*localvec.y());
       
-    Int_t nBouncesX=(Int_t)(lengthx)/17.; // 17 bar height
-    Int_t nBouncesY=(Int_t)(lengthy)/32.; // 32 bar width
+    Int_t nBouncesX=(Int_t)(lengthx)/17.1.; // 17 bar height
+    Int_t nBouncesY=(Int_t)(lengthy)/35.9; // 36 bar width
   
     //std::cout<<" angleX  "<< angleX <<"   angleY "<< angleY << " nBouncesX " << nBouncesX << " nBouncesY " << nBouncesY  << "  length "<< length<<std::endl;
     
@@ -254,7 +259,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     }
   }
 
-  
   Bool_t is_hit(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) {
