@@ -217,7 +217,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
-  if(PrtManager::Instance()->GetRunType()==0){
+  if(PrtManager::Instance()->GetRunType()==1 || fRunType==5){
     PrtManager::Instance()->AddHit(hit);
     return true;
   }
