@@ -168,11 +168,11 @@
 # /vis/viewer/set/background white
 
 # #trd_addendum
-# /vis/viewer/set/globalLineWidthScale 1.5
-# /vis/geometry/set/lineWidth all 0 1
-# /vis/modeling/trajectories/drawByParticleID-0/setRGBA opticalphoton 1 0.5 0 0.3
-# /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 4.0
-# /vis/viewer/set/background white
+/vis/viewer/set/globalLineWidthScale 1.5
+/vis/geometry/set/lineWidth all 0 1
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA opticalphoton 1 0.5 0 0.3
+/vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 4.0
+#/vis/viewer/set/background white
 
 #export
 #/vis/open VRML2FILE

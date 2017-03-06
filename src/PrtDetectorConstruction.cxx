@@ -184,7 +184,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   // radiator covered with grease
   G4double greased=0*mm;
-  if(fGeomId<2017 && false){
+  if(fGeomId<2017){
     greased=1.5*mm;
     if(fLensId==0) greased=0.5*mm;
     G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
@@ -192,14 +192,14 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+0.5*greased),lOpticalGreased,"wOpticalGreased", lDirc,false,0);
   }
   
-  // Optical grease
-  // G4double greasew=0.2*mm;
-  // if(fLensId==0) greasew=0.1*mm;
-  // G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
-  // lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
-  // new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
-  // greased+=greasew;
-  greased=0;
+  //Optical grease
+  G4double greasew=0.2*mm;
+  if(fLensId==0) greasew=0.1*mm;
+  G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
+  lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
+  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
+  greased+=greasew;
+
   // // The Mirror gap
   // G4double mirrorgap=0.1*mm;
   // G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
