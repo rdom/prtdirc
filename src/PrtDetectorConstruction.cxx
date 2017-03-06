@@ -184,7 +184,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   // radiator covered with grease
   G4double greased=0*mm;
-  if(fGeomId<2017){
+  if(fGeomId<2017 && false){
     greased=1.5*mm;
     if(fLensId==0) greased=0.5*mm;
     G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
@@ -193,13 +193,13 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
   
   // Optical grease
-  G4double greasew=0.2*mm;
-  if(fLensId==0) greasew=0.1*mm;
-  G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
-  lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
-  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
-  greased+=greasew;
-  
+  // G4double greasew=0.2*mm;
+  // if(fLensId==0) greasew=0.1*mm;
+  // G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
+  // lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
+  // new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
+  // greased+=greasew;
+  greased=0;
   // // The Mirror gap
   // G4double mirrorgap=0.1*mm;
   // G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
@@ -938,8 +938,8 @@ void PrtDetectorConstruction::SetVisualization(){
   G4Colour green = G4Colour(0.0,1.0,.0);
   G4Colour red = G4Colour(1.0,0.0,.0); 
   G4Colour DircColour = G4Colour(1.,1.0,0.);
-  //G4Colour Dark = G4Colour(0.,0.05,0.05,0.15);
-  G4Colour Dark = G4Colour(0.,0.85,0.85,0.15);
+  G4Colour Dark = G4Colour(0.,0.05,0.05,0.15);
+  //G4Colour Dark = G4Colour(0.,0.85,0.85,0.15);
 
   G4VisAttributes *waExpHall = new G4VisAttributes(DircColour);
   waExpHall->SetVisibility(false);
@@ -950,8 +950,8 @@ void PrtDetectorConstruction::SetVisualization(){
   lDirc->SetVisAttributes(waDirc);
   lCover->SetVisAttributes(waDirc);
 
-  // G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
-  G4VisAttributes *waBar = new G4VisAttributes(Dark);
+  G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
+  // G4VisAttributes *waBar = new G4VisAttributes(Dark);
   waBar->SetVisibility(true);
   lBar->SetVisAttributes(waBar);
 
@@ -974,8 +974,8 @@ void PrtDetectorConstruction::SetVisualization(){
     if(fLensId==3 || fLensId==6 ) lLens3->SetVisAttributes(vaLens);
   }
 
-  //  G4VisAttributes *waPrizm = new G4VisAttributes(G4Colour(0.,0.9,0.9,0.2));
-  G4VisAttributes *waPrizm = new G4VisAttributes(Dark);
+  G4VisAttributes *waPrizm = new G4VisAttributes(G4Colour(0.,0.9,0.9,0.2));
+  // G4VisAttributes *waPrizm = new G4VisAttributes(Dark);
   waPrizm->SetVisibility(true);
   //waPrizm->SetForceAuxEdgeVisible(true);
   //waPrizm->SetForceSolid(true);

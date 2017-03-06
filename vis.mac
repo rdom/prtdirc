@@ -66,7 +66,7 @@
 
 # Draw coordinate axes:
 #/vis/scene/add/axes -0.285 0 0122 1 m
-/vis/scene/add/axes 0 0 0 1 m
+#/vis/scene/add/axes 0 0 0 1 m
 #/vis/scene/add/axes 0.4 0 0.15 0.1 m
 #
 # Draw smooth trajectories at end of event, showing trajectory points
@@ -165,9 +165,14 @@
 # /vis/viewer/set/style surface
 # /vis/viewer/set/edge true
 # /vis/viewer/set/hiddenEdge true
-
 # /vis/viewer/set/background white
 
+# #trd_addendum
+# /vis/viewer/set/globalLineWidthScale 1.5
+# /vis/geometry/set/lineWidth all 0 1
+# /vis/modeling/trajectories/drawByParticleID-0/setRGBA opticalphoton 1 0.5 0 0.3
+# /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 4.0
+# /vis/viewer/set/background white
 
 #export
 #/vis/open VRML2FILE
