@@ -80,7 +80,7 @@ example:
 -p    particle momentum [GeV/c]
 
 -w    physical list
-                0    standard
+                0    standard  (default)
                 1    without multiple scattering
                 10   monochromatic Cherenkov light
                 11   10 + 1
