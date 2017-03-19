@@ -173,6 +173,8 @@
 /vis/modeling/trajectories/drawByParticleID-0/setRGBA opticalphoton 1 0.7 0 0.3
 /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 3.0
 #/vis/viewer/set/background white
+/vis/viewer/set/targetPoint -37.1947 5 -7.42294 cm
+/vis/viewer/zoomTo 50
 
 #export
 #/vis/open VRML2FILE

@@ -565,6 +565,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       ResetHists();
       nsHits=0;
     }
+
     if(++nsEvents>=end) break;
   }
 
