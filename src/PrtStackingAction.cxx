@@ -64,6 +64,10 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track * a
     // if(aTrack->GetParentID() == 1 && ParticleName == "opticalphoton" ) 	  return fKill;
     
     if(ParticleName == "opticalphoton") {
+
+      //tmp phs cut
+      if(fabs(aTrack->GetMomentum().unit().y())>0.15 ) return fKill;
+    
       Double_t lambda = 197.0*2.0*pi/(aTrack->GetMomentum().mag()*1.0E6);          
       // apply detector efficiency at the production stage:    
       if(true){

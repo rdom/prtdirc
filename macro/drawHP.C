@@ -19,19 +19,22 @@ void drawHP(TString infile="../build/hits.root"){
       fHit = prt_event->GetHit(h);
       Int_t mcpid = fHit.GetMcpId();
       Int_t pixid = fHit.GetPixelId()-1;
+      Double_t time = fHit.GetLeadTime();
+      if(pixid<0) continue;
       Int_t ch = map_mpc[mcpid][pixid];
-
-      fhDigi[mcpid]->Fill(pixid%8, pixid/8);
+ 
+      if(prt_pid==2)
+	fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     }
   }
 
   drawDigi("m,p,v\n",7,0,0);
   cDigi->cd();
-  cDigi->SetName(Form("hp_%d",(Int_t)fAngle));
-  fhDigi[0]->GetZaxis()->SetLabelSize(0.06);
+  cDigi->SetName(Form("hp_sim_pi_%d_s217",(Int_t)fAngle));
+  fhDigi[5]->GetZaxis()->SetLabelSize(0.06);
   (new TPaletteAxis(0.82,0.1,0.86,0.90,((TH1 *)(fhDigi[5])->Clone())))->Draw();
 
   canvasAdd(cDigi);
-  canvasSave(1,0);
+  canvasSave(0,0);
   
 }

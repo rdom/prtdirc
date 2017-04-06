@@ -14,9 +14,9 @@ if [ "$1" == "0" ] ; then
 					 -r $tseed$i > b_l$i.log & done
     
 else
-    for i in {0..30}; do ../build/prtdirc -o b_h$i.root \
-					 -p 7 -h 2 -l 0 -a 25 -gz 364 -gx 85 -gsx 0 -gsy 0 -z 10 -g 2016 -c 2016 \
-					 -b 1 -e 1500 -x "mix" -b 1 -r $tseed$i > b_l$i.log & done
+    for i in {0..5}; do ../build/prtdirc -o b_h$i.root \
+					 -p 7 -h 2 -l 2 -a 25.2 -gz 364 -gx 85 -gsx 0 -gsy 11.6 -z 10 -g 2016 -c 2016 \
+					 -b 1 -e 600 -x "pi+" -b 1 -r $tseed$i > b_l$i.log & done
 fi
 
 #   -p 5 -h 1 -l 3 -a 125.5 -gz 378 -gx 85 -gsx 67.5 -gsy 16.5 -z 10  -g 2015 -c 2015

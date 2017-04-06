@@ -56,6 +56,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
   if(PrtManager::Instance()->GetBeamDinsion() == -1){ // random momentum
     fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0*GeV*G4UniformRand()));
   }
+  
   if(PrtManager::Instance()->GetBeamDinsion() > 0){ // smearing and divergence
     G4double sigma = PrtManager::Instance()->GetBeamDinsion()*mm;
     z = fParticleGun->GetParticlePosition().z();
