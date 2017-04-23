@@ -23,12 +23,12 @@ void drawHP(TString infile="../build/hits.root"){
       if(pixid<0) continue;
       Int_t ch = map_mpc[mcpid][pixid];
  
-      if(prt_pid==2)
+      if(prt_pid==4)
 	fhDigi[mcpid]->Fill(pixid%8, pixid/8);
     }
   }
 
-  drawDigi("m,p,v\n",7,0,0);
+  drawDigi("m,p,v\n",2017,0,0);
   cDigi->cd();
   cDigi->SetName(Form("hp_sim_pi_%d_s217",(Int_t)fAngle));
   fhDigi[5]->GetZaxis()->SetLabelSize(0.06);
