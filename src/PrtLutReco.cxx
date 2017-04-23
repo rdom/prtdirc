@@ -81,13 +81,13 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     TString opath(infile);
     opath.Remove(opath.Last('/'));
     if(infile.Contains("C.root")){
-      fSavePath = opath+Form("/%dr/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
+      prt_savepath = opath+Form("/%dr/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
     }else{
-      fSavePath = opath+Form("/%ds/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
+      prt_savepath = opath+Form("/%ds/%d",prt_data_info.getStudyId(),prt_data_info.getFileId());
     }
     
-  }else fSavePath="data/sim";
-  std::cout<<"fSavePath  "<< fSavePath <<std::endl;    
+  }else prt_savepath="data/sim";
+  std::cout<<"fSavePath  "<< prt_savepath <<std::endl;    
 
   for(Int_t i=0; i<5000; i++){
     fLutNode[i] = (PrtLutNode*) fLut->At(i);
@@ -159,9 +159,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t rad = TMath::Pi()/180.;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
 
-  SetRootPalette(1);
-  CreateMap();
-  initDigi();
+  prt_setRootPalette(1);
+  prt_createMap();
+  prt_initDigi();
   
   TFile file(outFile,"recreate");
   TTree tree("dirc","SPR");
@@ -366,7 +366,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t mcpid=fHit.GetMcpId();
       if(reflected) lenz = 2*radiatorL - lenz;
       Int_t ch = map_mpc[mcpid][pixid];
-      if(badcannel(ch)) continue;
+      if(prt_isBadChannel(ch)) continue;
       //if(cluster[mcpid][pixid]>8) continue;
   
       // Int_t x(0),y(0), piid(pixid) , nedge(0); //new
@@ -515,7 +515,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
  
       if(isGoodHit) nsHits++;
-      if(isGoodHit) fhDigi[mcpid]->Fill(pixid%8, pixid/8);
+      if(isGoodHit) prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
     } 
 
     // for(Int_t j=0; j<prt_nmcp; j++){
@@ -533,15 +533,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     }
 
     // if(fVerbose==1){
-    //   canvasAdd("ff",800,400);
+    //   prt_canvasAdd("ff",800,400);
     //   gF1->Draw();
     //   gF2->SetLineColor(4);
     //   gF2->Draw("same");
       
-    //   waitPrimitive("ff");
-    //   canvasDel("ff");
-    //   //canvasSave(1,0);
-    //   //canvasDel(Form("lh_%d",gg_ind));
+    //   prt_waitPrimitive("ff");
+    //   prt_canvasDel("ff");
+    //   //prt_canvasSave(1,0);
+    //   //prt_canvasDel(Form("lh_%d",gg_ind));
     // }
 	
     if(fVerbose>0 &&  fMethod==3 && nsEvents%ninfit==0){
@@ -580,7 +580,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     tree.Fill();
   }else{
     if(fVerbose<2) gROOT->SetBatch(1);
-    canvasAdd("r_lhood",800,400);
+    prt_canvasAdd("r_lhood",800,400);
     prt_normalize(hLnDiffP,hLnDiffPi);
     hLnDiffP->SetLineColor(2);
 
@@ -608,8 +608,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     hLnDiffP->Draw();
     hLnDiffPi->SetLineColor(4);
     hLnDiffPi->Draw("same");
-    canvasSave(1,0);
-    //waitPrimitive("r_lhood","w");
+    prt_canvasSave(1,0);
+    //prt_waitPrimitive("r_lhood","w");
     if(fVerbose) gROOT->SetBatch(0);
     tree.Fill();
   }
@@ -668,14 +668,14 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
       // fFit->SetParLimits(2,0.004,0.008); // width 7-10
       // for(Int_t i=0; i<prt_nmcp; i++){
-      // 	canvasAdd(Form("r_tangle_%d",i),800,400);
+      // 	prt_canvasAdd(Form("r_tangle_%d",i),800,400);
       // 	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
       // 	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
       // 	fHistMcp[i]->Draw();
       // }
 
       // for(Int_t i=0; i<960; i++){
-      // 	canvasAdd(Form("r_tangle_ch_%d",i),800,400);
+      // 	prt_canvasAdd(Form("r_tangle_ch_%d",i),800,400);
       // 	fHistCh[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
       // 	std::cout<<"if(ch=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
       // 	fHistCh[i]->Draw();
@@ -683,7 +683,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
       //      TString name = Form("r_tangle_%3.1f",PrtManager::Instance()->GetTest3());
       TString nid = Form("_%2.0f",a);
-      canvasAdd("r_tangle"+nid,800,400);
+      prt_canvasAdd("r_tangle"+nid,800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
       //fHist->Scale(1/fHist->GetMaximum());
@@ -698,7 +698,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       fHisti->SetLineColor(kRed+2);
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
-      canvasGet("r_tangle"+nid)->Update();
+      prt_canvasGet("r_tangle"+nid)->Update();
       TLine *line = new TLine(0,0,0,1000);
       line->SetX1(fAngleP);
       line->SetX2(fAngleP);
@@ -716,48 +716,48 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       line2->Draw();
       std::cout<<"fAnglePi "<< fAnglePi<<std::endl;
       
-      // canvasAdd("r_time",800,400);
+      // prt_canvasAdd("r_time",800,400);
       // fHist1->SetTitle(Form("theta %3.1f", a));
       // fHist1->SetLineColor(2);
       // fHist1->Draw();
       // fHist2->Draw("same");
 
-      canvasAdd("r_diff"+nid,800,400);
+      prt_canvasAdd("r_diff"+nid,800,400);
       fHist0->SetTitle(Form("theta %3.1f", a));
       fHist0->Draw();
       fHist0i->SetLineColor(kRed+2);
       if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
       
-      canvasAdd("r_cm"+nid,800,400);
+      prt_canvasAdd("r_cm"+nid,800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
 
       if(false){
 	Int_t tmax, max=0;
 	for(Int_t m=0; m<prt_nmcp;m++){
-	  fhDigi[m]->Rebin2D(8,8);
-	  fhDigi[m]->GetXaxis()->SetNdivisions(0);
-	  fhDigi[m]->GetYaxis()->SetNdivisions(0);
-	  fhDigi[m]->GetXaxis()->SetTickLength(0);
-	  fhDigi[m]->GetYaxis()->SetTickLength(0);
-	  fhDigi[m]->GetXaxis()->SetAxisColor(1);
-	  fhDigi[m]->GetYaxis()->SetAxisColor(1);
-	  fhDigi[m]->SetMarkerSize(10);
-	  tmax = fhDigi[m]->GetMaximum();
+	  prt_hdigi[m]->Rebin2D(8,8);
+	  prt_hdigi[m]->GetXaxis()->SetNdivisions(0);
+	  prt_hdigi[m]->GetYaxis()->SetNdivisions(0);
+	  prt_hdigi[m]->GetXaxis()->SetTickLength(0);
+	  prt_hdigi[m]->GetYaxis()->SetTickLength(0);
+	  prt_hdigi[m]->GetXaxis()->SetAxisColor(1);
+	  prt_hdigi[m]->GetYaxis()->SetAxisColor(1);
+	  prt_hdigi[m]->SetMarkerSize(10);
+	  tmax = prt_hdigi[m]->GetMaximum();
 	  if(max<tmax) max = tmax;
 	}
 	for(Int_t m=0; m<prt_nmcp;m++){	  
-	  fhDigi[m]->Scale(1/(Double_t)max);
+	  prt_hdigi[m]->Scale(1/(Double_t)max);
 	}
       }
 
-      drawDigi("m,p,v\n",7);//2
-      cDigi->SetName("r_hits"+nid);
-      canvasAdd(cDigi);  
+      prt_drawDigi("m,p,v\n",fEvent->GetGeometry());//2
+      prt_cdigi->SetName("r_hits"+nid);
+      prt_canvasAdd(prt_cdigi);  
 
-      waitPrimitive("r_cm"+nid);
-      canvasSave(1,0);
-      canvasDel("*");
+      prt_waitPrimitive("r_cm"+nid);
+      prt_canvasSave(1,0);
+      prt_canvasDel("*");
       
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
@@ -818,7 +818,7 @@ void PrtLutReco::ResetHists(){
   fHist2->Reset();
   fHist3->Reset();
   fHist4->Reset();
-  for(Int_t m=0; m<prt_nmcp;m++) fhDigi[m]->Reset();
+  for(Int_t m=0; m<prt_nmcp;m++) prt_hdigi[m]->Reset();
 }
 
 TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
@@ -898,8 +898,8 @@ Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
   gg_ind++;
 
   if(fVerbose==1){
-    canvasAdd("ff",800,400);
-    //canvasAdd(Form("lh_%d",gg_ind),800,400);
+    prt_canvasAdd("ff",800,400);
+    //prt_canvasAdd(Form("lh_%d",gg_ind),800,400);
     fHist->SetTitle(Form("%d",tofPid));
     fHist->Draw();
     lFit->SetLineColor(2);
@@ -909,10 +909,10 @@ Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
     // gF2->Draw("same");
      
     //if(fabs(amin-amin2)<5)
-    waitPrimitive("ff");
-    canvasDel("ff");
-    //canvasSave(1,0);
-    //canvasDel(Form("lh_%d",gg_ind));
+    prt_waitPrimitive("ff");
+    prt_canvasDel("ff");
+    //prt_canvasSave(1,0);
+    //prt_canvasDel(Form("lh_%d",gg_ind));
   }
   
   return amin-amin2;
@@ -945,8 +945,8 @@ Double_t PrtLutReco::fillLnDiffPPi2(Double_t cangle, Int_t tofPid, Double_t mom)
   gg_ind++;
 
   if(fVerbose==1){
-    canvasAdd("ff",800,400);
-    //canvasAdd(Form("lh_%d",gg_ind),800,400);
+    prt_canvasAdd("ff",800,400);
+    //prt_canvasAdd(Form("lh_%d",gg_ind),800,400);
     fHist->SetTitle(Form("%d",tofPid));
     fHist->Draw();
     lFit->SetLineColor(2);
@@ -956,10 +956,10 @@ Double_t PrtLutReco::fillLnDiffPPi2(Double_t cangle, Int_t tofPid, Double_t mom)
     // gFpi->Draw("same");
      
     //if(fabs(amin-amin2)<5)
-    waitPrimitive("ff");
-    canvasDel("ff");
-    //canvasSave(1,0);
-    //canvasDel(Form("lh_%d",gg_ind));
+    prt_waitPrimitive("ff");
+    prt_canvasDel("ff");
+    //prt_canvasSave(1,0);
+    //prt_canvasDel(Form("lh_%d",gg_ind));
   }
   
   return sum1-sum2;
