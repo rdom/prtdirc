@@ -442,14 +442,14 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
 
     //    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-       // r1 = PrtManager::Instance()->GetTest1();
-       // r2 = PrtManager::Instance()->GetTest2();
-       //    }
-
-    // thickness scan
-    G4double d = PrtManager::Instance()->GetTest1();
-    d = (d==0)? 3: d;    
-   
+    r1 = PrtManager::Instance()->GetTest1();
+    r2 = PrtManager::Instance()->GetTest2();
+    //    }
+    
+    // // thickness scan
+    // G4double d = PrtManager::Instance()->GetTest1();
+    // d = (d==0)? 3: d;    
+    
    // r1 = (r1==0)? 27.45: r1;
    // r2 = (r2==0)? 20.02: r2;
 
@@ -458,7 +458,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double shight = 0; //19
 
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +3.0); //1.5
-    G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +3.0+d);// 3.5
+    G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +3.0+5);// 3.5
 
     G4Box* gfbox = new G4Box("fbox",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
     G4Box* gcbox = new G4Box("cbox",0.5*fLens[0],0.5*fLens[1]+1,0.5*fLens[2]);
