@@ -349,26 +349,31 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
-
+    
     //    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-       r1 = PrtManager::Instance()->GetTest1();
-       r2 = PrtManager::Instance()->GetTest2();
-       //    }
+    r1 = PrtManager::Instance()->GetTest1();
+    r2 = PrtManager::Instance()->GetTest2();
+    //    }
+    
+    //RMI lens
+    fLens[2]=13.12;
+    lensMinThikness = 2.51;
+    G4double layer12 = lensMinThikness+ 3.525; //lensMinThikness*2;
     
     // r1 = (r1==0)? 27.45: r1;
     // r2 = (r2==0)? 20.02: r2;
 
     r1 = (r1==0)? 33: r1;
-    r2 = (r2==0)? 25: r2;
+    r2 = (r2==0)? 24: r2;
     G4double shight = 20;
 
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +lensMinThikness);
-    G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +lensMinThikness*2);
+    G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +layer12);
 
     G4Box* gfbox = new G4Box("fbox",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
     G4Box* gcbox = new G4Box("cbox",0.5*fLens[0],0.5*fLens[1]+1,0.5*fLens[2]);
-    G4ThreeVector tTrans1( 0.5*(fLens[0]+shight),0,-fLens[2]+2*lensMinThikness);
-    G4ThreeVector tTrans0(-0.5*(fLens[0]+shight),0,-fLens[2]+2*lensMinThikness);
+    G4ThreeVector tTrans1( 0.5*(fLens[0]+shight),0,-fLens[2]+layer12);
+    G4ThreeVector tTrans0(-0.5*(fLens[0]+shight),0,-fLens[2]+layer12);
     G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfbox, gcbox,new G4RotationMatrix(),tTrans1);
     G4SubtractionSolid*  gubox = new G4SubtractionSolid("gubox", tubox, gcbox,new G4RotationMatrix(),tTrans0);
 

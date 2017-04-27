@@ -3,7 +3,6 @@
 #include "../src/PrtEvent.h"
 #include "../../prttools/datainfo.C"
 #include "../../prttools/prttools.C"
-#include "TRandom.h"
 
 void drawHP(TString infile="../build/hits.root"){
   
