@@ -77,6 +77,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fNCol = 4;
   }
 
+  if(fMcpLayout == 20171){
+    fNRow = 2;
+    fNCol = 4;
+  }
+
   if(fMcpLayout == 2021){ // Barrel DIRC layout
     fNCol = 4;
     fPrizm[2] = 40+fPrizm[1]*tan(33*deg); fPrizm[3] = 40;
@@ -616,6 +621,13 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
+	}
+
+	if(fMcpLayout==20171){
+	  Double_t ms = 3;
+	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  //	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
+	  shifty = (fMcpTotal[0]+3)*(j-1)+fMcpActive[0]/2.+7;
 	}
 
 	if(fMcpLayout==2021){

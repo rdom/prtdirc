@@ -52,7 +52,9 @@ example:
 		2014 (default) 
 		2015
 		2016
-                2021 - Barrel DIRC baseline design 
+		2017 3x4 layout
+		20171 2x4 layout
+                2021 3x3+2 layout - Barrel DIRC baseline design 
 
 -l    focusing system
                 0    no lens
