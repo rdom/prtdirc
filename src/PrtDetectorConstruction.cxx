@@ -619,7 +619,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	if(fMcpLayout==2017){
 	  Double_t ms = 3;
 	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
-	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
+	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
@@ -631,12 +631,16 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	}
 
 	if(fMcpLayout==2021){
-	  Double_t ms = 0;
+	  // Double_t ms = 0; // true 2021
+	  Double_t ms = 3; // 2021 layout for 2017 prototupe
 	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
-	  shifty = (fMcpTotal[0]+1)*(j-1);
+
+	  //shifty = (fMcpTotal[0]+1)*(j-1); 
+	  shifty = (fMcpTotal[0]+3)*(j-1); // 2021 layout for 2017 prototupe
 	  if(i==0){	   
 	    if(j==0) continue;
-	    shifty = (fMcpTotal[0]+1)*(j-1)-0.5*fMcpTotal[0]-0.5;
+	    // shifty = (fMcpTotal[0]+1)*(j-1)-0.5*fMcpTotal[0]-0.5;
+	    shifty = (fMcpTotal[0]+3)*(j-1)-0.5*fMcpTotal[0]-0.5; // 2021 layout for 2017 prototupe
 	  }
 	  new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0.5*fBar[2]+fPrizm[1]+0.5*fMcpActive[2]+greased+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+(j-1));
 	  continue;

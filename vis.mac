@@ -176,6 +176,11 @@
 /vis/viewer/set/targetPoint -37.1947 5 -7.42294 cm
 /vis/viewer/zoomTo 50
 
+#mcp layout
+/vis/viewer/set/viewpointThetaPhi 90 -180
+/vis/viewer/zoomTo 10
+/vis/viewer/set/targetPoint 0 0 2 cm
+
 #export
 #/vis/open VRML2FILE
 #/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts false

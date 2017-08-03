@@ -17,6 +17,9 @@ void drawHP(TString infile="../build/hits.root"){
       Int_t pixid = hit.GetPixelId()-1;
       Double_t time = hit.GetLeadTime();
       Int_t ch = map_mpc[mcpid][pixid];
+
+      if(mcpid%3==0 && pixid<32) continue;
+      if(mcpid%3==2 && pixid>=32) continue; 
       
       if(prt_pid==4)
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
