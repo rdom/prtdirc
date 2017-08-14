@@ -30,5 +30,5 @@ void drawHP(TString infile="../build/hits.root"){
   prt_cdigi->SetName(Form("hp_sim_%d",(Int_t)prt_theta));
   prt_canvasAdd(prt_cdigi);
   prt_cdigi_palette->Draw();
-  prt_canvasSave(1,0);
+  // prt_canvasSave(1,0);
 }
