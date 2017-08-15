@@ -363,10 +363,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
     
-    //    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-    r1 = PrtManager::Instance()->GetTest1();
-    r2 = PrtManager::Instance()->GetTest2();
-    //    }
+    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+      r1 = PrtManager::Instance()->GetTest1();
+      r2 = PrtManager::Instance()->GetTest2();
+    }
     
     //RMI lens
     fLens[2]=13.12;
@@ -414,10 +414,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
 
-    //    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-       r1 = PrtManager::Instance()->GetTest1();
-       r2 = PrtManager::Instance()->GetTest2();
-       //    }
+    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+      r1 = PrtManager::Instance()->GetTest1();
+      r2 = PrtManager::Instance()->GetTest2();
+    }
     
     // r1 = (r1==0)? 27.45: r1;
     // r2 = (r2==0)? 20.02: r2;
@@ -459,10 +459,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double r1 = 0; //PrtManager::Instance()->GetTest1();
     G4double r2 = 0; //PrtManager::Instance()->GetTest2();
 
-    //    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-    r1 = PrtManager::Instance()->GetTest1();
-    r2 = PrtManager::Instance()->GetTest2();
-    //    }
+    if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
+      r1 = PrtManager::Instance()->GetTest1();
+      r2 = PrtManager::Instance()->GetTest2();
+    }
     
     // // thickness scan
     // G4double d = PrtManager::Instance()->GetTest1();
