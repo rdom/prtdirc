@@ -162,7 +162,7 @@ int main(int argc,char** argv)
   
   if ( geomAng.size() ) {
     G4String command = "/Prt/geom/prtRotation ";
-    UImanager->ApplyCommand(command+geomAng);
+    //UImanager->ApplyCommand(command+geomAng);
   }
 
   if ( lensId.size() ) {

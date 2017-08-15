@@ -27,8 +27,8 @@ void drawHP(TString infile="../build/hits.root"){
   }
  
   prt_drawDigi("m,p,v\n",prt_geometry,0,0);
-  prt_cdigi->SetName(Form("hp_sim_%d",(Int_t)prt_theta));
+  prt_cdigi->SetName(Form("hp_sim_%d_%d",(Int_t)prt_theta,(Int_t)prt_test1));
   prt_canvasAdd(prt_cdigi);
   prt_cdigi_palette->Draw();
-  // prt_canvasSave(1,0);
+  prt_canvasSave(1,0);
 }

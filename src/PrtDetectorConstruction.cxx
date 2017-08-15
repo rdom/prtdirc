@@ -176,8 +176,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
   if(fGeomId == 0 || PrtManager::Instance()->GetRunType() == 1) zshift=0;
   //tilt scan
-  // fPrtRot->rotateX(PrtManager::Instance()->GetTest1()*deg);
-  // fPrtRot->rotateY((180-PrtManager::Instance()->GetAngle())*deg);
+  fPrtRot->rotateY((-PrtManager::Instance()->GetAngle()+90)*deg);
+  fPrtRot->rotateX(PrtManager::Instance()->GetTest1()*deg);
   std::cout<<"PrtManager::Instance()->GetAngle() "<<PrtManager::Instance()->GetAngle()<<std::endl;
   
   wDirc  = new G4PVPlacement(fPrtRot,dircpos+G4ThreeVector(-zshift,0,0),lDirc,"wDirc",lExpHall,false,0);
