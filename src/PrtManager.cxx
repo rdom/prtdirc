@@ -65,6 +65,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   fBeamZ=-1;
   fTimeRes=0.2;
   fInfo="";
+  fMixPiP=false;
 
   fnX1 = TVector3(1,0,0);   
   fnY1 = TVector3( 0,1,0);
@@ -86,7 +87,9 @@ void PrtManager::AddEvent(PrtEvent event){
     fEvent = new PrtEvent(event);
     fEvent->SetType(1);
     fEvent->SetPhysList(fPhysList);
-    fEvent->SetAngle((180*deg-fAngle)/deg);
+    //    fEvent->SetAngle((180*deg-fAngle)/deg);
+    fEvent->SetAngle(fAngle);
+    
     //fEvent->SetRadiatorL(fRadiatorL);
     //fEvent->SetRadiatorW(fRadiatorW);
     //fEvent->SetRadiatorH(fRadiatorH);

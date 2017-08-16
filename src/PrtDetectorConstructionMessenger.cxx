@@ -47,7 +47,7 @@ void PrtDetectorConstructionMessenger::SetNewValue(
   if( command == fAngleCmd ) {
     G4double angle = 180*deg - fAngleCmd->GetNewDoubleValue(newValue);// + 90*deg;
     fPrtGeom->SetRotation(angle);
-    PrtManager::Instance()->SetAngle(angle);
+    // PrtManager::Instance()->SetAngle(angle);
     std::cout<<"angle deg   "<<angle/deg <<std::endl;
     
   } 
