@@ -6,7 +6,7 @@
 
 void drawHP(TString infile="../build/hits.root"){
   
-  if(!prt_init(infile,1,"data/drawHP_2017")) return;
+  if(!prt_init(infile,1,"data/drawHP")) return;
  
   PrtHit hit;
   for (Int_t ievent=0; ievent< prt_entries; ievent++){

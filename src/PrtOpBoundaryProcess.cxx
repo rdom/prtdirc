@@ -56,7 +56,7 @@ G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
   // kill photons outside bar and prizm
   if(GetStatus() == FresnelRefraction 
      && aStep.GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wDirc"){
-    if(PrtManager::Instance()->GetLens()!=4) particleChange->ProposeTrackStatus(fStopAndKill);
+    // if(PrtManager::Instance()->GetLens()!=4) particleChange->ProposeTrackStatus(fStopAndKill); //rd
   }
 
   if((aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wLens1" 
