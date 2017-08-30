@@ -25,6 +25,9 @@ void drawHP(TString infile="../build/hits.root"){
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
     }
   }
+
+
+  //i%3*4+i/3
  
   prt_drawDigi("m,p,v\n",prt_geometry,0,0);
   prt_cdigi->SetName(Form("hp_sim_%d_%d",(Int_t)prt_theta,(Int_t)prt_test1));
