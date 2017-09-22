@@ -16,17 +16,17 @@
 PrtBarSD::PrtBarSD(const G4String& name, 
 		   const G4String& hitsCollectionName,
 		   G4int nofCells)
-  : G4VSensitiveDetector(name), fHitsCollection(NULL)
-{
+  : G4VSensitiveDetector(name), fHitsCollection(NULL){
+  
   collectionName.insert(hitsCollectionName);
 }
 
-PrtBarSD::~PrtBarSD() 
-{ 
+PrtBarSD::~PrtBarSD(){
+
 }
 
-void PrtBarSD::Initialize(G4HCofThisEvent* hce)
-{ 
+void PrtBarSD::Initialize(G4HCofThisEvent* hce){
+  
   // Create hits collection
   fHitsCollection = new PrtBarHitsCollection(SensitiveDetectorName, collectionName[0]); 
 
@@ -36,8 +36,8 @@ void PrtBarSD::Initialize(G4HCofThisEvent* hce)
   hce->AddHitsCollection( hcID, fHitsCollection );
 }
 
-G4bool PrtBarSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist)
-{   
+G4bool PrtBarSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
+
   // energy deposit
   G4double edep = aStep->GetTotalEnergyDeposit();
   G4Track *track = aStep->GetTrack();
@@ -69,8 +69,8 @@ G4bool PrtBarSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist)
   return true;
 }
 
-void PrtBarSD::EndOfEvent(G4HCofThisEvent*)
-{ 
+void PrtBarSD::EndOfEvent(G4HCofThisEvent*){
+
   if ( verboseLevel>1 ) { 
     G4int nofHits = fHitsCollection->entries();
     G4cout << "\n-------->Bar Hits Collection: in this event they are " << nofHits 

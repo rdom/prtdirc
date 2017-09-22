@@ -2,6 +2,7 @@
 #include "PrtDetectorConstruction.h"
 
 #include "G4Material.hh"
+#include "G4SDManager.hh"
 #include "G4Element.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
@@ -1129,18 +1130,22 @@ void PrtDetectorConstruction::SetVisualization(){
 }
 
 void PrtDetectorConstruction::ConstructSDandField(){
-  // Sensitive detectors
+  // Sensitive detectors  
   PrtPixelSD* pixelSD = new PrtPixelSD("PixelSD", "PixelHitsCollection", 0);
+  G4SDManager::GetSDMpointer()->AddNewDetector(pixelSD);
   SetSensitiveDetector("lPixel",pixelSD);
   //SetSensitiveDetector("lScan",pixelSD);
 
   PrtPrizmSD* prizmSD = new PrtPrizmSD("PrizmSD", "PrizmHitsCollection", 0);
+  G4SDManager::GetSDMpointer()->AddNewDetector(prizmSD);
   SetSensitiveDetector("lPrizm",prizmSD);
 
   PrtTriggerSD* triggerSD = new PrtTriggerSD("TriggerSD", "TriggerHitsCollection", 0);
+  G4SDManager::GetSDMpointer()->AddNewDetector(triggerSD);
   SetSensitiveDetector("lTrigger",triggerSD);
 
   PrtBarSD* barSD = new PrtBarSD("BarSD", "BarHitsCollection", 0);
+  G4SDManager::GetSDMpointer()->AddNewDetector(barSD);
   SetSensitiveDetector("lBar",barSD);
   // Magnetic field
 }
