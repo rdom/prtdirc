@@ -663,7 +663,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
     spr = fFit->GetParameter(2);
  
     if(fVerbose>1) gROOT->SetBatch(0);
-    
+
     if(fMethod==2 && fVerbose>0){
 
       // fFit->SetParLimits(2,0.004,0.008); // width 7-10
@@ -727,7 +727,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       fHist0->Draw();
       fHist0i->SetLineColor(kRed+2);
       if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
-      
+       
       prt_canvasAdd("r_cm"+nid,800,400);
       fHist3->SetTitle(Form("theta %3.1f", a));
       fHist3->Draw("colz");
@@ -752,12 +752,14 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       }
 
       prt_drawDigi("m,p,v\n",fEvent->GetGeometry());//2
-      prt_cdigi->SetName("r_hits"+nid);
-      prt_canvasAdd(prt_cdigi);  
-
+      prt_cdigi->SetName("r_hp"+nid);
+      prt_canvasAdd(prt_cdigi);
+      
       prt_waitPrimitive("r_cm"+nid);
       prt_canvasSave(1,0);
       prt_canvasDel("*");
+
+      
       
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);

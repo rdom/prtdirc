@@ -655,8 +655,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  continue;
 	}
 	
-	// new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0.5*fBar[2]+fPrizm[1]+0.5*fMcpActive[2]+greased+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+j);
-	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0.5*fBar[2]+fPrizm[1]+0.5*fMcpActive[2]+greased+fLens[2]+0.1),lMcp,"wMcp", lDirc,false,fNRow*i+j);  //rd air gap
+	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0.5*fBar[2]+fPrizm[1]+0.5*fMcpActive[2]+greased+fLens[2]),lMcp,"wMcp", lDirc,false,fNRow*i+j);
+	// new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0.5*fBar[2]+fPrizm[1]+0.5*fMcpActive[2]+greased+fLens[2]+0.1),lMcp,"wMcp", lDirc,false,fNRow*i+j);  //rd air gap
       }
     }
   }else{
@@ -968,8 +968,8 @@ void PrtDetectorConstruction::DefineMaterials(){
   for(int i=0;i<num;i++){
     WaveLength[i]= (300 +i*10)*nanometer;
     //    AirAbsorption[i] = 4*cm; // if photon in the air -> kill it immediately
-    //AirAbsorption[i] = 4*cm; // if photon in the air -> kill it immediately
-    AirAbsorption[i] = 400000000*cm; //rd for air gap 
+    AirAbsorption[i] = 4*cm; // if photon in the air -> kill it immediately
+    // AirAbsorption[i] = 400000000*cm; //rd for air gap 
     AirRefractiveIndex[i] = 1; 
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
 
