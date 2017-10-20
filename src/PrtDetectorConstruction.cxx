@@ -115,7 +115,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
 
   if(fGeomId == 2017){
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-146,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100.5);
   }
   
   if(fGeomId == 2021){ 
