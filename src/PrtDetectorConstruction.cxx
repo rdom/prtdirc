@@ -152,7 +152,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   // The experimental Hall
   G4Box* gExpHall = new G4Box("gExpHall",fHall[0],fHall[1],fHall[2]);
   lExpHall = new G4LogicalVolume(gExpHall,defaultMaterial,"lExpHall",0,0,0);
-  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-146;
+  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-146-fLens[2];
   G4VPhysicalVolume* wExpHall  = new G4PVPlacement(0,G4ThreeVector(),lExpHall,"gExpHall",0,false,0);
 
   // The Trigger and The front material
