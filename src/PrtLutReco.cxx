@@ -259,31 +259,31 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
     //if(fMethod==2 && tofPid!=2212) continue;
 	
-    if(fEvent->GetType()==0){
+ //    if(fEvent->GetType()==0){
 
-      Bool_t tof1(false), tof2(false);
-      Bool_t hodo1(false), hodo2(false);
-      for(Int_t h=0; h<nHits; h++) {
-      	fHit = fEvent->GetHit(h);
-      	Int_t gch=fHit.GetChannel();
-	//if(gch>1031 && gch<1034)
-	tof1=true;
+ //      Bool_t tof1(false), tof2(false);
+ //      Bool_t hodo1(false), hodo2(false);
+ //      for(Int_t h=0; h<nHits; h++) {
+ //      	fHit = fEvent->GetHit(h);
+ //      	Int_t gch=fHit.GetChannel();
+ // 	//if(gch>1031 && gch<1034)
+ // 	tof1=true;
 	
-	if(gch>1169 && gch<1171)
-	  tof2=true;
+ // 	if(gch>1169 && gch<1171)
+ // 	  tof2=true;
 
-	if(gch>1300 && gch<1307)
-	  hodo1=true;
-	// if(gch>1313 && gch<1316)
-	  hodo2=true;
+ // 	if(gch>1300 && gch<1307)
+ // 	  hodo1=true;
+ // 	// if(gch>1313 && gch<1316)
+ // 	  hodo2=true;
       
-      	if(tof1 && tof2 && hodo1 && hodo2) goto goodch;
-      }
- goto goodch;
-      continue;
-    }
+ //      	if(tof1 && tof2 && hodo1 && hodo2) goto goodch;
+ //      }
+ // goto goodch;
+ //      continue;
+ //    }
     
-  goodch:
+ //  goodch:
     
     
     //   //clusters search
@@ -342,14 +342,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       //================================================== 
       Double_t radiatorL = (radiator==2)? 1224.9 : 1250; //plate : bar
 
-      Double_t z =  fEvent->GetBeamZ()+25;
-      if( fEvent->GetType()==1){
-	lenz = radiatorL/2.-fHit.GetPosition().Z();
-      }else{
-	lenz = z-1/tan(prtangle*rad)*(122+(z-96)/tan((135-0.5*prtangle)*rad));
-	// Double_t b = 122*tan(0.5*((prtangle-90)*rad)); 
-	// Double_t lenz = (z-96+b)/cos((prtangle-90)*rad)+b+96;     
-      }
+      if(fEvent->GetType()==1) lenz = radiatorL/2.-fHit.GetPosition().Z();
+      else lenz = fHit.GetPosition().Z();
+
       
       if(fVerbose==3){
 	TVector3 cd = fHit.GetMomentum();
@@ -750,8 +745,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	  prt_hdigi[m]->Scale(1/(Double_t)max);
 	}
       }
-
-      prt_drawDigi("m,p,v\n",fEvent->GetGeometry());//2
+ 
+      prt_drawDigi("m,p,v\n",2017);
       prt_cdigi->SetName("r_hp"+nid);
       prt_canvasAdd(prt_cdigi);
       
