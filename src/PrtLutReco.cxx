@@ -67,7 +67,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->GetEntry(0);
 
   fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150  //80
-  fHistPi = new TH1F("chrenkov_angle_hist_Pi",  "chrenkov angle pi;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
+  fHistPi = new TH1F("chrenkov_angle_hist_Pi",  "chrenkov angle pi;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
   fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
@@ -257,7 +257,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    //if(fMethod==2 && tofPid!=2212) continue;
+    if(fMethod==2 && tofPid!=2212) continue;
 	
  //    if(fEvent->GetType()==0){
 
@@ -340,7 +340,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
       //================================================== 
-      Double_t radiatorL = (radiator==2)? 1224.9 : 1250; //plate : bar
+      Double_t radiatorL = (radiator==2)? 1224.9 : 1200; //plate : bar
 
       if(fEvent->GetType()==1) lenz = radiatorL/2.-fHit.GetPosition().Z();
       else lenz = fHit.GetPosition().Z();
@@ -474,7 +474,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    // if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    // else
-	      fHist->Fill(tangle ,weight);
+	    fHist->Fill(tangle ,weight);
 	    
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
@@ -543,7 +543,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(nsHits>10){
         // if(tofPid==2212 && sum > 0){
 	//   std::cout<<"p  "<<sum1 << "   pi "<<sum2 << "  s "<< sum<<std::endl;
-	//   if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;	  
+	//   if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;
 	// }
 
 	FindPeak(cangle,spr, prtangle, tofPid);
