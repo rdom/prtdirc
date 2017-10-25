@@ -134,20 +134,20 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
   
   Int_t layout = PrtManager::Instance()->GetMcpLayout();   
   if(layout==2015){
-    for(Int_t m=0; m<15; m++){
-      for(Int_t i=0; i<64; i++){
+    for(auto m=0; m<15; m++){
+      for(auto i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2015[m][i];
       }
     }
   }else if(layout==2016){
-    for(Int_t m=0; m<15; m++){
-      for(Int_t i=0; i<64; i++){
+    for(auto m=0; m<9; m++){
+      for(auto i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2016[m][i];
       }
     }
   }else{
-    for(Int_t m=0; m<14; m++){
-      for(Int_t i=0; i<64; i++){
+    for(auto m=0; m<14; m++){
+      for(auto i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2017[m][i];
       }
     }
