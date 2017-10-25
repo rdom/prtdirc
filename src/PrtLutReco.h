@@ -44,6 +44,7 @@ private:
   Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
   TRandom fRand;
   Int_t fMethod;
+  Int_t fRadiator;
 
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
