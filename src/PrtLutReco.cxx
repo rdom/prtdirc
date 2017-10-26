@@ -665,7 +665,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // }
 
       //      TString name = Form("r_tangle_%3.1f",PrtManager::Instance()->GetTest3());
-      TString nid = Form("_%2.0f",a);
+      TString nid = "";//Form("_%2.0f",a);
       prt_canvasAdd("r_tangle"+nid,800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
