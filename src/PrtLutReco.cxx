@@ -36,6 +36,8 @@ TH1F*  fHist0i = new TH1F("timediffi",";t_{calc}-t_{measured} [ns];entries [#]",
 TH1F*  fhNph = new TH1F("fhNph",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,100);
 TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100);
+TH1F*  fHist6 = new TH1F("time6",";measured time [ns];entries [#]", 1000,0,100);
+
 TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
@@ -426,7 +428,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  Double_t totaltime = bartime+evtime;
 	  fHist0->Fill(totaltime-hitTime);
 	  if(samepath)  fHist0i->Fill(totaltime-hitTime);
-	  fHist1->Fill(hitTime);
+	  //	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
 	  if(fabs(totaltime-hitTime)>timeRes) continue;	  
@@ -487,7 +489,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
 
+      fHist1->Fill(hitTime);
       if(isGoodHit){
+	fHist6->Fill(hitTime);
 	nhhits++;
 	nsHits++;
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
@@ -695,11 +699,13 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       line2->Draw();
       std::cout<<"fAnglePi "<< fAnglePi<<std::endl;
       
-      // prt_canvasAdd("r_time",800,400);
-      // fHist1->SetTitle(Form("theta %3.1f", a));
-      // fHist1->SetLineColor(2);
-      // fHist1->Draw();
-      // fHist2->Draw("same");
+      prt_canvasAdd("r_time",800,400);
+      prt_normalize(fHist1,fHist6);
+      fHist1->SetTitle(Form("theta %3.1f", a));
+      fHist1->SetLineColor(2);
+      fHist1->Draw();
+      fHist6->Draw("same");
+      //fHist2->Draw("same");
 
       prt_canvasAdd("r_nph"+nid,800,400);
       fhNph->Draw();

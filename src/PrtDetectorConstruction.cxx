@@ -175,7 +175,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 
   G4ThreeVector dircpos = G4ThreeVector(0., 0., 0.);
   if(fCenterShift.mag() !=0){
-    dircpos = fCenterShift; // G4ThreeVector(fCenterShift, 0., 0.);
+    dircpos = fCenterShift; // G4ThreeVector(fCenterShift, 0., 0.);   
+    std::cout<<"dircpos "<<dircpos<<std::endl;
     dircpos.rotateY((PrtManager::Instance()->GetAngle()-90)*deg);
   }
   if(fGeomId == 0 || PrtManager::Instance()->GetRunType() == 1) zshift=0;
@@ -183,7 +184,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   fPrtRot->rotateY((-PrtManager::Instance()->GetAngle()+90)*deg);
   fPrtRot->rotateX(PrtManager::Instance()->GetTest1()*deg);
   std::cout<<"PrtManager::Instance()->GetAngle() "<<PrtManager::Instance()->GetAngle()<<std::endl;
-  
+
   wDirc  = new G4PVPlacement(fPrtRot,dircpos+G4ThreeVector(-zshift,0,0),lDirc,"wDirc",lExpHall,false,0);
 
   // The DIRC cover box
