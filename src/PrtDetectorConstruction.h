@@ -80,7 +80,8 @@ private:
   G4ThreeVector fPrismShift;
   G4double fPrismRadiatorStep;
   G4ThreeVector fCenterShift;
-
+  G4double fOffset;
+  
   G4double fRotAngle;
   G4RotationMatrix *fPrtRot;
   PrtDetectorConstructionMessenger* fGeomMessenger;

@@ -116,9 +116,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
   }
 
+  fOffset=0;
   if(fGeomId == 2017){
+    fOffset=145;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(146-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
   
   if(fGeomId == 2021){ 
@@ -155,7 +157,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   // The experimental Hall
   G4Box* gExpHall = new G4Box("gExpHall",fHall[0],fHall[1],fHall[2]);
   lExpHall = new G4LogicalVolume(gExpHall,defaultMaterial,"lExpHall",0,0,0);
-  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-146;
+  Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-fOffset;
   G4VPhysicalVolume* wExpHall  = new G4PVPlacement(0,G4ThreeVector(),lExpHall,"gExpHall",0,false,0);
 
   // The Trigger and The front material
