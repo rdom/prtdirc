@@ -118,7 +118,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
 
   fOffset=0;
   if(fGeomId == 2017){
-    fOffset=150;
+    fOffset=140;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
