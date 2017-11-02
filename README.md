@@ -66,7 +66,9 @@ example:
                 6    3-layer cylindrical lens		
                 10   ideal lens (thickness = 0, ideal focusing)
 
--a    angle between particle beam and bar radiator
+-a    polar angle between particle beam and bar radiator
+
+-phi  azimuth angle between particle beam and bar radiator
 
 -e    number of simulated events
 -f     number of the first event for the reconstruction
