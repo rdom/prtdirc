@@ -49,7 +49,7 @@ int main(int argc,char** argv)
   TApplication theApp("App", 0, 0);
 
   G4String macro, events, geometry, radiator, physlist, outfile, 
-    session,geomAng,batchmode,lensId,particle,momentum,testVal1,testVal2,testVal3,
+    session,geomAng,geomPhi,batchmode,lensId,particle,momentum,testVal1,testVal2,testVal3,
     prismStepX,prismStepY,beamZ,beamX,timeRes,
     beamDimension, mcpLayout, infile = "hits.root", lutfile = "../data/lut.root";
   G4int firstevent(0), runtype(0), verbose(0);
@@ -65,6 +65,7 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-g" ) geometry  = argv[i+1];
     else if ( G4String(argv[i]) == "-h" ) radiator  = argv[i+1];
     else if ( G4String(argv[i]) == "-a" ) geomAng   = argv[i+1];
+    else if ( G4String(argv[i]) == "-phi" ) geomPhi   = argv[i+1];
     else if ( G4String(argv[i]) == "-b" ) batchmode = argv[i+1];
     else if ( G4String(argv[i]) == "-f" ) firstevent= atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-e" ) events    = argv[i+1];
@@ -111,6 +112,7 @@ int main(int argc,char** argv)
   if(testVal2.size())   PrtManager::Instance()->SetTest2(atof(testVal2));
   if(testVal3.size())   PrtManager::Instance()->SetTest3(atof(testVal3));
   if(geomAng.size())   PrtManager::Instance()->SetAngle(atof(geomAng));
+  if(geomPhi.size())   PrtManager::Instance()->SetPhi(atof(geomPhi));
   if(prismStepX.size())   PrtManager::Instance()->SetPrismStepX(atof(prismStepX));
   if(prismStepY.size())   PrtManager::Instance()->SetPrismStepY(atof(prismStepY));
   if(beamX.size())   PrtManager::Instance()->SetBeamX(atof(beamX));

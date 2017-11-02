@@ -31,6 +31,7 @@ public:
   Long_t GetTime() const { return fTime; }
 
   Double_t GetAngle()      const { return fAngle; }
+  Double_t GetPhi()        const { return fPhi; }
   Int_t GetPhysList()      const { return fPhysList; }
   Int_t GetParticle()      const { return fParticle; }
   TVector3 GetMomentum()   const { return fMomentum; }
@@ -56,6 +57,7 @@ public:
 
   void SetPhysList(Int_t val) { fPhysList = val; }
   void SetAngle(Double_t val) { fAngle = val; }
+  void SetPhi(Double_t val) { fPhi = val; }
   void SetParticle(Int_t val) { fParticle = val; }
   void SetMomentum(TVector3 val) { fMomentum = val; }
   void SetPosition(TVector3 val) { fPosition = val; }
@@ -84,6 +86,7 @@ private:
   Int_t fPhysList;
   Int_t fParticle;
   Double_t fAngle;
+  Double_t fPhi;
   TVector3 fMomentum;
   TVector3 fPosition;
   Int_t fGeometry;

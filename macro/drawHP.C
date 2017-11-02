@@ -17,7 +17,8 @@ void drawHP(TString infile="../build/hits.root"){
       Int_t pixid = hit.GetPixelId()-1;
       Double_t time = hit.GetLeadTime();
       Int_t ch = map_mpc[mcpid][pixid];
-
+      if(prt_isBadChannel(ch)) continue;
+      
       // if(mcpid%3==0 && pixid<32) continue;
       // if(mcpid%3==2 && pixid>=32) continue; 
       
@@ -29,9 +30,9 @@ void drawHP(TString infile="../build/hits.root"){
 
   //i%3*4+i/3
  
-  prt_drawDigi("m,p,v\n",prt_geometry,0,0);
-  prt_cdigi->SetName(Form("hp_sim_%d_%d",(Int_t)prt_theta,(Int_t)prt_test1));
+  prt_drawDigi("m,p,v\n",2017,0,0);
+  prt_cdigi->SetName(Form("hp_data_%d_%2.1f",(Int_t)prt_theta,prt_phi));
   prt_canvasAdd(prt_cdigi);
-  //  prt_cdigi_palette->Draw();
+  //prt_cdigi_palette->Draw();
   prt_canvasSave(1,0);
 }

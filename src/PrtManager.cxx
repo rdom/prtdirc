@@ -47,6 +47,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   fMomentum = TVector3(0,0,0);
   fGeometry = 3;
   fAngle = 0;
+  fPhi = 0;
   fRadiator=1;
   fRadiatorL=0;
   fRadiatorW=0;
@@ -89,6 +90,7 @@ void PrtManager::AddEvent(PrtEvent event){
     fEvent->SetPhysList(fPhysList);
     //    fEvent->SetAngle((180*deg-fAngle)/deg);
     fEvent->SetAngle(fAngle);
+    fEvent->SetPhi(fPhi);
     
     //fEvent->SetRadiatorL(fRadiatorL);
     //fEvent->SetRadiatorW(fRadiatorW);

@@ -50,6 +50,7 @@ public:
   void SetLens(int val){ fLens = val; }
   void SetMcpLayout(int val){ fMcpLayout = val; }
   void SetAngle(double val){ fAngle = val; }
+  void SetPhi(double val){ fPhi = val; }
   void SetRadiatorL(double val){ fRadiatorL = val; }
   void SetRadiatorW(double val){ fRadiatorW = val; }
   void SetRadiatorH(double val){ fRadiatorH = val; }
@@ -78,6 +79,7 @@ public:
   int GetLens(){ return fLens; }
   int GetMcpLayout(){ return fMcpLayout; }
   double GetAngle(){ return fAngle; }
+  double GetPhi(){ return fPhi; }
   double GetRadiatorL(){ return fRadiatorL; }
   double GetRadiatorW(){ return fRadiatorW; }
   double GetRadiatorH(){ return fRadiatorH; }
@@ -105,6 +107,7 @@ private:
   int fLens;
   int fMcpLayout;
   double fAngle;
+  double fPhi;
   double fRadiatorL;
   double fRadiatorW;
   double fRadiatorH;
