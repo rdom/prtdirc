@@ -158,10 +158,9 @@ int main(int argc,char** argv)
   if ( macro.size() ) {
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);
+  }else { 
+    UImanager->ApplyCommand("/control/execute prt.mac");
   }
-  // else { 
-  //   UImanager->ApplyCommand("/control/execute ../prt.mac");
-  // }
   
   if ( geomAng.size() ) {
     G4String command = "/Prt/geom/prtRotation ";
