@@ -173,18 +173,19 @@ int main(int argc,char** argv)
   }
  
   if ( particle.size() ) {
-    G4String command = "/gun/particle ";
-    UImanager->ApplyCommand(command+particle);
     int pdgid = 0;
-    if(particle=="proton") pdgid = 2212;
-    if(particle=="pi+") pdgid = 211;
-    if(particle=="pi0") pdgid = 111;
-    if(particle=="kaon+") pdgid = 321;
-    if(particle=="kaon-") pdgid = -321;
-    if(particle=="mu-") pdgid = 13;
-    if(particle=="e-") pdgid = 11;
     if(particle=="mix") PrtManager::Instance()->SetMixPiP(true);
-    
+    else{
+      G4String command = "/gun/particle ";
+      UImanager->ApplyCommand(command+particle);
+      if(particle=="proton") pdgid = 2212;
+      if(particle=="pi+") pdgid = 211;
+      if(particle=="pi0") pdgid = 111;
+      if(particle=="kaon+") pdgid = 321;
+      if(particle=="kaon-") pdgid = -321;
+      if(particle=="mu-") pdgid = 13;
+      if(particle=="e-") pdgid = 11;
+    }    
     PrtManager::Instance()->SetParticle(pdgid);
   }
 
