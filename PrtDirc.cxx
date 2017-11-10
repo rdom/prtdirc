@@ -46,6 +46,10 @@ int main(int argc,char** argv)
     PrintUsage();
     return 1;
   }
+  
+#ifdef G4MULTITHREADED
+  G4int nThreads = 0;
+#endif
   TApplication theApp("App", 0, 0);
 
   G4String macro, events, geometry, radiator, physlist, outfile, 
@@ -85,6 +89,11 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-gx" ) beamX    = argv[i+1];
     else if ( G4String(argv[i]) == "-tr" ) timeRes  = argv[i+1];
     else if ( G4String(argv[i]) == "-v" ) verbose   = atoi(argv[i+1]);
+#ifdef G4MULTITHREADED
+    else if ( G4String(argv[i]) == "-t" ) {
+      nThreads = G4UIcommand::ConvertToInt(argv[i+1]);
+    }
+#endif
     else {
       PrintUsage();
       return 1;
@@ -129,13 +138,20 @@ int main(int argc,char** argv)
 
   // Choose the Random engine
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
+  
+#ifdef G4MULTITHREADED
+  G4MTRunManager * runManager = new G4MTRunManager;
+  if ( nThreads > 0 ) runManager->SetNumberOfThreads(nThreads);
+#else
+  G4RunManager * runManager = new G4RunManager;
+#endif
+  
   std::cout<<"SEED "<<myseed <<std::endl;
   G4Random::setTheSeed(myseed);
   // Seed the random number generator manually
   // if(myseed==345354) myseed = time(NULL);
 
-  G4RunManager * runManager = new G4RunManager;
- 
+  
   // Detector construction
   runManager-> SetUserInitialization(new PrtDetectorConstruction());
   // Physics list

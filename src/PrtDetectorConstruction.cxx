@@ -146,7 +146,6 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   PrtManager::Instance()->AddInfo("Initialization done");
 }
 
-
 PrtDetectorConstruction::~PrtDetectorConstruction(){}
 
 G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
@@ -1145,13 +1144,14 @@ void PrtDetectorConstruction::ConstructSDandField(){
   G4SDManager::GetSDMpointer()->AddNewDetector(prizmSD);
   SetSensitiveDetector("lPrizm",prizmSD);
 
-  PrtTriggerSD* triggerSD = new PrtTriggerSD("TriggerSD", "TriggerHitsCollection", 0);
-  G4SDManager::GetSDMpointer()->AddNewDetector(triggerSD);
-  SetSensitiveDetector("lTrigger",triggerSD);
+  // PrtTriggerSD* triggerSD = new PrtTriggerSD("TriggerSD", "TriggerHitsCollection", 0);
+  // G4SDManager::GetSDMpointer()->AddNewDetector(triggerSD);
+  // SetSensitiveDetector("lTrigger",triggerSD);
 
   PrtBarSD* barSD = new PrtBarSD("BarSD", "BarHitsCollection", 0);
   G4SDManager::GetSDMpointer()->AddNewDetector(barSD);
   SetSensitiveDetector("lBar",barSD);
+
   // Magnetic field
 }
 

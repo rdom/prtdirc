@@ -9,6 +9,7 @@
 
 #include <vector>
 #include "G4VSensitiveDetector.hh"
+#include "G4AutoLock.hh"
 
 #include "PrtBarHit.h"
 
@@ -30,6 +31,7 @@ public:
 
 private: 
   PrtBarHitsCollection* fHitsCollection;
+  static G4Mutex fMutex;
 };
 
 #endif

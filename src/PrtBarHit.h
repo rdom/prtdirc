@@ -10,6 +10,7 @@
 #include "G4VHit.hh"
 #include "G4THitsCollection.hh"
 #include "G4Allocator.hh"
+#include "G4Types.hh"
 #include "G4ThreeVector.hh"
 
 
@@ -53,7 +54,6 @@ class PrtBarHit : public G4VHit
 
 
 typedef G4THitsCollection<PrtBarHit> PrtBarHitsCollection;
-
 extern G4ThreadLocal G4Allocator<PrtBarHit>* PrtBarHitAllocator;
 
 inline void* PrtBarHit::operator new(size_t)

@@ -13,11 +13,14 @@
 #include "PrtRunAction.h"
 #include "PrtManager.h"
 
+G4Mutex PrtBarSD::fMutex = G4MUTEX_INITIALIZER;
+
 PrtBarSD::PrtBarSD(const G4String& name, 
 		   const G4String& hitsCollectionName,
 		   G4int nofCells)
   : G4VSensitiveDetector(name), fHitsCollection(NULL){
-  
+
+  G4AutoLock tuberier(&fMutex);
   collectionName.insert(hitsCollectionName);
 }
 
