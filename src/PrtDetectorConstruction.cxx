@@ -33,8 +33,6 @@
 PrtDetectorConstruction::PrtDetectorConstruction()
   : G4VUserDetectorConstruction(){
 
-  std::cout<<"m "<<m<<" cm "<< cm<<"  mm "<<mm<< "  GeV "<<GeV<< std::endl;
-  
   fGeomId = PrtManager::Instance()->GetGeometry();
   fMcpLayout = PrtManager::Instance()->GetMcpLayout();
   fLensId = PrtManager::Instance()->GetLens();
@@ -708,12 +706,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     PhotonEnergy[num-(i+1)]= LambdaE/WaveLength[i];
     PMTReflectivity[i]=0.;
     EfficiencyMirrors[i]=0; 
-  }
-  for(Int_t i=0; i<num; i++){
-    std::cout<<","<<1.24/(PhotonEnergy[i]*1e6); 
-  }
-  std::cout<<std::endl;
-  
+  }  
   
   /***************** QUANTUM EFFICIENCY OF BURLE AND HAMAMTSU PMT'S *****/
 

@@ -40,7 +40,7 @@ PrtPhysicsList::PrtPhysicsList()
    fMessenger(0) 
 {
   fMessenger = new PrtPhysicsListMessenger(this);
-  SetVerboseLevel(0);
+  SetVerboseLevel(0);  
   fPhysList =  PrtManager::Instance()->GetPhysList();
 }
 
@@ -124,7 +124,7 @@ void PrtPhysicsList::ConstructEM()
     G4ParticleDefinition* particle = particleIterator->value();
     G4ProcessManager* pmanager = particle->GetProcessManager();
     G4String particleName = particle->GetParticleName();
-
+    
     if (particleName == "gamma") {
     // gamma
       // Construct processes for gamma
@@ -165,6 +165,7 @@ void PrtPhysicsList::ConstructEM()
      }
     }
   }
+  
 }
 
 void PrtPhysicsList::ConstructOp() 
@@ -195,9 +196,9 @@ void PrtPhysicsList::ConstructOp()
   fScintillationProcess->SetTrackSecondariesFirst(true);
  
   // Use Birks Correction in the Scintillation process
-
   G4EmSaturation* emSaturation =
                                G4LossTableManager::Instance()->EmSaturation();
+  
   fScintillationProcess->AddSaturation(emSaturation);
 
   auto particleIterator=GetParticleIterator();

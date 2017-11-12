@@ -46,9 +46,9 @@ int main(int argc,char** argv)
     PrintUsage();
     return 1;
   }
-  
+ 
 #ifdef G4MULTITHREADED
-  G4int nThreads = 0;
+  G4int nThreads = 1;
 #endif
   TApplication theApp("App", 0, 0);
 
@@ -155,7 +155,7 @@ int main(int argc,char** argv)
   // Detector construction
   runManager-> SetUserInitialization(new PrtDetectorConstruction());
   // Physics list
-  runManager-> SetUserInitialization(new PrtPhysicsList());
+  runManager->SetUserInitialization(new PrtPhysicsList());
   // User action initialization
   runManager->SetUserInitialization(new PrtActionInitialization(outfile));
   // Initialize G4 kernel
@@ -169,8 +169,8 @@ int main(int argc,char** argv)
 #endif
 
   // Get the pointer to the User Interface manager
-  G4UImanager* UImanager = G4UImanager::GetUIpointer(); 
-   
+  G4UImanager* UImanager = G4UImanager::GetUIpointer();
+
   if ( macro.size() ) {
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);

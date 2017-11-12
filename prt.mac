@@ -5,6 +5,15 @@
 /particle/process/verbose 0
 /Prt/phys/verbose 0
 
+
+#/process/eLoss/verbose 0
+/particle/verbose 0
+/particle/property/verbose 0
+#/process/em/verbose 0
+#/process/setVerbose 0
+#/process/em/workerVerbose 0
+
+
 #
 /Prt/geom/prtRotation 90 deg
 /Prt/geom/lensId 0
