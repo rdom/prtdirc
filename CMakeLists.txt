@@ -46,7 +46,6 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
 
 #set(CMAKE_CXX_FLAGS "-std=gnu++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DG4MULTITHREADED=0")
 add_executable(prtdirc PrtDirc.cxx ${sources} PrtDict.cxx ${headers})
 target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} -lSpectrum -lHistPainter )
 
