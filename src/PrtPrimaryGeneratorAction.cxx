@@ -62,12 +62,12 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     z = fParticleGun->GetParticlePosition().z();
 
     // gaussian smearing
-    // x = G4RandGauss::shoot(0,sigma);
-    // y = G4RandGauss::shoot(0,sigma);
+    x = G4RandGauss::shoot(0,sigma);
+    y = G4RandGauss::shoot(0,sigma);
 
     // box smearing
-    x = (0.5-G4UniformRand())*sigma;
-    y = (0.5-G4UniformRand())*sigma;
+    // x = (0.5-G4UniformRand())*sigma;
+    // y = (0.5-G4UniformRand())*sigma;
 
     fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
     PrtManager::Instance()->Event()->SetPosition(TVector3(x,y,z));
