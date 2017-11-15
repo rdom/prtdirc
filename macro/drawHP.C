@@ -22,7 +22,7 @@ void drawHP(TString infile="../build/hits.root"){
       // if(mcpid%3==0 && pixid<32) continue;
       // if(mcpid%3==2 && pixid>=32) continue; 
       
-      if(prt_pid==2)
+      if(prt_pid==4)
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
     }
   }
@@ -31,8 +31,8 @@ void drawHP(TString infile="../build/hits.root"){
   //i%3*4+i/3
  
   prt_drawDigi("m,p,v\n",2017,0,0);
-  prt_cdigi->SetName(Form("hp_dataS317_%d_%2.1f",(Int_t)prt_theta,prt_phi));
+  prt_cdigi->SetName(Form("hp_dataProtonS332_%d_%2.1f",(Int_t)prt_theta,prt_phi));
   prt_canvasAdd(prt_cdigi);
   //prt_cdigi_palette->Draw();
-  prt_canvasSave(1,0);
+  //prt_canvasSave(1,0);
 }
