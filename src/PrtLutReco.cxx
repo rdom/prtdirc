@@ -216,15 +216,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       studyId = fEvent->GetGeometry();      
       mom=fEvent->GetMomentum().Mag();
-      Double_t beam_corr(0); 
-      //if(studyId==151) beam_corr = 0.0045; //125 deg //!
-      // if(studyId==151) beam_corr = 0.001; // 20 deg
-      // if(studyId==151) beam_corr = -0.003; // 25 deg
-      // beam_corr = 0.002; // 125 deg s160
-      
+
       if(fEvent->GetType()==0){
-	momInBar.RotateY(TMath::Pi()-prtangle*rad-beam_corr);
-	momInBar.RotateX(beam_corr);
+	momInBar.RotateY(TMath::Pi()-prtangle*rad-test1);
+	momInBar.RotateX(test2);
       }else{
 	momInBar.RotateY(TMath::Pi()-prtangle*rad);
       }
@@ -534,7 +529,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	// }
 
 	FindPeak(cangle,spr, prtangle, tofPid);	
-	test1 = fTest;
 	distPid = FindPdg(momentum,cangle);
 	nph = nsHits/(Double_t)ninfit;
 	spr = spr*1000;
@@ -620,7 +614,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-    fFit->SetParLimits(2,0.005,0.014); // width 7-10
+    fFit->SetParLimits(2,0.005,0.016); // width 7-10
     
     // fFit->FixParameter(2,0.01); 
     // fFit->FixParameter(3,0); 
@@ -664,7 +658,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // 	fHistCh[i]->Draw();
       // }
 
-      //      TString name = Form("r_tangle_%3.1f",PrtManager::Instance()->GetTest3());
+      //      TString name = Form("r_tangle_%3.1f",test3);
       TString nid = "";//Form("_%2.0f",a);
       prt_canvasAdd("r_tangle"+nid,800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
