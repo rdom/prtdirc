@@ -455,7 +455,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  // if(mcpid==14) tangle += 0.00905419;
 	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
-	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
+	    if(tofPid==2212 && fMethod==2) fHistPi->Fill(tangle ,weight); //r switch to 211 
 	    else fHist->Fill(tangle ,weight);
 	    
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);
