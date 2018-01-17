@@ -10,6 +10,7 @@
 class PrtPrizmHit : public G4VHit
 {
   public:
+  
     PrtPrizmHit();
     PrtPrizmHit(const PrtPrizmHit&);
     virtual ~PrtPrizmHit();

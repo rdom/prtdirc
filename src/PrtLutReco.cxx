@@ -251,7 +251,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    if(fMethod==2 && tofPid!=2212) continue;
+    //    if(fMethod==2 && tofPid!=2212) continue;
+    if(fMethod==2 && tofPid!=211) continue;
 	
     if(fEvent->GetType()==0){
 
@@ -404,7 +405,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	
-	for(int u=0; u<4; u++){
+	for(int u=0; u<2; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
