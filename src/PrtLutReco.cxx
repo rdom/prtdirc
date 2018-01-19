@@ -187,10 +187,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("test3",&test3,"test3/D");
   tree.Branch("theta",&theta,"theta/D");
   tree.Branch("prtphi",&prtphi,"prtphi/D");
-
+  
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
   test3 = PrtManager::Instance()->GetTest3();
+  par5 = PrtManager::Instance()->GetPrismStepX();
+  par6 = PrtManager::Instance()->GetPrismStepY();
+
   Double_t timeRes = PrtManager::Instance()->GetTimeRes();
   fMethod = PrtManager::Instance()->GetRunType();
   
