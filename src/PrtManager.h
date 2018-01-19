@@ -63,6 +63,10 @@ public:
   void SetTest3(double val){ fTest3 = val; }
   void SetPrismStepX(double val){ fPrismStepX = val; }
   void SetPrismStepY(double val){ fPrismStepY = val; }
+  void SetRStepX(double val){ fRStepX = val; }
+  void SetRStepY(double val){ fRStepY = val; }
+  void SetLStepX(double val){ fLStepX = val; }
+  void SetLStepY(double val){ fLStepY = val; }
   void SetBeamX(double val){ fBeamX = val; }
   void SetBeamZ(double val){ fBeamZ = val; }
   void SetTimeRes(double val){ fTimeRes = val; }
@@ -92,6 +96,10 @@ public:
   double GetTest3(){ return fTest3; }
   double GetPrismStepX(){ return fPrismStepX; }
   double GetPrismStepY(){ return fPrismStepY; }
+  double GetRStepX(){ return fRStepX; }
+  double GetRStepY(){ return fRStepY; }
+  double GetLStepX(){ return fLStepX; }
+  double GetLStepY(){ return fLStepY; }
   double GetBeamX(){ return fBeamX; }
   double GetBeamZ(){ return fBeamZ; }
   double GetTimeRes(){ return fTimeRes; }
@@ -123,6 +131,10 @@ private:
   double fTest3;
   double fPrismStepX;
   double fPrismStepY;
+  double fRStepX;
+  double fRStepY;
+  double fLStepX;
+  double fLStepY;
   double fBeamX;
   double fBeamZ;
   double fTimeRes;

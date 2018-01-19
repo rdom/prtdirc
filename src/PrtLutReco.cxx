@@ -156,11 +156,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t angdiv,dtheta,dtphi,prtangle;
 
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
-  Double_t theta(0),phi(0), trr(0),  nph(0),
+  Double_t theta(0),prtphi(0), trr(0),  nph(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),separation(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
   Double_t rad = TMath::Pi()/180.;
+  Double_t deg = 1/rad;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
 
   prt_setRootPalette(1);
@@ -185,7 +186,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("test2",&test2,"test2/D");
   tree.Branch("test3",&test3,"test3/D");
   tree.Branch("theta",&theta,"theta/D");
-  tree.Branch("phi",&phi,"phi/D");
+  tree.Branch("prtphi",&prtphi,"prtphi/D");
 
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
@@ -212,16 +213,18 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = fEvent->GetAngle();
-      
+      prtangle = prt_data_info.getAngle();// fEvent->GetAngle();
+      prtphi = prt_data_info.getPhi(); //fEvent->GetPhi();
       studyId = fEvent->GetGeometry();      
       mom=fEvent->GetMomentum().Mag();
 
       if(fEvent->GetType()==0){
 	momInBar.RotateY(TMath::Pi()-prtangle*rad-test1);
 	momInBar.RotateX(test2);
+	momInBar.RotateX(prtphi*rad);
       }else{
 	momInBar.RotateY(TMath::Pi()-prtangle*rad);
+	momInBar.RotateX(prtphi*rad);
       }
 
       if(fVerbose==3){
@@ -251,8 +254,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    //    if(fMethod==2 && tofPid!=2212) continue;
-    if(fMethod==2 && tofPid!=211) continue;
+    if(fMethod==2 && tofPid!=2212) continue;
 	
     if(fEvent->GetType()==0){
 
@@ -455,7 +457,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  // if(mcpid==14) tangle += 0.00905419;
 	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
-	    if(tofPid==2212 && fMethod==2) fHistPi->Fill(tangle ,weight); //r switch to 211 
+	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle ,weight);
 	    
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);

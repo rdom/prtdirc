@@ -78,7 +78,6 @@ private:
   G4double fMcpTotal[3];
   G4double fMcpActive[3];
   G4ThreeVector fPrismShift;
-  G4double fPrismRadiatorStep;
   G4ThreeVector fCenterShift;
   G4double fOffset;
   

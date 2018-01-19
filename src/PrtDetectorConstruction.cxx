@@ -97,8 +97,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
   
   // X configuration
-  fPrismRadiatorStep = PrtManager::Instance()->GetPrismStepY();
-  if(fPrismRadiatorStep !=0 ) fPrismRadiatorStep = fBar[0]/2.-fPrizm[3]/2.+fPrismRadiatorStep;
+  double radiatorStepY = PrtManager::Instance()->GetPrismStepY();
+  if(radiatorStepY !=0 ) radiatorStepY += fBar[0]/2.-fPrizm[3]/2.;
+  
+  PrtManager::Instance()->SetRStepY(radiatorStepY);
+  PrtManager::Instance()->SetRStepX(-(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX());
   fCenterShift =  G4ThreeVector(0., 0., 0.);
 
   if(fGeomId == 2015){
@@ -155,6 +158,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   G4Box* gExpHall = new G4Box("gExpHall",fHall[0],fHall[1],fHall[2]);
   lExpHall = new G4LogicalVolume(gExpHall,defaultMaterial,"lExpHall",0,0,0);
   Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-fOffset;
+  Double_t radiatorStepY =  PrtManager::Instance()->GetRStepY();
+  Double_t radiatorStepX =  PrtManager::Instance()->GetRStepX();
   G4VPhysicalVolume* wExpHall  = new G4PVPlacement(0,G4ThreeVector(),lExpHall,"gExpHall",0,false,0);
 
   // The Trigger and The front material
@@ -199,9 +204,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   if(PrtManager::Instance()->GetRunType() == 6) lBar = new G4LogicalVolume(gBar,OilMaterial,"lBar",0,0,0);
   else lBar = new G4LogicalVolume(gBar,BarMaterial,"lBar",0,0,0);
   
-  G4double xshift = -(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX();
-  if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) xshift = -(fBar[1]-fPrizm[0])/2.;
-  wBar =  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0),lBar,"wBar", lDirc,false,0);
+  if(fGeomId>2014 && PrtManager::Instance()->GetRadiator()==2) radiatorStepX = -(fBar[1]-fPrizm[0])/2.;
+  wBar =  new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0),lBar,"wBar", lDirc,false,0);
   
   // radiator covered with grease
   G4double greased=0*mm;
@@ -210,7 +214,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     if(fLensId==0) greased=0.5*mm;
     G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
     lOpticalGreased = new G4LogicalVolume(gOpticalGreased,BarMaterial,"lOpticalGreased",0,0,0);
-    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+0.5*greased),lOpticalGreased,"wOpticalGreased", lDirc,false,0);
+    new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+0.5*greased),lOpticalGreased,"wOpticalGreased", lDirc,false,0);
   }
   
   //Optical grease
@@ -218,19 +222,19 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   if(fLensId==0) greasew=0.1*mm;
   G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
   lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
-  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
+  new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
   greased+=greasew;
 
   // // The Mirror gap
   // G4double mirrorgap=0.1*mm;
   // G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
   // lMirrorGap = new G4LogicalVolume(gMirrorGap,defaultMaterial,"lMirrorGap",0,0,0);
-  // wMirrorGap =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-0.5*mirrorgap),lMirrorGap,"wMirrorGap", lDirc,false,0);
+  // wMirrorGap =new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,-fBar[2]/2.-0.5*mirrorgap),lMirrorGap,"wMirrorGap", lDirc,false,0);
   
   // The Mirror
   G4Box* gMirror = new G4Box("gMirror",fMirror[0]/2.,fMirror[1]/2.,fMirror[2]/2.);
   lMirror = new G4LogicalVolume(gMirror,MirrorMaterial,"lMirror",0,0,0);
-  wMirror =new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,-fBar[2]/2.-fMirror[2]/2.),lMirror,"wMirror", lDirc,false,0);//-mirrorgap
+  wMirror =new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,-fBar[2]/2.-fMirror[2]/2.),lMirror,"wMirror", lDirc,false,0);//-mirrorgap
 
   // The Lens
   G4Box* gfbox = new G4Box("Fbox",fLens[0]/2.,fLens[1]/2.,fLens[2]/2.);
@@ -507,9 +511,9 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
 
   if(fLensId != 0 && fLensId != 10){
-    new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*fLens[2]),lLens1,"wLens1", lDirc,false,0);
-    if(fLensId != 4) new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*fLens[2]),lLens2,"wLens2", lDirc,false,0);
-    if(fLensId == 3 || fLensId==6 || fLensId==7 || fLensId==8)  new G4PVPlacement(0,G4ThreeVector(fPrismRadiatorStep,xshift,0.5*fBar[2]+greased+0.5*fLens[2]),lLens3,"wLens3", lDirc,false,0);
+    new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*fLens[2]),lLens1,"wLens1", lDirc,false,0);
+    if(fLensId != 4) new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*fLens[2]),lLens2,"wLens2", lDirc,false,0);
+    if(fLensId == 3 || fLensId==6 || fLensId==7 || fLensId==8)  new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*fLens[2]),lLens3,"wLens3", lDirc,false,0);
 
   }else{
     fLens[2]=0; 

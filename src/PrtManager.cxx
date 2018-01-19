@@ -62,6 +62,10 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
 
   fPrismStepX=0;
   fPrismStepY=0;
+  fRStepX=0;
+  fRStepY=0;
+  fLStepX=0;
+  fLStepY=0;
   fBeamX=0;
   fBeamZ=-1;
   fTimeRes=0.2;
