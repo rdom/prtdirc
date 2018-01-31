@@ -69,6 +69,7 @@ public:
   void SetLStepY(double val){ fLStepY = val; }
   void SetBeamX(double val){ fBeamX = val; }
   void SetBeamZ(double val){ fBeamZ = val; }
+  void SetTime(double val){ fTime = val; }
   void SetTimeRes(double val){ fTimeRes = val; }
   void SetInfo(TString val){ fInfo = val; }
   void AddInfo(TString val){ fInfo += val + "\n"; }
@@ -102,6 +103,7 @@ public:
   double GetLStepY(){ return fLStepY; }
   double GetBeamX(){ return fBeamX; }
   double GetBeamZ(){ return fBeamZ; }
+  double GetTime(){ return fTime; }
   double GetTimeRes(){ return fTimeRes; }
   TString GetOutName(){return fOutName; }
   TString GetInfo() { return fInfo; }
@@ -137,6 +139,7 @@ private:
   double fLStepY;
   double fBeamX;
   double fBeamZ;
+  double fTime;
   double fTimeRes;
   TString fOutName;
   TString fInfo;

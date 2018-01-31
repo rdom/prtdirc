@@ -9,6 +9,7 @@
 #include "G4PhysicalConstants.hh"
 
 #include "G4TrackingManager.hh"
+#include "PrtManager.h"
 
 PrtSteppingAction::PrtSteppingAction()
 : G4UserSteppingAction()
@@ -46,8 +47,19 @@ void PrtSteppingAction::UserSteppingAction(const G4Step* step)
     // std::cout<<"WRN: too many steps or track length > 10m  N=" <<track->GetCurrentStepNumber()<<" Len="<<track->GetTrackLength()/1000. <<std::endl;    
     track->SetTrackStatus(fStopAndKill);
   }
-   // G4cout<<step->GetPreStepPoint()->GetPhysicalVolume()->GetName()  <<" - "
-   // 	<<step->GetPostStepPoint()->GetPhysicalVolume()->GetName() <<"  "<< G4endl;
+
+  // G4cout<<step->GetPreStepPoint()->GetPhysicalVolume()->GetName()  <<" - "
+  //  	<<step->GetPostStepPoint()->GetPhysicalVolume()->GetName() <<"  "<< G4endl;
+
+  if(PrtManager::Instance()->GetRunType()==11 && step->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wBar"
+     && step->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wOpticalGrease") {
+    G4ThreeVector dir = step->GetPreStepPoint()->GetMomentum();
+    TVector3 v(dir.x(),dir.y(),dir.z());
+    v.RotateY(-(TMath::Pi()-20*TMath::Pi()/180.));
+    PrtManager::Instance()->SetMomentum(v);
+    PrtManager::Instance()->SetTime(step->GetPreStepPoint()->GetLocalTime());
+  }
+  
   //if(step->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="Bar" && step->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="ExpHall" ) track->SetTrackStatus(fStopAndKill);
   //if(step->GetPreStepPoint()->GetPosition().z()>1200 ) track->SetTrackStatus(fStopAndKill);
 

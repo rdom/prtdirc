@@ -50,13 +50,13 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
       PrtManager::Instance()->SetParticle(211);
     }
   }
-
+    
   PrtManager::Instance()->AddEvent(PrtEvent());
-  
+
   if(PrtManager::Instance()->GetBeamDinsion() == -1){ // random momentum
     fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0*GeV*G4UniformRand()));
   }
-  
+
   if(PrtManager::Instance()->GetBeamDinsion() > 0){ // smearing and divergence
     G4double sigma = PrtManager::Instance()->GetBeamDinsion()*mm;
     z = fParticleGun->GetParticlePosition().z();
@@ -68,22 +68,19 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     // box smearing
     // x = (0.5-G4UniformRand())*sigma;
     // y = (0.5-G4UniformRand())*sigma;
-
     fParticleGun->SetParticlePosition(G4ThreeVector(x,y,z));
     PrtManager::Instance()->Event()->SetPosition(TVector3(x,y,z));
-
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     vec.setTheta(G4RandGauss::shoot(0,0.0015)); //beam divergence  
     vec.setPhi(2*M_PI*G4UniformRand());
 
-    fParticleGun->SetParticleMomentumDirection(vec);
-    
+    fParticleGun->SetParticleMomentumDirection(vec);    
   }
   if(PrtManager::Instance()->GetRunType() == 1){ // LUT generation
     //fParticleGun->SetParticlePosition(G4ThreeVector(radiatorH*(0.5-G4UniformRand()),radiatorW*(0.5-G4UniformRand()),radiatorL/2.-0.1));
-    fParticleGun->SetParticlePosition(G4ThreeVector(PrtManager::Instance()->GetRStepY(),
-						    PrtManager::Instance()->GetRStepX(),
+    fParticleGun->SetParticlePosition(G4ThreeVector(PrtManager::Instance()->GetRStepY()+5-10*G4UniformRand(),
+						    PrtManager::Instance()->GetRStepX()+10-20*G4UniformRand(),
 						    radiatorL/2.-0.1));
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);

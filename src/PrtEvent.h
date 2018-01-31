@@ -28,7 +28,7 @@ public:
   Int_t GetDecoderId() const { return fDecoderId; }
   Int_t GetId() const { return fId; }
   Int_t GetType() const { return fType; }
-  Long_t GetTime() const { return fTime; }
+  Double_t GetTime() const { return fTime; }
 
   Double_t GetAngle()      const { return fAngle; }
   Double_t GetPhi()        const { return fPhi; }
@@ -53,7 +53,7 @@ public:
   void SetDecoderId(Int_t val)  { fDecoderId=val; }
   void SetId(Int_t val)        { fId=val; }
   void SetType(Int_t val)        { fType=val; }
-  void SetTime(Long_t val)      { fTime=val; }
+  void SetTime(Double_t val)      { fTime=val; }
 
   void SetPhysList(Int_t val) { fPhysList = val; }
   void SetAngle(Double_t val) { fAngle = val; }
@@ -77,7 +77,7 @@ private:
   Int_t fDecoderId;
   Int_t fId;
   Int_t fType;
-  Long_t fTime;
+  Double_t fTime;
 
 
   Int_t fHitSize;

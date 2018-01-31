@@ -160,8 +160,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),separation(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
-  Double_t rad = TMath::Pi()/180.;
-  Double_t deg = 1/rad;
+  Double_t deg = TMath::Pi()/180.;
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
 
   prt_setRootPalette(1);
@@ -222,12 +221,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       mom=fEvent->GetMomentum().Mag();
 
       if(fEvent->GetType()==0){
-	momInBar.RotateY(TMath::Pi()-prtangle*rad-test1);
+	momInBar.RotateY(TMath::Pi()-prtangle*deg-test1);
 	momInBar.RotateX(test2);
-	momInBar.RotateX(prtphi*rad);
+	momInBar.RotateX(prtphi*deg);
       }else{
-	momInBar.RotateY(TMath::Pi()-prtangle*rad);
-	momInBar.RotateX(prtphi*rad);
+	momInBar.RotateY(TMath::Pi()-prtangle*deg);
+	momInBar.RotateX(prtphi*deg);
       }
 
       if(fVerbose==3){
@@ -238,7 +237,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     Double_t momentum=fEvent->GetMomentum().Mag();
     if( fEvent->GetType()==1) momentum /= 1000;
     tofPid=fEvent->GetParticle();
-    if(tofPid==212) tofPid=211;
 
     Int_t pdg[]={11,13,211,321,2212};
     Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};    
@@ -257,7 +255,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    if(fMethod==2 && tofPid!=2212) continue;
+    //if(fMethod==2 && tofPid!=2212) continue;
 	
     if(fEvent->GetType()==0){
 
@@ -343,7 +341,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
 
       // TVector3 vv = fHit.GetMomentum();
-      // vv.RotateY(prtangle*rad);
+      // vv.RotateY(prtangle*deg);
       // dirz = vv.Z();
       // if(dirz<0) reflected = kTRUE;
       // else reflected = kFALSE;
@@ -672,7 +670,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       //fHist->Scale(1/fHist->GetMaximum());
 
       prt_normalize(fHist,fHistPi);
-      fHistPi->SetLineColor(2);
+      fHistPi->SetLineColor(4);
+      fHist->SetLineColor(1);
       
       fHist->Draw();
       fHistPi->Draw("same");

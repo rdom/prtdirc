@@ -51,10 +51,10 @@ G4bool PrtBarSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
   // if (edep==0.) return false;
 
   PrtBarHit* newHit = new PrtBarHit();
-  newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
+  newHit->SetTrackID(aStep->GetTrack()->GetTrackID());
   newHit->SetEdep(edep);
   newHit->SetPos(aStep->GetPostStepPoint()->GetPosition());
-  newHit->SetMom(aStep->GetTrack()->GetMomentum());
+  newHit->SetMom(track->GetMomentum());
   // // store normal to the closest boundary
   G4Navigator* theNavigator 
     = G4TransportationManager::GetTransportationManager()
@@ -65,7 +65,7 @@ G4bool PrtBarSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
   double cherenkov = acos(1/(1.47125*(fP/fEnergy)));
   PrtManager::Instance()->SetCurrentCherenkov(cherenkov);
 
-  fHitsCollection->insert( newHit );
+  fHitsCollection->insert(newHit);
 
   // newHit->Print();
 

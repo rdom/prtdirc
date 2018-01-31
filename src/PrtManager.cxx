@@ -16,13 +16,13 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   
   if(fRunType!=2 && fRunType!=3) fRootFile = new TFile(filename,"RECREATE");
 
+  fEvent = new PrtEvent();
   if(fRunType==0 || fRunType==6){
     fTree = new TTree("data","Prototype hits tree");
-    fEvent = new PrtEvent();
     fTree->Branch("PrtEvent", "PrtEvent", &fEvent, 64000, 2);
   }
 
-  if(fRunType==1 || fRunType==5){
+  if(fRunType==1 || fRunType==5 || fRunType==11){
     fLut = new TClonesArray("PrtLutNode");
     fTree = new TTree("prtlut","Look-up table for the geometrical reconstruction.");
     fTree->Branch("LUT",&fLut,256000,2); 
@@ -68,6 +68,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   fLStepY=0;
   fBeamX=0;
   fBeamZ=-1;
+  fTime=0;
   fTimeRes=0.2;
   fInfo="";
   fMixPiP=false;
@@ -110,6 +111,7 @@ void PrtManager::AddEvent(PrtEvent event){
     fEvent->SetBeamX(fBeamX);
     fEvent->SetBeamZ(fBeamZ);
     fEvent->SetTimeRes(fTimeRes);
+    fEvent->SetTime(fTime);
     fEvent->SetInfo(fInfo);
   }
 }
@@ -123,13 +125,15 @@ void PrtManager::AddHit(PrtHit hit){
       std::cout<<"Event does not exist. Create it first. "<<std::endl;
     }
   }
-  if(fRunType==1 || fRunType==5){
+  if(fRunType==1 || fRunType==5 || fRunType==11){
     if(fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle){
       Int_t id = 100*hit.GetMcpId() + hit.GetPixelId();
+      Double_t time = hit.GetLeadTime();
+      if(fRunType==11) time -= fTime;      
       ((PrtLutNode*)(fLut->At(id)))->
 	AddEntry(id, fMomentum, hit.GetPathInPrizm(),
 		 hit.GetNreflectionsInPrizm(),
-		 hit.GetLeadTime(),hit.GetLocalPos(),hit.GetDigiPos());
+		 time,hit.GetLocalPos(),hit.GetDigiPos());
     }
   }
 }
@@ -152,5 +156,5 @@ void PrtManager::Fill(){
 }
 
 void PrtManager::FillLut(){
-  if(fRunType==1 || fRunType==5) fTree->Fill();
+  if(fRunType==1 || fRunType==5 || fRunType==11) fTree->Fill();
 }

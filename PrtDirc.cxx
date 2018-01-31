@@ -101,7 +101,7 @@ int main(int argc,char** argv)
   }
 
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
-  if(outfile=="" && (runtype == 1 || runtype == 5)) outfile = "../data/lut.root";  // lookup table generation
+  if(outfile=="" && (runtype == 1 || runtype == 5 || runtype == 11)) outfile = "../data/lut.root";  // lookup table generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
   if(outfile=="" && (runtype == 2 || runtype == 3)) outfile = "reco.root"; // reconstruction
 

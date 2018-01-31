@@ -210,7 +210,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4ThreeVector globalvec = track->GetVertexMomentumDirection();
   G4ThreeVector localvec = touchable->GetHistory()->GetTopTransform().TransformAxis(globalvec);
 
-  G4ThreeVector g4mom = track->GetMomentum(); //track->GetVertexMomentumDirection(); //
+  G4ThreeVector g4mom = track->GetVertexMomentumDirection(); // track->GetMomentum(); 
   G4ThreeVector g4pos = track->GetVertexPosition();
  
   TVector3 globalPos(inPrismpos.x(),inPrismpos.y(),inPrismpos.z());
@@ -276,7 +276,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
-  if(PrtManager::Instance()->GetRunType()==1 || PrtManager::Instance()->GetRunType()==5){
+  if(PrtManager::Instance()->GetRunType()==1 || PrtManager::Instance()->GetRunType()==5 || PrtManager::Instance()->GetRunType()==11){
     PrtManager::Instance()->AddHit(hit);
     return true;
   }
