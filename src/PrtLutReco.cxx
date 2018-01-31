@@ -395,11 +395,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       Bool_t isGoodHit(0);      
       Int_t size =fLutNode[sensorId]->Entries();
-
+      double minangle=100;
+      double mintime=100;
+      
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        //dird   = fLutNode[sensorId]->GetEntry(i);
+	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
+        dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -407,8 +409,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//if(fLutNode[sensorId]->GetNRefl(i)!=1 ) continue;
 	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
+	//if(!samepath) continue;
 	
-	for(int u=0; u<2; u++){
+	for(int u=0; u<4; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
@@ -424,13 +427,14 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
 
 	  bartime = fabs(lenz/cos(luttheta)/198.);
-	  Double_t totaltime = bartime+evtime;
+	  double totaltime = bartime+evtime;
+	  double timediff = totaltime-hitTime;
 	  fHist0->Fill(totaltime-hitTime);
-	  if(samepath)  fHist0i->Fill(totaltime-hitTime);
+	  if(samepath)  fHist0i->Fill(timediff);
 	  //	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
-	  if(fabs(totaltime-hitTime)>timeRes) continue;	  
+	  if(fabs(timediff)>timeRes) continue;	  
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);
@@ -463,6 +467,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
+
+	    if(fabs(timediff)<mintime){
+	      mintime=fabs(timediff);
+	      minangle=tangle;
+	    }
 	    
 	    if(true && tangle>0.4 && tangle<0.9 ){
 	      sum1 += TMath::Log(gF1->Eval(tangle)+noise);
@@ -470,7 +479,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    }
 	    
 	    // //if(samepath) fHist->Fill(tangle ,weight);
-	    if(fRadiator==1 && fabs(tangle-0.815)<0.05) isGoodHit=true;
+	    if(fRadiator==1 && fabs(tangle-0.815)<0.02) isGoodHit=true;
 	    if(fRadiator==2 && fabs(tangle-0.815)<0.2)  isGoodHit=true;
 
 	    if(fVerbose==3){
@@ -494,6 +503,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	nhhits++;
 	nsHits++;
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
+
+	// if(true && tangle>0.4 && tangle<0.9 ){
+	//   sum1 += TMath::Log(gF1->Eval(minangle)+noise);
+	//   sum2 += TMath::Log(gF2->Eval(minangle)+noise);
+	// }
       }
     } 
 
@@ -549,8 +563,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   }
 
   if(fMethod==2){
+    gROOT->SetBatch(1);
     nph = prt_fit(fhNph,40,100,100,1).X();
-    
+    gROOT->SetBatch(0);
     FindPeak(cangle,spr, prtangle);
     //nph = nsHits/(Double_t)nsEvents;
     spr = spr*1000;
@@ -614,16 +629,14 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
     if(cangle>0.85) cangle=0.82;
     fFit->SetParameters(100,cangle,0.010);
-    fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");
-      
+    fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");      
     fFit->SetParLimits(0,0.1,1E6);
     fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-    fFit->SetParLimits(2,0.005,0.016); // width 7-10
-    
+    fFit->SetParLimits(2,0.005,0.016); // width 7-10    
     // fFit->FixParameter(2,0.01); 
     // fFit->FixParameter(3,0); 
     // fFit->FixParameter(4,0);
-    
+
     Int_t status(0);
     if(fMethod==3) status = fHist->Fit("fgaus","lq","",0.6,1);
     else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);    
@@ -647,6 +660,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
     if(fMethod==2 && fVerbose>0){
 
+      TString nid = "";//Form("_%2.0f",a);
+      prt_canvasAdd("r_tangle"+nid,800,400);
+
       // fFit->SetParLimits(2,0.004,0.008); // width 7-10
       // for(Int_t i=0; i<prt_nmcp; i++){
       // 	prt_canvasAdd(Form("r_tangle_%d",i),800,400);
@@ -663,8 +679,6 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // }
 
       //      TString name = Form("r_tangle_%3.1f",test3);
-      TString nid = "";//Form("_%2.0f",a);
-      prt_canvasAdd("r_tangle"+nid,800,400);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
       fHist->SetMinimum(0);
       //fHist->Scale(1/fHist->GetMaximum());
@@ -745,9 +759,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
      if(fVerbose>1)  prt_waitPrimitive("r_cm"+nid);
       prt_canvasSave(1,0);
       prt_canvasDel("*");
-
-      
-      
+           
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
 	c2->Divide(2,1);
