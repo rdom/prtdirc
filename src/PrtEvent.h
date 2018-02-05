@@ -101,6 +101,6 @@ private:
   Double_t fTimeRes;
   TString  fInfo;
   
-  ClassDef(PrtEvent, 4);
+  ClassDef(PrtEvent, 5);
 };
 #endif

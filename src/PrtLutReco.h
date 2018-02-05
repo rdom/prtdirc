@@ -32,7 +32,8 @@ public:
   // Destructor
   ~PrtLutReco();
   void Run(Int_t start=0, Int_t end=0);
-
+  void drawTheoryLines();
+  
 private:
   Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Double_t a, Int_t tofpid=0);
   Int_t FindPdg(Double_t mom, Double_t cangle);

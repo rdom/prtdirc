@@ -68,7 +68,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150  //80
+  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
   fHistPi = new TH1F("chrenkov_angle_hist_Pi",  "chrenkov angle pi;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
   fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
@@ -99,7 +99,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
 
   for(Int_t i=0; i<prt_nmcp; i++){
-    fHistMcp[i] = new TH1F(Form("fHistMcp_%d",i),Form("fHistMcp_%d;#theta_{C} [rad];entries [#]",i), 80,0.6,1); //150
+    fHistMcp[i] = new TH1F(Form("fHistMcp_%d",i),Form("fHistMcp_%d;#theta_{C} [rad];entries [#]",i), 160,0.6,1); //150
   }
 
    for(Int_t i=0; i<960; i++){
@@ -215,18 +215,18 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = prt_data_info.getAngle();// fEvent->GetAngle();
-      prtphi = prt_data_info.getPhi(); //fEvent->GetPhi();
+      prtangle =fEvent->GetAngle();// prt_data_info.getAngle();// fEvent->GetAngle();
+      prtphi = fEvent->GetPhi(); //prt_data_info.getPhi(); //fEvent->GetPhi();
       studyId = fEvent->GetGeometry();      
       mom=fEvent->GetMomentum().Mag();
-
+      std::cout<<"prtangle++  "<<prtangle<< " phi "<<prtphi<<std::endl;
+      
       if(fEvent->GetType()==0){
 	momInBar.RotateY(TMath::Pi()-prtangle*deg-test1);
-	momInBar.RotateX(test2);
-	momInBar.RotateX(prtphi*deg);
+	momInBar.RotateZ(prtphi*deg);
       }else{
-	momInBar.RotateY(TMath::Pi()-prtangle*deg);
-	momInBar.RotateX(prtphi*deg);
+	momInBar.RotateY(TMath::Pi()-prtangle*deg);	
+	momInBar.RotateZ(prtphi*deg);
       }
 
       if(fVerbose==3){
@@ -395,13 +395,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       Bool_t isGoodHit(0);      
       Int_t size =fLutNode[sensorId]->Entries();
-      double minangle=100;
-      double mintime=100;
-      
+
       for(Int_t i=0; i<size; i++){
 	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	//dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        dird   = fLutNode[sensorId]->GetEntry(i);
+	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
+        //dird   = fLutNode[sensorId]->GetEntry(i);
 	evtime = fLutNode[sensorId]->GetTime(i);
 	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
 	Bool_t samepath(false);
@@ -439,39 +437,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir);
 	  
-	  // // 151 125 deg
-	  // if(mcpid/3==4) tangle += 0.005;
-	  // if(mcpid/3==3) tangle += 0.002;
-	  // if(mcpid/3==2) tangle += 0.001;
-	  // if(mcpid/3==1) tangle -= 0.001;
-
-	  
-	  // if(mcpid==0) tangle += 0.00139066;
-	  // if(mcpid==1) tangle += 0.00119448;
-	  // if(mcpid==2) tangle += 0.00164041;
-	  // if(mcpid==3) tangle += 0.00387281;
-	  // if(mcpid==4) tangle += 0.00150349;
-	  // if(mcpid==5) tangle += -0.00110365;
-	  // if(mcpid==6) tangle += 0.00222708;
-	  // if(mcpid==7) tangle += -0.00319795;
-	  // if(mcpid==8) tangle += 0.00215669;
-	  // if(mcpid==9) tangle += 0.00909303;
-	  // if(mcpid==10) tangle += 0.00374635;
-	  // if(mcpid==11) tangle += 0.00407815;
-	  // if(mcpid==12) tangle += 0.00905419;
-	  // if(mcpid==14) tangle += 0.00905419;
-	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle ,weight);
 	    
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
-
-	    if(fabs(timediff)<mintime){
-	      mintime=fabs(timediff);
-	      minangle=tangle;
-	    }
 	    
 	    if(true && tangle>0.4 && tangle<0.9 ){
 	      sum1 += TMath::Log(gF1->Eval(tangle)+noise);
@@ -479,7 +450,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    }
 	    
 	    // //if(samepath) fHist->Fill(tangle ,weight);
-	    if(fRadiator==1 && fabs(tangle-0.815)<0.02) isGoodHit=true;
+	    if(fRadiator==1 && fabs(tangle-0.815)<0.05) isGoodHit=true;
 	    if(fRadiator==2 && fabs(tangle-0.815)<0.2)  isGoodHit=true;
 
 	    if(fVerbose==3){
@@ -503,11 +474,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	nhhits++;
 	nsHits++;
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
-
-	// if(true && tangle>0.4 && tangle<0.9 ){
-	//   sum1 += TMath::Log(gF1->Eval(minangle)+noise);
-	//   sum2 += TMath::Log(gF2->Eval(minangle)+noise);
-	// }
       }
     } 
 
@@ -669,6 +635,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // 	fHistMcp[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
       // 	std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	
       // 	fHistMcp[i]->Draw();
+      // 	drawTheoryLines();
       // }
 
       // for(Int_t i=0; i<960; i++){
@@ -694,23 +661,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       fHisti->SetLineColor(kRed+2);
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
-      prt_canvasGet("r_tangle"+nid)->Update();
-      TLine *line = new TLine(0,0,0,1000);
-      line->SetX1(fAngleP);
-      line->SetX2(fAngleP);
-      line->SetY1(gPad->GetUymin());
-      line->SetY2(gPad->GetUymax());
-      line->SetLineColor(kRed);
-      line->Draw();
-
-      TLine *line2 = new TLine(0,0,0,1000);
-      line2->SetX1(fAnglePi);
-      line2->SetX2(fAnglePi);
-      line2->SetY1(gPad->GetUymin());
-      line2->SetY2(gPad->GetUymax());
-      line2->SetLineColor(kBlue);
-      line2->Draw();
-      std::cout<<"fAnglePi "<< fAnglePi<<std::endl;
+      drawTheoryLines();
       
       prt_canvasAdd("r_time",800,400);
       prt_normalize(fHist1,fHist6);
@@ -1057,4 +1008,21 @@ Int_t PrtLutReco::FindPdg(Double_t mom, Double_t cangle){
   return pdg[minid]; 
 }
 
+void PrtLutReco::drawTheoryLines(){
+  gPad->Update();
+  TLine *line = new TLine(0,0,0,1000);
+  line->SetX1(fAngleP);
+  line->SetX2(fAngleP);
+  line->SetY1(gPad->GetUymin());
+  line->SetY2(gPad->GetUymax());
+  line->SetLineColor(kRed);
+  line->Draw();
 
+  TLine *line1 = new TLine(0,0,0,1000);
+  line1->SetX1(fAnglePi);
+  line1->SetX2(fAnglePi);
+  line1->SetY1(gPad->GetUymin());
+  line1->SetY2(gPad->GetUymax());
+  line1->SetLineColor(kBlue);
+  line1->Draw();
+}
