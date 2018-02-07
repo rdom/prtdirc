@@ -168,3 +168,5 @@ void PrtPrimaryGeneratorAction::SetOptPhotonPolar(G4double angle){
  G4ThreeVector polar = std::cos(angle)*e_paralle + std::sin(angle)*e_perpend;
  fParticleGun->SetParticlePolarization(polar);
 }
+
+

@@ -832,7 +832,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     0.9405,0.9405,0.9405,0.9405,0.94,0.9385,0.936,0.934,
     0.931,0.9295,0.928,0.928,0.921,0.92,0.927,0.9215};
 
-  //G4double ReflectivityMirrorBar[36]={0};
+  for(int i=0; i<num; i++) ReflectivityMirrorBar[i] -=  ReflectivityMirrorBar[i]*0.08; 
   
   G4MaterialPropertiesTable *MirrorMPT = new G4MaterialPropertiesTable();
 
@@ -1031,7 +1031,6 @@ void PrtDetectorConstruction::DefineMaterials(){
   AirMPT->AddProperty("ABSLENGTH", PhotonEnergy, AirAbsorption,      num);
   //  assign this parameter table to the air 
   defaultMaterial->SetMaterialPropertiesTable(AirMPT);
-
 
   // KamLandOil                                                
   G4MaterialPropertiesTable* KamLandOilMPT = new G4MaterialPropertiesTable();
