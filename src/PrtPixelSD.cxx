@@ -335,7 +335,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     //charge sharing for 8x8 MCP
     Double_t pixdim(53/16.);
     //Double_t chargesig(1),threshold(0.5);
-    Double_t chargesig(1.5),threshold(0.7); //high cs / ct  // 1.5/0.9 for 0.5mV // 1.5/0.7 for 1mV
+    Double_t chargesig(1.7),threshold(0.7); //high cs / ct  // 1.5/0.9 for 0.5mV // 1.5/0.7 for 1mV
     if(mcpid==3){
       chargesig=3;
       threshold=1;

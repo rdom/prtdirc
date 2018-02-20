@@ -435,7 +435,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(fabs(timediff)>timeRes) continue;	  
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
-	  tangle = momInBar.Angle(dir);
+	  tangle = momInBar.Angle(dir)-0.002;
 	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);

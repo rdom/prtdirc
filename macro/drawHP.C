@@ -7,7 +7,6 @@
 void drawHP(TString infile="../build/hits.root"){
   
   if(!prt_init(infile,1,"data/drawHPt")) return;
- 
   PrtHit hit;
   for (Int_t ievent=0; ievent< prt_entries && ievent< 50000; ievent++){
     prt_nextEvent(ievent,1000);
