@@ -62,7 +62,8 @@ private:
   G4Material*        MirrorMaterial; // material of mirror
   G4Material*        opticalGreaseMaterial; // material of mirror 
   G4Material*        epotekMaterial;  
-  G4Material*        Nlak33aMaterial;  
+  G4Material*        Nlak33aMaterial;
+  G4Material*        PbF2Material;  
   G4Material*        frontMaterial;
   
   G4int fNRow;

@@ -297,8 +297,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   if(fLensId == 3){ // 3-component spherical lens
     G4double lensMinThikness = 2.0; 
   
-    G4double r1 = 0; //PrtManager::Instance()->GetTest1();
-    G4double r2 = 0; //PrtManager::Instance()->GetTest2();
+    G4double r1 = PrtManager::Instance()->GetTest1();
+    G4double r2 = PrtManager::Instance()->GetTest2();
 
     if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
        r1 = PrtManager::Instance()->GetTest1();
@@ -324,7 +324,6 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4IntersectionSolid* gbbox = new G4IntersectionSolid("bbox", gfbox, gfbox0,new G4RotationMatrix(),G4ThreeVector(0,0,lensMinThikness*2)); 
     G4IntersectionSolid* gsbox = new G4IntersectionSolid("sbox", gfstube, gfbox0,new G4RotationMatrix(),G4ThreeVector(0,0,-lensMinThikness*2)); 
 
-
     G4UnionSolid* gubox = new G4UnionSolid("unionbox", gbbox, gsbox,new G4RotationMatrix(),G4ThreeVector(0,0,0)); 
 
     G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Lens1", gubox, gsphere1,new G4RotationMatrix(),zTrans1); 
@@ -334,7 +333,8 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4SubtractionSolid*  gLens3 = new G4SubtractionSolid("Lens3", gLenst, gsphere2,new G4RotationMatrix(),zTrans2);
     
     lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0);
-    lLens2 = new G4LogicalVolume(gLens2,Nlak33aMaterial,"lLens2",0,0,0);
+    if(PrtManager::Instance()->GetTest3()>1) lLens2 = new G4LogicalVolume(gLens2,PbF2Material,"lLens2",0,0,0);
+    else lLens2 = new G4LogicalVolume(gLens2,Nlak33aMaterial,"lLens2",0,0,0);
     lLens3 = new G4LogicalVolume(gLens3,BarMaterial,"lLens3",0,0,0);
   }
 
@@ -877,6 +877,10 @@ void PrtDetectorConstruction::DefineMaterials(){
   Nlak33aMaterial->AddElement(Si, natoms=1);
   Nlak33aMaterial->AddElement(O , natoms=2);
 
+  PbF2Material  = new G4Material("PbF2",density= 4.220*g/cm3, ncomponents=2);
+  PbF2Material->AddElement(Si, natoms=1);
+  PbF2Material->AddElement(O , natoms=2);
+
   G4Material* Vacuum = new G4Material("interGalactic", 1., 1.008*g/mole, 
 				      1.e-25*g/cm3, kStateGas, 
 				      2.73*kelvin, 3.e-18*pascal);
@@ -966,6 +970,12 @@ void PrtDetectorConstruction::DefineMaterials(){
   G4double Nlak33bEn[25]={0.4959, 0.5332 ,0.6293 ,0.8103 ,1.1696 ,1.7712 ,1.8785,1.9997,2.1376,2.2707,2.4796,2.6953,2.8436,2.9520,3.0613,3.0996,3.1790,3.2627,3.3509,3.3968,3.5424,3.7121,3.8745,3.9994,4.1328};
   G4double Nlak33bAb[25]={0.398114,0.679068,0.937060,0.985032,0.997996,0.997996,0.997595,0.997194,0.997595,0.997996,0.997194,0.994376,0.991546,0.988297,0.982161,0.979691,0.971388,0.954455,0.928177,0.910019,0.820600,0.657099,0.455454,0.245954,0.158490};
 
+  G4int n_PbF2=56;
+  G4double en_PbF2[] = {1.55 ,1.569,1.59 ,1.61 ,1.631,1.653,1.675,1.698,1.722,1.746,1.771,1.797,1.823,1.851,1.879,1.907,1.937,1.968,2    ,2.033,2.066,2.101,2.138,2.175,2.214,2.254,2.296,2.339,2.384,2.431,2.48 ,2.53 ,2.583,2.638,2.695,2.755,2.818,2.883,2.952,3.024,3.1  ,3.179,3.263,3.351,3.444,3.542,3.647,3.757,3.875,3.999,4.133,4.275,4.428,4.592,4.769,4.959};
+
+  G4double ab_PbF2[]= {407  ,403.3,379.1,406.3,409.7,408.9,406.7,404.7,391.7,397.7,409.6,403.7,403.8,409.7,404.9,404.2,407.1,411.1,403.1,406.1,415.4,399.1,405.8,408.2,385.7,405.6,405.2,401.6,402.6,407.1,417.7,401.1,389.9,411.9,400.9,398.3,402.1,408.7,384.8,415.8,413.1,385.7,353.7,319.1,293.6,261.9,233.6,204.4,178.3,147.6,118.2,78.7 ,51.6 ,41.5 ,24.3 ,8.8};
+  G4double ref_PbF2[]= {1.749,1.749,1.75 ,1.75 ,1.751,1.752,1.752,1.753,1.754,1.754,1.755,1.756,1.757,1.757,1.758,1.759,1.76 ,1.761,1.762,1.764,1.765,1.766,1.768,1.769,1.771,1.772,1.774,1.776,1.778,1.78 ,1.782,1.785,1.787,1.79 ,1.793,1.796,1.8  ,1.804,1.808,1.813,1.818,1.824,1.83 ,1.837,1.845,1.854,1.865,1.877,1.892,1.91 ,1.937,1.991,1.38 ,1.915,1.971,2.019};
+  
   for(int i=0;i<num;i++){
     WaveLength[i]= (300 +i*10)*nanometer;
     //    AirAbsorption[i] = 4*cm; // if photon in the air -> kill it immediately
@@ -1048,6 +1058,12 @@ void PrtDetectorConstruction::DefineMaterials(){
   //Nlak33aMPT->AddProperty("ABSLENGTH",PhotonEnergyNlak33a, Nlak33aAbsorption, 76);
   Nlak33aMPT->AddProperty("ABSLENGTH",Nlak33bEn, Nlak33bAb, 25);
   Nlak33aMaterial->SetMaterialPropertiesTable(Nlak33aMPT);
+
+  // PbF2
+  G4MaterialPropertiesTable* PbF2MPT = new G4MaterialPropertiesTable();
+  PbF2MPT->AddProperty("RINDEX", en_PbF2, ref_PbF2, n_PbF2);
+  PbF2MPT->AddProperty("ABSLENGTH",en_PbF2, ab_PbF2, n_PbF2);
+  PbF2Material->SetMaterialPropertiesTable(PbF2MPT);
 
   // Optical grease                                                
   G4MaterialPropertiesTable* opticalGreaseMPT = new G4MaterialPropertiesTable();
