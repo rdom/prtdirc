@@ -16,20 +16,9 @@ else()
 endif()
 
 #----------------------------------------------------------------------------
-# Setup Geant4 include directories and compile definitions
-#
-include(${Geant4_USE_FILE})
-
-#----------------------------------------------------------------------------
 # Find ROOT (required package)
 #
 find_package(ROOT REQUIRED)
-
-#----------------------------------------------------------------------------
-# Generate dictionary for root
-#
-execute_process(COMMAND rootcint -f PrtDict.cxx -c ../src/PrtHit.h ../src/PrtEvent.h ../src/PrtLutNode.h ../src/PrtTrackInfo.h  ../src/PrtPhotonInfo.h ../src/PrtAmbiguityInfo.h ../src/PrtLinkDef.h)
-
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
@@ -37,8 +26,17 @@ execute_process(COMMAND rootcint -f PrtDict.cxx -c ../src/PrtHit.h ../src/PrtEve
 include_directories(${PROJECT_SOURCE_DIR}/src 
                     ${Geant4_INCLUDE_DIR}
 		    ${ROOT_INCLUDE_DIR})
+
+include(${ROOT_USE_FILE})
+include(${Geant4_USE_FILE})
+
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
+
+#----------------------------------------------------------------------------
+# Generate dictionary for root
+#
+execute_process(COMMAND rootcint -f PrtDict.cxx -c ../src/PrtHit.h ../src/PrtEvent.h ../src/PrtLutNode.h ../src/PrtTrackInfo.h  ../src/PrtPhotonInfo.h ../src/PrtAmbiguityInfo.h ../src/PrtLinkDef.h)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
