@@ -42,7 +42,7 @@ int main(int argc,char** argv)
   for ( G4int i=1; i<argc; i=i+2 ) std::cout<< argv[i] << "  "<<argv[i+1] <<std::endl;
   
   // Evaluate arguments
-  if ( argc > 50 ) {
+  if ( argc > 100 ) {
     PrintUsage();
     return 1;
   }
