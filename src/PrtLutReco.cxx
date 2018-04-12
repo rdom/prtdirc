@@ -157,7 +157,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),prtphi(0), trr(0),  nph(0),
-    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),separation(0);
+    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
+    separation(0),beamx(0),beamz(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
   Double_t deg = TMath::Pi()/180.;
@@ -185,11 +186,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("test2",&test2,"test2/D");
   tree.Branch("test3",&test3,"test3/D");
   tree.Branch("theta",&theta,"theta/D");
+  tree.Branch("beamx",&beamx,"beamx/D");
+  tree.Branch("beamz",&beamz,"beamz/D");
   tree.Branch("prtphi",&prtphi,"prtphi/D");
   
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
   test3 = PrtManager::Instance()->GetTest3();
+  beamx = PrtManager::Instance()->GetBeamX();
+  beamz = PrtManager::Instance()->GetBeamZ();
   par5 = PrtManager::Instance()->GetPrismStepX();
   par6 = PrtManager::Instance()->GetPrismStepY();
 
