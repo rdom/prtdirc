@@ -158,7 +158,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),prtphi(0), trr(0),  nph(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
-    separation(0),beamx(0),beamz(0);
+    separation(0),beamx(0),beamz(0),nnratio(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
   Double_t deg = TMath::Pi()/180.;
@@ -185,6 +185,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("test1",&test1,"test1/D");
   tree.Branch("test2",&test2,"test2/D");
   tree.Branch("test3",&test3,"test3/D");
+  tree.Branch("nnratio",&nnratio,"nnratio/D");
   tree.Branch("theta",&theta,"theta/D");
   tree.Branch("beamx",&beamx,"beamx/D");
   tree.Branch("beamz",&beamz,"beamz/D");
@@ -482,6 +483,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
     } 
 
+    if(nhhits>35)
     fhNph->Fill(nhhits);
 
     // for(Int_t j=0; j<prt_nmcp; j++){
@@ -533,9 +535,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(++nsEvents>=end) break;
   }
 
+  nnratio = fhNph->GetEntries()/(double)end;
+
+  std::cout<<"nnratio "<<nnratio<<" "<<end <<"  "<< fhNph->GetEntries()<<std::endl;
+  
   if(fMethod==2){
     gROOT->SetBatch(1);
-    nph = prt_fit(fhNph,40,100,100,1).X();
+    nph = prt_fit(fhNph,40,10,50,1).X();
     gROOT->SetBatch(0);
     FindPeak(cangle,spr, prtangle);
     //nph = nsHits/(Double_t)nsEvents;
@@ -543,7 +549,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     trr = spr/sqrt(nph);
     theta = fEvent->GetAngle();
     par3 = fEvent->GetTest1();
-    if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl; 
+    if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl;     
     tree.Fill();
   }else{
     if(fVerbose<2) gROOT->SetBatch(1);
@@ -685,9 +691,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       fHist0i->SetLineColor(kRed+2);
       if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
        
-      prt_canvasAdd("r_cm"+nid,800,400);
-      fHist3->SetTitle(Form("theta %3.1f", a));
-      fHist3->Draw("colz");
+      // prt_canvasAdd("r_cm"+nid,800,400);
+      // fHist3->SetTitle(Form("theta %3.1f", a));
+      // fHist3->Draw("colz");
 
       if(false){
 	Int_t tmax, max=0;
@@ -712,7 +718,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       prt_cdigi->SetName("r_hp"+nid);
       prt_canvasAdd(prt_cdigi);
       
-     if(fVerbose>1)  prt_waitPrimitive("r_cm"+nid);
+     if(fVerbose>1)  prt_waitPrimitive("r_time"+nid);
       prt_canvasSave(1,0);
       prt_canvasDel("*");
            
