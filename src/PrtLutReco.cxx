@@ -34,6 +34,8 @@ using std::endl;
 TH1F*  fHist0 = new TH1F("timediff",";t_{calc}-t_{measured} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0i = new TH1F("timediffi",";t_{calc}-t_{measured} [ns];entries [#]", 500,-10,10);
 TH1F*  fhNph = new TH1F("fhNph",";detected photons [#];entries [#]", 150,0,150);
+TH1F*  fhNph_pi = new TH1F("fhNph_pi",";detected photons [#];entries [#]", 150,0,150);
+TH1F*  fhNph_p = new TH1F("fhNph_p",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,100);
 TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,100);
 TH1F*  fHist6 = new TH1F("time6",";measured time [ns];entries [#]", 1000,0,100);
@@ -158,7 +160,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
   Double_t theta(0),prtphi(0), trr(0),  nph(0),nph_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
-    separation(0),beamx(0),beamz(0),nnratio(0);
+    separation(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);
   Double_t deg = TMath::Pi()/180.;
@@ -187,6 +189,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("test2",&test2,"test2/D");
   tree.Branch("test3",&test3,"test3/D");
   tree.Branch("nnratio",&nnratio,"nnratio/D");
+  tree.Branch("nnratio_p",&nnratio_p,"nnratio_p/D");
+  tree.Branch("nnratio_pi",&nnratio_pi,"nnratio_pi/D");
   tree.Branch("theta",&theta,"theta/D");
   tree.Branch("beamx",&beamx,"beamx/D");
   tree.Branch("beamz",&beamz,"beamz/D");
@@ -488,6 +492,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(nhhits>35)
     fhNph->Fill(nhhits);
 
+
+    if(tofPid==2212) fhNph_p->Fill(nhhits);
+    if(tofPid==211) fhNph_pi->Fill(nhhits);
+
     // for(Int_t j=0; j<prt_nmcp; j++){
     //   for(Int_t i=0; i<65; i++){
     // 	mcpdata[j][i]=0;
@@ -538,16 +546,20 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   }
 
   nnratio = fhNph->GetEntries()/(double)end;
+  nnratio_pi = fhNph_pi->GetEntries()/(double)end;
+  nnratio_p = fhNph_p->GetEntries()/(double)end;
 
   std::cout<<"nnratio "<<nnratio<<" "<<end <<"  "<< fhNph->GetEntries()<<std::endl;
 
   TF1 *ff;
   if(fMethod==2){
     gROOT->SetBatch(1);
-    fhNph->Fit("gaus","","MQN",20,120);
-    ff = fhNph->GetFunction("gaus");
-    nph=ff->GetParameter(1);
-    nph_err=ff->GetParError(1);
+    if(fhNph->GetEntries()>20){
+      fhNph->Fit("gaus","","MQN",20,120);
+      ff = fhNph->GetFunction("gaus");
+      nph=ff->GetParameter(1);
+      nph_err=ff->GetParError(1);
+    }
     //nph = prt_fit(fhNph,40,10,50,1).X();
     gROOT->SetBatch(0);
     FindPeak(cangle,spr, prtangle);
