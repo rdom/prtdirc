@@ -156,7 +156,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t angdiv,dtheta,dtphi,prtangle;
 
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
-  Double_t theta(0),prtphi(0), trr(0),  nph(0),
+  Double_t theta(0),prtphi(0), trr(0),  nph(0),nph_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
     separation(0),beamx(0),beamz(0),nnratio(0);
   Double_t minChangle(0);
@@ -177,6 +177,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("spr", &spr,"spr/D");
   tree.Branch("trr", &trr,"trr/D");
   tree.Branch("nph",&nph,"nph/D");
+  tree.Branch("nph_err",&nph_err,"nph_err/D");
   tree.Branch("cangle",&cangle,"cangle/D");
   tree.Branch("likelihood",&likelihood,"par3/D");
   tree.Branch("separation",&separation,"separation/D");
@@ -270,14 +271,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       for(auto h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
-	
+
+	if(gch==817) t2++;
 	if(gch==818) t3h++;
 	if(gch==819) t3v++;
- 	if(gch>=1350 && gch<=1352) hodo1++;
- 	if(gch>=1367 && gch<=1372) hodo2++;      
+ 	if(gch>=1350 && gch<=1351) hodo1++;
+ 	if(gch>=1369 && gch<=1370) hodo2++;      
       }
       if(ndirc<5) continue;
-      // if(!(t3h && t3v && hodo1 && hodo2)) continue;
+      if(!(t2 && t3h && t3v && hodo1 && hodo2)) continue;
       // if(!(t3h && t3v)) continue;
     }
 
@@ -538,10 +540,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   nnratio = fhNph->GetEntries()/(double)end;
 
   std::cout<<"nnratio "<<nnratio<<" "<<end <<"  "<< fhNph->GetEntries()<<std::endl;
-  
+
+  TF1 *ff;
   if(fMethod==2){
     gROOT->SetBatch(1);
-    nph = prt_fit(fhNph,40,10,50,1).X();
+    fhNph->Fit("gaus","","MQN",20,120);
+    ff = fhNph->GetFunction("gaus");
+    nph=ff->GetParameter(1);
+    nph_err=ff->GetParError(1);
+    //nph = prt_fit(fhNph,40,10,50,1).X();
     gROOT->SetBatch(0);
     FindPeak(cangle,spr, prtangle);
     //nph = nsHits/(Double_t)nsEvents;
@@ -549,7 +556,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     trr = spr/sqrt(nph);
     theta = fEvent->GetAngle();
     par3 = fEvent->GetTest1();
-    if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f",spr,nph)<<std::endl;     
+    if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;     
     tree.Fill();
   }else{
     if(fVerbose<2) gROOT->SetBatch(1);
@@ -557,7 +564,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     prt_normalize(hLnDiffP,hLnDiffPi);
     hLnDiffP->SetLineColor(2);
 
-    TF1 *ff;
     Double_t m1,m2,s1,s2; 
     if(hLnDiffP->GetEntries()>10){
       hLnDiffP->Fit("gaus","S");
