@@ -283,7 +283,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
  	if(gch>=1369 && gch<=1370) hodo2++;      
       }
       if(ndirc<5) continue;
-      if(!(t2 && t3h && t3v && hodo1 && hodo2)) continue;
+      // if(!(t2 && t3h && t3v && hodo1 && hodo2)) continue;
       // if(!(t3h && t3v)) continue;
     }
 
