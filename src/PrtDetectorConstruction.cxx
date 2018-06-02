@@ -99,9 +99,8 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   // X configuration
   double radiatorStepY = PrtManager::Instance()->GetPrismStepY();
   if(radiatorStepY !=0 ) radiatorStepY += fBar[0]/2.-fPrizm[3]/2.;
-  
-  PrtManager::Instance()->SetRStepY(radiatorStepY);
-  PrtManager::Instance()->SetRStepX(-(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX());
+  double radiatorStepX = -(fBar[1]-fPrizm[0])/2.- PrtManager::Instance()->GetPrismStepX();
+   
   fCenterShift =  G4ThreeVector(0., 0., 0.);
 
   if(fGeomId == 2015){
@@ -133,13 +132,16 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
   
   if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
-    fPrizm[1] = 30; fPrizm[3] = 300;  fPrizm[2]=500;
-    fBar[0] = 40;
+    fPrizm[1] = 60; fPrizm[3] = 500;  fPrizm[2]=500;
+    radiatorStepX=0;
   }
     
   PrtManager::Instance()->SetRadiatorL(fBar[2]);
   PrtManager::Instance()->SetRadiatorW(fBar[1]);
-  PrtManager::Instance()->SetRadiatorH(fBar[0]);			  
+  PrtManager::Instance()->SetRadiatorH(fBar[0]);
+  PrtManager::Instance()->SetRStepY(radiatorStepY);
+  PrtManager::Instance()->SetRStepX(radiatorStepX);
+
   fPrtRot = new G4RotationMatrix();
   //create a messenger for this class
   fGeomMessenger = new PrtDetectorConstructionMessenger(this);
@@ -160,6 +162,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   Double_t zshift = (PrtManager::Instance()->GetBeamZ()==-1)? 0: PrtManager::Instance()->GetBeamZ()-fOffset;
   Double_t radiatorStepY =  PrtManager::Instance()->GetRStepY();
   Double_t radiatorStepX =  PrtManager::Instance()->GetRStepX();
+    
   G4VPhysicalVolume* wExpHall  = new G4PVPlacement(0,G4ThreeVector(),lExpHall,"gExpHall",0,false,0);
 
   // The Trigger and The front material
@@ -209,7 +212,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   // radiator covered with grease
   G4double greased=0*mm;
-  if(fGeomId<2017){
+  if(fGeomId<2017 && PrtManager::Instance()->GetRunType() != 6){
     greased=1.5*mm;
     if(fLensId==0) greased=0.5*mm;
     G4Box* gOpticalGreased = new G4Box("gOpticalgreased",0.5*fBar[0],0.5*fBar[1],0.5*greased);
@@ -218,12 +221,14 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
   
   //Optical grease
-  G4double greasew=0.1*mm;
-  if(fLensId==0) greasew=0.1*mm;
-  G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
-  lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
-  new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
-  greased+=greasew;
+  if(PrtManager::Instance()->GetRunType() != 6){
+    G4double greasew=0.1*mm;
+    if(fLensId==0) greasew=0.1*mm;
+    G4Box* gOpticalGrease = new G4Box("gOpticalgrease",0.5*fBar[0],0.5*fBar[1],0.5*greasew);
+    lOpticalGrease = new G4LogicalVolume(gOpticalGrease,opticalGreaseMaterial,"lOpticalGrease",0,0,0);
+    new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*greasew),lOpticalGrease,"wOpticalGrease", lDirc,false,0);
+    greased+=greasew;
+  }
 
   // // The Mirror gap
   // G4double mirrorgap=0.1*mm;

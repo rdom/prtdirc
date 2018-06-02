@@ -279,7 +279,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	if(gch==817) t2++;
 	if(gch==818) t3h++;
 	if(gch==819) t3v++;	
-	if(gch>=1350 && gch<=1350) hodo1++;
+	if(gch>=1350 && gch<=1351) hodo1++;
  	//if(gch>=1350 && gch<=1351) hodo1++;
  	//if(gch>=1369 && gch<=1370)
 	hodo2++;      

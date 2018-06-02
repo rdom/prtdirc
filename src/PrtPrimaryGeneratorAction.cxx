@@ -116,12 +116,14 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     //std::cout<<"angle "<<angle*180/M_PI <<std::endl;
     
     G4double lensThickness=15;
-    G4double separation=5;
+    G4double separation=PrtManager::Instance()->GetBeamDinsion();
+    if(separation<0.001) separation=10;
     G4double rotShiftX=0.5*separation*std::cos(angle)+(0.5*lensThickness+0.1)*std::tan(angle);
     G4double rotShiftY=-0.5*radiatorL +0.1;
 
     //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
-    fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY, 0,-rotShiftX));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY, 0,-rotShiftX));
+    fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY, 0,0.5*separation));
   
     
     vec.rotateY(-M_PI/2.);
@@ -133,7 +135,8 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     shifty = radiatorW/2. - G4UniformRand()*radiatorW;
     shiftz = radiatorH/2. - G4UniformRand()*radiatorH;
     //fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
-    fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY,0,-rotShiftX));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY,0,-rotShiftX));
+    fParticleGun->SetParticlePosition(G4ThreeVector(rotShiftY, 0,-0.5*separation));
   }
 
   fParticleGun->GeneratePrimaryVertex(anEvent);

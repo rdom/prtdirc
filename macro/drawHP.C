@@ -26,9 +26,8 @@ void drawHP(TString infile="../build/hits.root"){
     }
   }
 
-
   //i%3*4+i/3
- 
+
   prt_drawDigi("m,p,v\n",2017,0,0);
   prt_cdigi->SetName(Form("hp_dataProtonS332_%d_%2.1f",(Int_t)prt_theta,prt_phi));
   prt_canvasAdd(prt_cdigi);

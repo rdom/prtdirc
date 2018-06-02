@@ -119,7 +119,7 @@ void PrtManager::AddEvent(PrtEvent event){
 
 void PrtManager::AddHit(PrtHit hit){
   if(fRunType==0 || fRunType==6){
-    if ( fEvent ){
+    if(fEvent){
       fEvent->AddHit(hit);
     }else{
       std::cout<<"Event does not exist. Create it first. "<<std::endl;

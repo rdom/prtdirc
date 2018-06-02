@@ -214,12 +214,13 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4ThreeVector g4pos = track->GetVertexPosition();
  
   TVector3 globalPos(inPrismpos.x(),inPrismpos.y(),inPrismpos.z());
-  
+  TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
+    
   if(PrtManager::Instance()->GetRunType() == 6){ //focal plane scan
     globalPos = TVector3(globalpos.x(),globalpos.y(),globalpos.z());
+    localPos = TVector3(g4pos.x(),g4pos.y(),g4pos.z());
   }
   
-  TVector3 localPos(localpos.x(),localpos.y(),localpos.z());
   translation=touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
   TVector3 momentum(g4mom.x(),g4mom.y(),g4mom.z());
@@ -276,7 +277,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
-  if(PrtManager::Instance()->GetRunType()==1 || PrtManager::Instance()->GetRunType()==5 || PrtManager::Instance()->GetRunType()==11){
+  if(PrtManager::Instance()->GetRunType()==1 || PrtManager::Instance()->GetRunType()==5 || PrtManager::Instance()->GetRunType()==11 || PrtManager::Instance()->GetRunType()==6){
     PrtManager::Instance()->AddHit(hit);
     return true;
   }
@@ -286,7 +287,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   Bool_t dead_time(true);
   Bool_t dark_counts(true);
   Bool_t transport_efficiency(true);
-
+  
   if(PrtManager::Instance()->GetGeometry()==2021) charge_sharing=false; //no cs in mfield 
 
   if(transport_efficiency){
