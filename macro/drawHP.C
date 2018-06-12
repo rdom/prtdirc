@@ -34,3 +34,4 @@ void drawHP(TString infile="../build/hits.root"){
   //prt_cdigi_palette->Draw();
   //prt_canvasSave(1,0);
 }
+

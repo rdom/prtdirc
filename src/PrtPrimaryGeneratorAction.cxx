@@ -8,6 +8,8 @@
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
 #include "globals.hh"
+#include "G4PhysicalVolumeStore.hh"
+#include "G4LogicalVolume.hh"
 
 #include "PrtManager.h"
 
@@ -28,6 +30,17 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction():G4VUserPrimaryGeneratorAc
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0*cm,0.0*cm,0.0*cm));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
   fParticleGun->SetParticleEnergy(7*MeV);
+
+  // auto store = G4PhysicalVolumeStore::GetInstance();
+  // for (size_t i=0;i<store->size();i++){
+  //   std::cout<<"name "<<(*store)[i]->GetName()<<std::endl;
+    
+  //   if((*store)[i]->GetName()=="wPixel") {
+  //     auto t = (*store)[i]->GetTranslation();
+  //     std::cout<<"x "<<t.x()<<" y "<<t.y()<<" z "<<t.z()<<std::endl;      
+  //   }
+  // }
+  
 }
 
 PrtPrimaryGeneratorAction::~PrtPrimaryGeneratorAction(){

@@ -338,7 +338,11 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     //Double_t chargesig(1),threshold(0.5);
     Double_t chargesig(1.7),threshold(0.7); //high cs / ct  // 1.5/0.9 for 0.5mV // 1.5/0.7 for 1mV
     if(mcpid==3){
-      chargesig=3;
+      chargesig=3.2;
+      threshold=1;
+    }
+    if(mcpid==4){
+      chargesig=2.5;
       threshold=1;
     }
     Double_t x(localPos.x()), y(localPos.y());

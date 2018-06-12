@@ -153,7 +153,7 @@ int main(int argc,char** argv)
 
   
   // Detector construction
-  runManager-> SetUserInitialization(new PrtDetectorConstruction());
+  runManager->SetUserInitialization(new PrtDetectorConstruction());
   // Physics list
   runManager->SetUserInitialization(new PrtPhysicsList());
   // User action initialization
