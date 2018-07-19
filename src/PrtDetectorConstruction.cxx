@@ -187,7 +187,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   if(fGeomId == 3 || fGeomId >= 2015){
     new G4PVPlacement(0,G4ThreeVector(0,0,-4500),lFront,"wFront",lExpHall,false,0);
-    // new G4PVPlacement(0,G4ThreeVector(0,0,-5500),lEdd,"wEdd",lExpHall,false,0);
+    new G4PVPlacement(0,G4ThreeVector(0,0,-5500),lEdd,"wEdd",lExpHall,false,0);
     new G4PVPlacement(0,G4ThreeVector(0,0,1500),lTrigger,"wTrigger",lExpHall,false,0); 
   }
   
