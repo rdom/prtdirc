@@ -342,7 +342,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
       threshold=1;
     }
     if(mcpid==4){
-      chargesig=2.5;
+      chargesig=1.7;
       threshold=1;
     }
     Double_t x(localPos.x()), y(localPos.y());

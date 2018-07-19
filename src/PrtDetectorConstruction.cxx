@@ -40,7 +40,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   fNRow = 3;
   fNCol = 5;
   
-  fHall[0] = 1000; fHall[1] = 500; fHall[2] = 2000;
+  fHall[0] = 1000; fHall[1] = 500; fHall[2] = 6000;
 
   // fBar[0] = 17; fBar[1] = 32; fBar[2] =1250;
   // fBar[0] = 17.1; fBar[1] = 35.9; fBar[2] =1200; // InSync
@@ -76,6 +76,11 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   }
 
   if(fMcpLayout == 2017){
+    fNCol = 4;
+  }
+
+  if(fMcpLayout == 2018){
+    fNRow = 2;	
     fNCol = 4;
   }
 
@@ -122,6 +127,12 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
+
+  if(fGeomId == 2018){
+    fOffset=146;
+    fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
+  }    
   
   if(fGeomId == 2021){ 
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
@@ -170,9 +181,13 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   lFront = new G4LogicalVolume(gFront,frontMaterial,"lFront",0,0,0);
   G4Box* gTrigger = new G4Box("gTrigger",20.,20.,5);
   lTrigger = new G4LogicalVolume(gTrigger,frontMaterial,"lTrigger",0,0,0);
+  G4Box* gEdd = new G4Box("gEdd",200,200,23);
+  lEdd = new G4LogicalVolume(gEdd,BarMaterial,"lEdd",0,0,0);
+
   
   if(fGeomId == 3 || fGeomId >= 2015){
-    new G4PVPlacement(0,G4ThreeVector(0,0,-1200),lFront,"wFront",lExpHall,false,0);
+    new G4PVPlacement(0,G4ThreeVector(0,0,-4500),lFront,"wFront",lExpHall,false,0);
+    new G4PVPlacement(0,G4ThreeVector(0,0,-5500),lEdd,"wEdd",lExpHall,false,0);
     new G4PVPlacement(0,G4ThreeVector(0,0,1500),lTrigger,"wTrigger",lExpHall,false,0); 
   }
   
@@ -643,6 +658,13 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
+	if(fMcpLayout==2018){
+	  Double_t ms = 3;
+	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
+	  shifty = (fMcpTotal[0]+3)*(j-1)+0.5*fMcpTotal[0]+1.5;
+	}
+	
 	if(fMcpLayout==20171){
 	  Double_t ms = 3;
 	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;

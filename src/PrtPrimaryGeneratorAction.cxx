@@ -1,16 +1,14 @@
-#include "PrtPrimaryGeneratorAction.h"
-#include "PrtPrimaryGeneratorMessenger.h"
-
-#include "Randomize.hh"
-
 #include "G4Event.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
 #include "G4SystemOfUnits.hh"
-#include "globals.hh"
 #include "G4PhysicalVolumeStore.hh"
 #include "G4LogicalVolume.hh"
+#include "Randomize.hh"
+#include "globals.hh"
 
+#include "PrtPrimaryGeneratorAction.h"
+#include "PrtPrimaryGeneratorMessenger.h"
 #include "PrtManager.h"
 
 PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction():G4VUserPrimaryGeneratorAction(),fParticleGun(0){
@@ -30,17 +28,23 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction():G4VUserPrimaryGeneratorAc
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0*cm,0.0*cm,0.0*cm));
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1.,0.,0.));
   fParticleGun->SetParticleEnergy(7*MeV);
+  
 
+  // int mid=-1, pid=-1;
+  // G4ThreeVector vdirc,vmcp[12],vpix[64];
   // auto store = G4PhysicalVolumeStore::GetInstance();
   // for (size_t i=0;i<store->size();i++){
-  //   std::cout<<"name "<<(*store)[i]->GetName()<<std::endl;
-    
-  //   if((*store)[i]->GetName()=="wPixel") {
-  //     auto t = (*store)[i]->GetTranslation();
-  //     std::cout<<"x "<<t.x()<<" y "<<t.y()<<" z "<<t.z()<<std::endl;      
-  //   }
+  //   if((*store)[i]->GetName()=="wDirc")  vdirc = (*store)[i]->GetTranslation();    
+  //   if((*store)[i]->GetName()=="wMcp")   vmcp[++mid] = (*store)[i]->GetTranslation();  
+  //   if((*store)[i]->GetName()=="wPixel") vpix[++pid] = (*store)[i]->GetTranslation();
   // }
   
+  // for(auto m=0; m<mid; m++){
+  //   for(auto p=0; p<pid; p++){
+  //     gpix[m][p] = vdirc+(vmcp[m]+vpix[p]).rotateY(PrtManager::Instance()->GetAngle()*deg-180*deg);
+  //   }
+  // }
+
 }
 
 PrtPrimaryGeneratorAction::~PrtPrimaryGeneratorAction(){
@@ -96,12 +100,13 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     fParticleGun->SetParticlePosition(G4ThreeVector(PrtManager::Instance()->GetRStepY(),//+5-10*G4UniformRand(),
 						    PrtManager::Instance()->GetRStepX(),//+10-20*G4UniformRand(),
 						    radiatorL/2.-0.1));
+
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
     vec.setTheta(acos(G4UniformRand()));
     vec.setPhi(2*M_PI*G4UniformRand());
     
-    //    vec.rotateY(-M_PI/2.);
+    // vec.rotateY(-M_PI/2.);
     fParticleGun->SetParticleMomentumDirection(vec);
   }
   if(PrtManager::Instance()->GetRunType() == 5){ // calibration light

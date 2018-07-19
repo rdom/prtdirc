@@ -67,6 +67,8 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track * a
 
       // //tmp phs cut
       // if(fabs(aTrack->GetMomentum().unit().y())>0.15 ) return fKill;
+      
+      if(aTrack->GetPosition().z()<-4000 ) return fKill; // disc dirc
     
       Double_t lambda = 197.0*2.0*pi/(aTrack->GetMomentum().mag()*1.0E6);          
       // apply detector efficiency at the production stage:    

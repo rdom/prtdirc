@@ -35,6 +35,7 @@ public:
 private:
   G4LogicalVolume* lExpHall;
   G4LogicalVolume* lFront;
+  G4LogicalVolume* lEdd;
   G4LogicalVolume* lTrigger;
   G4LogicalVolume* lDirc;
   G4LogicalVolume* lBar;
