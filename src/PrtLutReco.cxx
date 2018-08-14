@@ -70,9 +70,9 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fTree->SetBranchAddress("LUT",&fLut); 
   fTree->GetEntry(0);
 
-  fHist = new TH1F("chrenkov_angle_hist",  "chrenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
-  fHistPi = new TH1F("chrenkov_angle_hist_Pi",  "chrenkov angle pi;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
-  fHisti = new TH1F("chrenkov_angle_histi","chrenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
+  fHist = new TH1F("cherenkov_angle_hist",  "cherenkov angle;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
+  fHistPi = new TH1F("cherenkov_angle_hist_Pi",  "cherenkov angle pi;#theta_{C} [rad];entries [#]", 150,0.6,1); //150
+  fHisti = new TH1F("cherenkov_angle_histi","cherenkov angle;#theta_{C} [rad];entries [#]", 80,0.6,1); //150
   fFit = new TF1("fgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.35,0.9);
   fSpect = new TSpectrum(10);
   fRadiator=1;
@@ -266,26 +266,31 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     gF2->SetParameter(2,sigma);
 
     
-    //if(fMethod==2 && tofPid!=2212) continue;
+    // if(fMethod==2 && tofPid!=2212) continue;
 	
     if(fEvent->GetType()==0){
 
-      Int_t gch, ndirc(0), t2(0), t3h(0), t3v(0);
+      Int_t gch, ndirc(0), t2(0), t3h(0), t3v(0),
+	str1(0),stl1(0),str2(0),stl2(0);
       Int_t hodo1(0), hodo2(0);
       for(auto h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
 
-	if(gch==817) t2++;
-	if(gch==818) t3h++;
-	if(gch==819) t3v++;	
-	if(gch>=1350 && gch<=1351) hodo1++;
- 	//if(gch>=1350 && gch<=1351) hodo1++;
- 	//if(gch>=1369 && gch<=1370)
+	if(gch==513) t2++;
+	if(gch==514) t3h++;
+	if(gch==515) t3v++;
+	if(gch>=1094 && gch<=1101) hodo1++;
+	if(gch==1140) str1++;
+	if(gch==1142) stl1++;
+	if(gch==1144) str2++;
+	if(gch==1146) stl2++;
+	
 	hodo2++;      
       }
       if(ndirc<5) continue;
       if(!(t2 && t3h && t3v && hodo1 && hodo2)) continue;
+      if(!(str1 && stl1 && str2 && stl2)) continue;
       // if(!(t3h && t3v)) continue;
     }
 
@@ -423,15 +428,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
 	
-	for(int u=0; u<4; u++){
+	for(int u=0; u<2; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
 
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
-	  if(u == 2) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
-	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
+	  //if(u == 2) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
+	  //if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
 	  if(reflected) dir.SetXYZ( dir.X(), dir.Y(), -dir.Z());
 	  if(dir.Angle(fnX1) < criticalAngle || dir.Angle(fnY1) < criticalAngle) continue;
 
@@ -446,7 +451,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  //	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
-	  if(fabs(timediff)>timeRes) continue;	  
+	  if(fabs(timediff+0.5)>timeRes) continue;	  
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir)-0.002;
@@ -693,7 +698,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
       drawTheoryLines();
-      
+      std::cout<<"here0 "<<std::endl;
       prt_canvasAdd("r_time",800,400);
       prt_normalize(fHist1,fHist6);
       fHist1->SetTitle(Form("theta %3.1f", a));
@@ -714,7 +719,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // prt_canvasAdd("r_cm"+nid,800,400);
       // fHist3->SetTitle(Form("theta %3.1f", a));
       // fHist3->Draw("colz");
-
+      std::cout<<"here1 "<<std::endl;
       if(false){
 	Int_t tmax, max=0;
 	for(Int_t m=0; m<prt_nmcp;m++){
@@ -734,14 +739,15 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	}
       }
  
-      prt_drawDigi("m,p,v\n",2017);
+      prt_drawDigi("m,p,v\n",2018);
       prt_cdigi->SetName("r_hp"+nid);
       prt_canvasAdd(prt_cdigi);
       
      if(fVerbose>1)  prt_waitPrimitive("r_time"+nid);
       prt_canvasSave(1,0);
       prt_canvasDel("*");
-           
+      std::cout<<"here2 "<<std::endl;
+		 
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
 	c2->Divide(2,1);

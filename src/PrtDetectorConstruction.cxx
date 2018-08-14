@@ -43,8 +43,8 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   fHall[0] = 1000; fHall[1] = 500; fHall[2] = 6000;
 
   // fBar[0] = 17; fBar[1] = 32; fBar[2] =1250;
-  // fBar[0] = 17.1; fBar[1] = 35.9; fBar[2] =1200; // InSync
-  fBar[0] = 17.9; fBar[1] = 35.9; fBar[2] =1200.7; // Zygo
+  fBar[0] = 17.1; fBar[1] = 35.9; fBar[2] =1200; // InSync // 2018
+  //fBar[0] = 17.9; fBar[1] = 35.9; fBar[2] =1200.7; // Zygo //2017
 
   fMirror[0] = 20; fMirror[1] = 40; fMirror[2] =1;
   fPrizm[0] = 170; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(45*deg);
