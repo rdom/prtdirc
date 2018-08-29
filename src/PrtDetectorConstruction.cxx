@@ -245,6 +245,14 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     greased+=greasew;
   }
 
+  if(PrtManager::Instance()->GetStudy()==430){ // add cookies
+    G4double cookiew=2*mm;
+    G4Box* gCookie1 = new G4Box("gCookie1",0.9*fBar[0],0.9*fBar[1],0.5*cookiew);
+    lCookie1 = new G4LogicalVolume(gCookie1,opticalCookieMaterial,"lCookie1",0,0,0);
+    new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+greased+0.5*cookiew),lCookie1,"wCookie1", lDirc,false,0);
+    greased+=cookiew;    
+  }
+
   // // The Mirror gap
   // G4double mirrorgap=0.1*mm;
   // G4Box* gMirrorGap = new G4Box("gMirrorGap",fMirror[0]/2.,fMirror[1]/2.,0.5*mirrorgap);
@@ -539,6 +547,15 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     fLens[2]=0; 
   }
 
+  if(PrtManager::Instance()->GetStudy()==430){
+    G4double cookiew=2*mm;
+    G4Box* gCookie2 = new G4Box("gCookie2",1.5*fBar[0],0.9*fBar[1],0.5*cookiew);
+    lCookie2 = new G4LogicalVolume(gCookie2,opticalCookieMaterial,"lCookie2",0,0,0);
+    new G4PVPlacement(0,G4ThreeVector(radiatorStepY,radiatorStepX,0.5*fBar[2]+fLens[2]+greased+0.5*cookiew),lCookie2,"wCookie1", lDirc,false,0);    
+    greased+=cookiew;
+  }
+
+  
   // The Prizm
   G4Trap* gPrizm = new G4Trap("gPrizm",fPrizm[0],fPrizm[1],fPrizm[2],fPrizm[3]);
   if(PrtManager::Instance()->GetRunType() == 6)  lPrizm = new G4LogicalVolume(gPrizm, OilMaterial,"lPrizm",0,0,0);
@@ -1104,6 +1121,19 @@ void PrtDetectorConstruction::DefineMaterials(){
   opticalGreaseMaterial->AddElement(Si, natoms=1);
   opticalGreaseMaterial->AddElement(O , natoms=2);
   opticalGreaseMaterial->SetMaterialPropertiesTable(opticalGreaseMPT);  
+  
+  // Optical cookie (RTV615)                                                
+  G4MaterialPropertiesTable* opticalCookieMPT = new G4MaterialPropertiesTable();
+  G4double oc_en[9]={1.50*eV,2.00*eV,2.50*eV,3.00*eV,3.50*eV,4.00*eV,4.10*eV,4.50*eV,5.00*eV};
+  G4double oc_ab[9]={14.2*cm,14.2*cm,14.2*cm,11.54*cm,5.29*cm,2.98*cm,2.43*cm,2.43*cm,2.43*cm};
+  G4double oc_re[9]={1.406,1.406,1.406,1.406,1.406,1.406,1.406,1.406,1.406};
+  opticalCookieMPT->AddProperty("RINDEX", oc_en, oc_re, 9);
+  opticalCookieMPT->AddProperty("ABSLENGTH",oc_en, oc_ab, 9);
+
+  opticalCookieMaterial = new G4Material("opticalCookieMaterial",density= 2.200*g/cm3, ncomponents=2);
+  opticalCookieMaterial->AddElement(Si, natoms=1);
+  opticalCookieMaterial->AddElement(O , natoms=2);
+  opticalCookieMaterial->SetMaterialPropertiesTable(opticalCookieMPT);  
 
   // Epotek Glue                                        
   G4MaterialPropertiesTable* EpotekMPT = new G4MaterialPropertiesTable();

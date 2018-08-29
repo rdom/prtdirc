@@ -41,6 +41,7 @@ private:
   G4LogicalVolume* lBar;
   G4LogicalVolume* lOpticalGrease;
   G4LogicalVolume* lOpticalGreased;
+  G4LogicalVolume* lCookie1,*lCookie2;
   G4LogicalVolume* lMirrorGap;
   G4LogicalVolume* lMirror;
   G4LogicalVolume* lLens1;
@@ -61,7 +62,8 @@ private:
   G4Material*        BarMaterial; // material for bars
   G4Material*        OilMaterial;
   G4Material*        MirrorMaterial; // material of mirror
-  G4Material*        opticalGreaseMaterial; // material of mirror 
+  G4Material*        opticalGreaseMaterial; // material of mirror
+  G4Material*        opticalCookieMaterial;
   G4Material*        epotekMaterial;  
   G4Material*        Nlak33aMaterial;
   G4Material*        PbF2Material;  
