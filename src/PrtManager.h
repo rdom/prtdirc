@@ -43,6 +43,7 @@ public:
   
   // Mutators
   void SetRunType(int val){ fRunType = val; }
+  void SetStudy(int val){ fStudy = val; }
   void SetPhysList(int val){ fPhysList = val; }
   void SetGeometry(int val){ fGeometry = val; }
   void SetBeamDimension(double val){ fBeamDimension = val; }
@@ -77,6 +78,7 @@ public:
   
   // Accessors
   int GetRunType(){ return fRunType; }
+  int GetStudy(){ return fStudy; }
   int GetPhysList(){ return fPhysList; }
   int GetGeometry(){ return fGeometry; }
   double GetBeamDinsion(){ return fBeamDimension; }
@@ -109,8 +111,9 @@ public:
   TString GetInfo() { return fInfo; }
   bool GetMixPiP(){ return fMixPiP; }
 
-private: 
+private:
   int fRunType;
+  int fStudy;
   int fPhysList;
   int fGeometry;
   int fRadiator;

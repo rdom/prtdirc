@@ -1130,6 +1130,8 @@ void PrtDetectorConstruction::SetVisualization(){
   waDirc->SetVisibility(false);
   lDirc->SetVisAttributes(waDirc);
   lCover->SetVisAttributes(waDirc);
+  lFront->SetVisAttributes(waDirc);
+  lEdd->SetVisAttributes(waDirc);
 
   G4VisAttributes *waBar = new G4VisAttributes(G4Colour(0.,1.,0.9,0.2));
   // G4VisAttributes *waBar = new G4VisAttributes(Dark);
