@@ -23,6 +23,7 @@
 #include <TVirtualFitter.h>
 #include <TArc.h>
 #include <TLegend.h>
+#include "G4SystemOfUnits.hh"
 
 #define prt__sim
 #include "../../prttools/datainfo.C"
@@ -162,8 +163,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
     separation(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0);
   Double_t minChangle(0);
-  Double_t maxChangle(1);
-  Double_t deg = TMath::Pi()/180.;
+  Double_t maxChangle(1);  
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
 
   prt_setRootPalette(1);
@@ -227,7 +227,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle =fEvent->GetAngle();// prt_data_info.getAngle();// fEvent->GetAngle();
-      prtphi = fEvent->GetPhi()+test2; //prt_data_info.getPhi(); //fEvent->GetPhi();
+      prtphi = fEvent->GetPhi()+test2*rad; //prt_data_info.getPhi(); //fEvent->GetPhi();
       studyId = fEvent->GetGeometry();      
       mom=fEvent->GetMomentum().Mag();
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<prtphi<<std::endl;
