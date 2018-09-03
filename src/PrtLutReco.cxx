@@ -227,7 +227,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle =fEvent->GetAngle();// prt_data_info.getAngle();// fEvent->GetAngle();
-      prtphi = fEvent->GetPhi(); //prt_data_info.getPhi(); //fEvent->GetPhi();
+      prtphi = fEvent->GetPhi()+test2; //prt_data_info.getPhi(); //fEvent->GetPhi();
       studyId = fEvent->GetGeometry();      
       mom=fEvent->GetMomentum().Mag();
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<prtphi<<std::endl;
