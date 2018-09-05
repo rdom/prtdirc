@@ -187,7 +187,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   
   if(fGeomId == 3 || fGeomId >= 2015){
     new G4PVPlacement(0,G4ThreeVector(0,0,-4500),lFront,"wFront",lExpHall,false,0);
-    new G4PVPlacement(0,G4ThreeVector(0,0,-5500),lEdd,"wEdd",lExpHall,false,0);
+    //new G4PVPlacement(0,G4ThreeVector(0,0,-5500),lEdd,"wEdd",lExpHall,false,0);
     new G4PVPlacement(0,G4ThreeVector(0,0,1500),lTrigger,"wTrigger",lExpHall,false,0); 
   }
   
@@ -202,7 +202,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
   if(fGeomId == 0 || PrtManager::Instance()->GetRunType() == 1) zshift=0;
   //tilt scan
-  fPrtRot->rotateY((-PrtManager::Instance()->GetAngle()+90)*deg);
+  fPrtRot->rotateY((90-PrtManager::Instance()->GetAngle())*deg);
   fPrtRot->rotateX(PrtManager::Instance()->GetPhi()*deg);
   std::cout<<"PrtManager::Instance()->GetAngle() "<<PrtManager::Instance()->GetAngle()<<std::endl;
 

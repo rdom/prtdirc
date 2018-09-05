@@ -18,13 +18,9 @@ void drawHP(TString infile="../build/hits.root"){
       
       Int_t ch = map_mpc[mcpid][pixid];
       if(prt_isBadChannel(ch)) continue;
-      std::cout<<"ch "<<ch<<std::endl;
-      
-      if(mcpid%3==0 && pixid<32) continue;
-      if(mcpid%3==2 && pixid>=32) continue; 
-      
+
       //if(prt_pid==4)
-	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
+      prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
     }
   }
   
@@ -33,6 +29,6 @@ void drawHP(TString infile="../build/hits.root"){
   prt_drawDigi("m,p,v\n",2018,0,0);
   prt_cdigi->SetName(Form("hp_dataProtonS332_%d_%2.1f",(Int_t)prt_theta,prt_phi));
   prt_canvasAdd(prt_cdigi);
-  prt_canvasSave(1,0);
+  //prt_canvasSave(1,0);
 }
 

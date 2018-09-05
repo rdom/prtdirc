@@ -159,9 +159,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t angdiv,dtheta,dtphi,prtangle;
 
   TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
-  Double_t theta(0),prtphi(0), trr(0),  nph(0),nph_err(0),
+  Double_t theta(0),phi(0), trr(0),  nph(0),nph_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
-    separation(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0);
+    separation(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);  
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
@@ -194,7 +194,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Branch("theta",&theta,"theta/D");
   tree.Branch("beamx",&beamx,"beamx/D");
   tree.Branch("beamz",&beamz,"beamz/D");
-  tree.Branch("prtphi",&prtphi,"prtphi/D");
+  tree.Branch("phi",&phi,"phi/D");
+  tree.Branch("timeRes",&timeRes,"timeRes/D");
   
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
@@ -203,10 +204,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   beamz = PrtManager::Instance()->GetBeamZ();
   par5 = PrtManager::Instance()->GetPrismStepX();
   par6 = PrtManager::Instance()->GetPrismStepY();
-
-  Double_t timeRes = PrtManager::Instance()->GetTimeRes();
+  timeRes = PrtManager::Instance()->GetTimeRes();
   fMethod = PrtManager::Instance()->GetRunType();
-  
+
+  Double_t radiatorL = (fRadiator==2)? 1224.9 : 1200; //plate : bar
+
   Int_t nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
   
@@ -226,18 +228,18 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle =fEvent->GetAngle();// prt_data_info.getAngle();// fEvent->GetAngle();
-      prtphi = fEvent->GetPhi();//prt_data_info.getPhi(); //fEvent->GetPhi();
+      prtangle = fEvent->GetAngle(); //prt_data_info.getAngle();// fEvent->GetAngle();
+      phi = fEvent->GetPhi(); //prt_data_info.getPhi(); //fEvent->GetPhi();
       studyId = fEvent->GetGeometry();      
       mom=fEvent->GetMomentum().Mag();
-      std::cout<<"prtangle++  "<<prtangle<< " phi "<<prtphi<<std::endl;
+      std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
       if(fEvent->GetType()==0){
 	momInBar.RotateY(TMath::Pi()-prtangle*deg+test1);
-	momInBar.RotateZ(prtphi*deg+test2);
+	momInBar.RotateZ(phi*deg+test2);
       }else{
-	momInBar.RotateY(TMath::Pi()-prtangle*deg);	
-	momInBar.RotateZ(prtphi*deg);
+	momInBar.RotateY(TMath::Pi()-prtangle*deg);
+	momInBar.RotateZ(phi*deg);
       }
 
       if(fVerbose==3){
@@ -293,7 +295,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       if(!(str1 && stl1 && str2 && stl2)) continue;
       // if(!(t3h && t3v)) continue;
     }
-
     
   //   //clusters search
   //   for(Int_t h=0; h<nHits; h++) {
@@ -349,7 +350,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
       //================================================== 
-      Double_t radiatorL = (fRadiator==2)? 1224.9 : 1200; //plate : bar
 
       if(fEvent->GetType()==1) lenz = radiatorL/2.-fHit.GetPosition().Z();
       else lenz = fHit.GetPosition().Z();
@@ -428,15 +428,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
 	
-	for(int u=0; u<2; u++){
+	for(int u=0; u<4; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
 
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
-	  //if(u == 2) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
-	  //if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
+	  if(u == 2) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
+	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
 	  if(reflected) dir.SetXYZ( dir.X(), dir.Y(), -dir.Z());
 	  if(dir.Angle(fnX1) < criticalAngle || dir.Angle(fnY1) < criticalAngle) continue;
 
@@ -475,12 +475,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	      rdir.RotateUz(cz);	      
-	      Double_t phi = rdir.Phi();
+	      Double_t lphi = rdir.Phi();
 	      Double_t tt =  rdir.Theta();
-	      fHist4->Fill(tt*TMath::Sin(phi),tt*TMath::Cos(phi));
+	      fHist4->Fill(tt*TMath::Sin(lphi),tt*TMath::Cos(lphi));
 
 	      //for cherenckov circle fit
-	      gg_gr.SetPoint(gg_i,tt*TMath::Sin(phi),tt*TMath::Cos(phi));
+	      gg_gr.SetPoint(gg_i,tt*TMath::Sin(lphi),tt*TMath::Cos(lphi));
 	      gg_i++;
 	    }
 	  }
@@ -496,7 +496,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       }
     } 
 
-    if(nhhits>35)
     fhNph->Fill(nhhits);
 
 
@@ -562,7 +561,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   if(fMethod==2){
     gROOT->SetBatch(1);
     if(fhNph->GetEntries()>20){
-      fhNph->Fit("gaus","","MQN",20,120);
+      fhNph->Fit("gaus","","MQN",5,120);
       ff = fhNph->GetFunction("gaus");
       nph=ff->GetParameter(1);
       nph_err=ff->GetParError(1);

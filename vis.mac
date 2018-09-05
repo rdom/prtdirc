@@ -186,3 +186,4 @@
 #export
 #/vis/open VRML2FILE
 #/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts false
+/vis/ogl/set/displayListLimit 1000000
