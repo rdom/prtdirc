@@ -253,7 +253,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     Int_t pdg[]={11,13,211,321,2212};
     Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};    
-    Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.009),range(5*sigma),noise(0.3);
+    Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.010),range(5*sigma),noise(0.3);
     
     fAngleP = acos(sqrt(momentum*momentum+ mass[4]*mass[4])/momentum/1.4738)-0.00; //1.4738 = 370 = 3.35
     fAnglePi= acos(sqrt(momentum*momentum + mass[2]*mass[2])/momentum/1.4738)-0.00; //-0.0014 for 160 25deg
