@@ -428,7 +428,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
 	
-	for(int u=0; u<4; u++){
+	for(int u=0; u<2; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
