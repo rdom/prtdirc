@@ -435,7 +435,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
-	  if(u == 2) dir.SetXYZ( dird.X(),-dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
+	  if(u == 2) dir.SetXYZ( dird.X(), -dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
 	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
 	  if(reflected) dir.SetXYZ( dir.X(), dir.Y(), -dir.Z());
 	  if(dir.Angle(fnX1) < criticalAngle || dir.Angle(fnY1) < criticalAngle) continue;
@@ -575,8 +575,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     theta = fEvent->GetAngle();
     par3 = fEvent->GetTest1();
     if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;     
-    tree.Fill();
-  }else{
+
+    // }else{
     if(fVerbose<2) gROOT->SetBatch(1);
     prt_canvasAdd("r_lhood",800,400);
     prt_normalize(hLnDiffP,hLnDiffPi);
@@ -608,9 +608,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     prt_canvasSave(1,0);
     //prt_waitPrimitive("r_lhood","w");
     if(fVerbose) gROOT->SetBatch(0);
-    tree.Fill();
   }
   
+  tree.Fill();
   if(fVerbose) ResetHists();
   tree.Write();
   file.Write();
