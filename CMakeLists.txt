@@ -23,9 +23,8 @@ find_package(ROOT REQUIRED)
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
 #
-include_directories(${PROJECT_SOURCE_DIR}/src 
-                    ${Geant4_INCLUDE_DIR}
-		    ${ROOT_INCLUDE_DIR})
+include_directories(SYSTEM ${Geant4_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS})
+include_directories(${PROJECT_SOURCE_DIR}/src)
 
 include(${ROOT_USE_FILE})
 include(${Geant4_USE_FILE})
@@ -43,7 +42,7 @@ execute_process(COMMAND rootcint -f PrtDict.cxx -c ../src/PrtHit.h ../src/PrtEve
 #
 
 #set(CMAKE_CXX_FLAGS "-std=gnu++11")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
 add_executable(prtdirc PrtDirc.cxx ${sources} PrtDict.cxx ${headers})
 target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} -lSpectrum -lHistPainter )
 

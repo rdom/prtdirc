@@ -30,11 +30,14 @@ void PrtRunAction::BeginOfRunAction(const G4Run* aRun)
 
 void PrtRunAction::EndOfRunAction(const G4Run* aRun)
 {
-  PrtManager::Instance()->FillLut();
-  PrtManager::Instance()->Save();
+  if(IsMaster())
+    {
+      PrtManager::Instance()->FillLut();
+      PrtManager::Instance()->Save();
   
-  fTimer->Stop();
-  G4cout << "number of event = " << aRun->GetNumberOfEvent()
-         << " " << *fTimer << G4endl;
+      fTimer->Stop();
+      G4cout << "number of event = " << aRun->GetNumberOfEvent()
+	     << " " << *fTimer << G4endl;
+    }
 }
 

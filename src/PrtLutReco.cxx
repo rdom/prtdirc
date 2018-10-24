@@ -5,6 +5,7 @@
 // Author: R.Dzhygadlo at gsi.de
 // -----------------------------------------
 
+
 #include "PrtLutReco.h"
 
 #include "PrtManager.h"
@@ -13,6 +14,10 @@
 #include "PrtTrackInfo.h"
 #include "PrtPhotonInfo.h"
 #include "PrtAmbiguityInfo.h"
+
+#define prt__sim
+#include "../../prttools/datainfo.C"
+#include "../../prttools/prttools.C"
 
 #include "TROOT.h"
 #include "TStyle.h"
@@ -23,11 +28,7 @@
 #include <TVirtualFitter.h>
 #include <TArc.h>
 #include <TLegend.h>
-#include "G4SystemOfUnits.hh"
-
-#define prt__sim
-#include "../../prttools/datainfo.C"
-#include "../../prttools/prttools.C"
+#include <CLHEP/Units/SystemOfUnits.h>
 
 using std::cout;
 using std::endl;
@@ -235,11 +236,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
       if(fEvent->GetType()==0){
-	momInBar.RotateY(TMath::Pi()-prtangle*deg+test1);
-	momInBar.RotateZ(phi*deg+test2);
+	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
+	momInBar.RotateZ(phi*CLHEP::deg+test2);
       }else{
-	momInBar.RotateY(TMath::Pi()-prtangle*deg);
-	momInBar.RotateZ(phi*deg);
+	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
+	momInBar.RotateZ(phi*CLHEP::deg);
       }
 
       if(fVerbose==3){
@@ -288,7 +289,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	if(gch==1144) str2++;
 	if(gch==1146) stl2++;
 	
-	hodo2++;      
+	if(gch>=1115 && gch<=1120) hodo2++;      
       }
       if(ndirc<5) continue;
       if(!(t2 && t3h && t3v && hodo1 && hodo2)) continue;
@@ -373,10 +374,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       //if(cluster[mcpid][pixid]>8) continue;
   
       // Int_t x(0),y(0), piid(pixid) , nedge(0); //new
-      // for(Int_t h=0; h<nHits; h++) {
-      // 	Int_t pid=fEvent->GetHit(h).GetPixelId();
-      // 	Int_t mid=fEvent->GetHit(h).GetMcpId();
-      // 	Double_t tdif=fabs(hitTime-fEvent->GetHit(h).GetLeadTime());
+      // for(Int_t hh=0; hh<nHits; hh++) {
+      // 	Int_t pid=fEvent->GetHit(hh).GetPixelId();
+      // 	Int_t mid=fEvent->GetHit(hh).GetMcpId();
+      // 	Double_t tdif=fabs(hitTime-fEvent->GetHit(hh).GetLeadTime());
       // 	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
       // 	if(pid==piid-1 && piid%8!=0) y-=1;
       // 	if(pid==piid+1 && piid%8!=7) y+=1;
@@ -386,9 +387,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // }
 
       Int_t x(0),y(0), piid(pixid+1) , nedge(0); //old
-      for(Int_t h=0; h<nHits; h++) {
-      	Int_t pid=fEvent->GetHit(h).GetPixelId();
-      	Int_t mid=fEvent->GetHit(h).GetMcpId();
+      for(Int_t hh=0; hh<nHits; hh++) {
+      	Int_t pid=fEvent->GetHit(hh).GetPixelId();
+      	Int_t mid=fEvent->GetHit(hh).GetMcpId();
       	if(mid!=mcpid || pid==piid) continue;
       	if(pid==piid-1 && piid%8!=1) x-=1;
       	if(pid==piid+1 && piid%8!=0) x+=1;
@@ -428,7 +429,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
 	
-	for(int u=0; u<2; u++){
+	for(int u=0; u<4; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
@@ -605,15 +606,21 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     hLnDiffP->Draw();
     hLnDiffPi->SetLineColor(4);
     hLnDiffPi->Draw("same");
-    prt_canvasSave(1,0);
-    //prt_waitPrimitive("r_lhood","w");
     if(fVerbose) gROOT->SetBatch(0);
   }
   
   tree.Fill();
-  if(fVerbose) ResetHists();
   tree.Write();
   file.Write();
+
+  if(fVerbose>1) {
+    prt_waitPrimitive("r_time");
+    prt_canvasSave(1,0);
+    prt_canvasDel("*");
+  }
+
+  
+  if(fVerbose) ResetHists(); 
 }
 
 Int_t g_num =0;
@@ -741,12 +748,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       prt_drawDigi("m,p,v\n",2018);
       prt_cdigi->SetName("r_hp"+nid);
       prt_canvasAdd(prt_cdigi);
-      
-     if(fVerbose>1)  prt_waitPrimitive("r_time"+nid);
-      prt_canvasSave(1,0);
-      prt_canvasDel("*");
-      std::cout<<"here2 "<<std::endl;
-		 
+      		 
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
 	c2->Divide(2,1);
@@ -781,10 +783,10 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
 	c2->cd(2);
 	gStyle->SetOptStat(1110); 
-	fHist5->SetTitle(Form("True from MC, #theta = %d#circ", a));
+	fHist5->SetTitle(Form("True from MC, #theta = %3.1f#circ", a));
 	fHist5->Draw("colz");
 
-	c2->Print(Form("spr/tcorr_%d.png", a));
+	c2->Print(Form("spr/tcorr_%3.1f.png", a));
 	c2->Modified();
 	c2->Update();
 	c2->WaitPrimitive("");

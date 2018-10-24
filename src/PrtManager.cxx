@@ -25,7 +25,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   if(fRunType==1 || fRunType==5 || fRunType==11){
     fLut = new TClonesArray("PrtLutNode");
     fTree = new TTree("prtlut","Look-up table for the geometrical reconstruction.");
-    fTree->Branch("LUT",&fLut,256000,2); 
+    fTree->Branch("LUT",&fLut,256000,2);
     Int_t Nnodes = 5000;
     
     TClonesArray &fLuta = *fLut; 
