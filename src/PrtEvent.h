@@ -77,10 +77,13 @@ private:
   Int_t fDecoderId;
   Int_t fId;
   Int_t fType;
+  Double_t fTime;
+
   Int_t fHitSize;
+  std::vector<PrtHit> fHitArray;
+
   Int_t fPhysList;
   Int_t fParticle;
-  Double_t fTime;
   Double_t fAngle;
   Double_t fPhi;
   TVector3 fMomentum;
@@ -96,8 +99,6 @@ private:
   Double_t fBeamZ;
   Double_t fTimeRes;
   TString  fInfo;
-
-  std::vector<PrtHit> fHitArray;
   
   ClassDef(PrtEvent, 5);
 };
