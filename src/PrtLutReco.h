@@ -37,6 +37,8 @@ public:
 private:
   Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Double_t a, Int_t tofpid=0);
   Int_t FindPdg(Double_t mom, Double_t cangle);
+  Int_t GetEdge(Int_t mcpid, Int_t pixid);
+  void SearchClusters();
   void FitRing(Double_t& x0, Double_t& y0, Double_t& theta);
   Double_t fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom);
   Double_t fillLnDiffPPi2(Double_t cangle, Int_t tofPid, Double_t mom);

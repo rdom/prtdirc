@@ -5,30 +5,20 @@
 // Author: R.Dzhygadlo at gsi.de
 // -----------------------------------------
 
-
 #include "PrtLutReco.h"
-
 #include "PrtManager.h"
-
 #include "PrtLutNode.h"
 #include "PrtTrackInfo.h"
 #include "PrtPhotonInfo.h"
 #include "PrtAmbiguityInfo.h"
 
+#include "TVirtualFitter.h"
+#include "TArc.h"
+#include "CLHEP/Units/SystemOfUnits.h"
+
 #define prt__sim
 #include "../../prttools/datainfo.C"
 #include "../../prttools/prttools.C"
-
-#include "TROOT.h"
-#include "TStyle.h"
-#include "TCanvas.h"
-#include "TMath.h"
-#include "TRotation.h"
-#include "TGraph.h"
-#include <TVirtualFitter.h>
-#include <TArc.h>
-#include <TLegend.h>
-#include <CLHEP/Units/SystemOfUnits.h>
 
 using std::cout;
 using std::endl;
@@ -46,8 +36,8 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-30,30);
-TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-30,30);
+TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",90,-30,30);
+TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",90,-30,30);
 
 TF1 *gF1 = new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
 TF1 *gF2= new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
@@ -58,6 +48,12 @@ PrtLutNode *fLutNode[5000];
 
 TH1F*  fHistMcp[15];
 TH1F*  fHistCh[960];
+
+//cluster search
+Int_t mcpdata[15][65];
+Int_t cluster[15][65];
+Int_t lneighbours[65];
+Int_t lsize(0);
 
 // -----   Default constructor   -------------------------------------------
 PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
@@ -106,7 +102,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     fHistMcp[i] = new TH1F(Form("fHistMcp_%d",i),Form("fHistMcp_%d;#theta_{C} [rad];entries [#]",i), 160,0.6,1); //150
   }
 
-   for(Int_t i=0; i<960; i++){
+  for(Int_t i=0; i<960; i++){
     fHistCh[i] = new TH1F(Form("fHistCh_%d",i),Form("fHistCh_%d;#theta_{C} [rad];entries [#]",i), 100,0.6,1); //150
   }
 
@@ -117,40 +113,12 @@ PrtLutReco::~PrtLutReco(){
 
 }
 
-Int_t mcpdata[15][65];
-Int_t cluster[15][65];
-Int_t lneighbours[65];
-Int_t lsize(0);
-
-Int_t getneighbours(Int_t m, Int_t p){
-  for(Int_t i=0; i<65; i++) if(p==lneighbours[i]) return -1;
-  lneighbours[lsize]=p;
-  lsize++;
-  for(Int_t t=0; t<65; t++){
-    if(mcpdata[m][t]){
-      for(Int_t i=0; i<65; i++) if(t==lneighbours[i]) continue;
-      if((t==p-1 && p%8!=0) || (t==p+1 && p%8!=7) ||
-	 (t==p+8 && p<57) || (t==p-8 && p>8)) getneighbours(m,t);
-    }
-  }
-  return lsize;
-}
-
-void getclusters(){
-  for(Int_t m=0; m<prt_nmcp; m++){
-    for(Int_t p=0; p<65; p++){
-      if(mcpdata[m][p])  cluster[m][p] = getneighbours(m,p);
-      lsize=0;
-      for(Int_t i=0; i<65; i++) lneighbours[i]=0;
-    }
-  }
-}
-
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
   Double_t mom, cangle,spr,tangle,likelihood(0),boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
   Int_t  tofPid(0),distPid(0),likePid(0),pdgcode, evpointcount=0;
+  int events[5]={0};
   Bool_t reflected = kFALSE;
   gStyle->SetOptFit(111);
 
@@ -166,6 +134,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t minChangle(0);
   Double_t maxChangle(1);  
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
+  Double_t radiatorL = (fRadiator==2)? 1224.9 : 1200; //plate : bar
 
   prt_setRootPalette(1);
   prt_createMap();
@@ -208,8 +177,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   timeRes = PrtManager::Instance()->GetTimeRes();
   fMethod = PrtManager::Instance()->GetRunType();
 
-  Double_t radiatorL = (fRadiator==2)? 1224.9 : 1200; //plate : bar
-
   Int_t nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
   
@@ -220,27 +187,28 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     ninfit=abs(start);
     start=0;
   }
-  
-  for (Int_t ievent=start; ievent<start+end; ievent++){ //&& ievent<end
+    
+  for (Int_t ievent=start; ievent<start+nEvents && (events[2]<end || events[4]<end); ievent++){
+    
     Int_t nhhits(0);
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
-    if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits"<<std::endl;
+    if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;
 
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = fEvent->GetAngle(); // prt_data_info.getAngle();
       phi = fEvent->GetPhi(); //prt_data_info.getPhi(); //
       studyId = fEvent->GetGeometry();      
-      mom=fEvent->GetMomentum().Mag();
+      mom = fEvent->GetMomentum().Mag();
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
       if(fEvent->GetType()==0){
-	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
-	momInBar.RotateZ(phi*CLHEP::deg+test2);
+      	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
+      	momInBar.RotateZ(phi*CLHEP::deg+test2);
       }else{
-	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
-	momInBar.RotateZ(phi*CLHEP::deg);
+        momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
+       	momInBar.RotateZ(phi*CLHEP::deg);
       }
 
       if(fVerbose==3){
@@ -248,23 +216,21 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	cz = TVector3(-cz.X(),cz.Y(),cz.Z());
       }
     }
-    Double_t momentum=fEvent->GetMomentum().Mag();
+    Double_t momentum = fEvent->GetMomentum().Mag();
     if( fEvent->GetType()==1) momentum /= 1000;
-    tofPid=fEvent->GetParticle();
-
-    Int_t pdg[]={11,13,211,321,2212};
-    Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};    
-    Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.010),range(5*sigma),noise(0.3);
+    tofPid = fEvent->GetParticle();
+    int pid = prt_get_pid(tofPid);
+    if(events[pid]>end) continue;
     
-    fAngleP = acos(sqrt(momentum*momentum+ mass[4]*mass[4])/momentum/1.4738)-0.00; //1.4738 = 370 = 3.35
-    fAnglePi= acos(sqrt(momentum*momentum + mass[2]*mass[2])/momentum/1.4738)-0.00; //-0.0014 for 160 25deg
+    Double_t angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.010),range(5*sigma),noise(0.4);
+    
+    fAngleP = acos(sqrt(momentum*momentum+ prt_mass[4]*prt_mass[4])/momentum/1.4738)-0.00; //1.4738 = 370 = 3.35
+    fAnglePi= acos(sqrt(momentum*momentum + prt_mass[2]*prt_mass[2])/momentum/1.4738)-0.00; //-0.0014 for 160 25deg
 
     gF1->SetParameter(0,1);
     gF2->SetParameter(0,1);
-    
     gF1->SetParameter(1,fAngleP);
     gF2->SetParameter(1,fAnglePi);
-
     gF1->SetParameter(2,sigma);
     gF2->SetParameter(2,sigma);
 
@@ -276,6 +242,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t gch, ndirc(0), t2(0), t3h(0), t3v(0),
 	str1(0),stl1(0),str2(0),stl2(0);
       Int_t hodo1(0), hodo2(0);
+      // if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
+      // 	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
+      // 	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
+      // }
       for(auto h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
@@ -289,7 +259,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	if(gch==1144) str2++;
 	if(gch==1146) stl2++;
 	
-	if(gch>=1115 && gch<=1120) hodo2++;      
+	//if(gch>=1115 && gch<=1120)
+	hodo2++;      
       }
       if(ndirc<5) continue;
       if(!(t2 && t3h && t3v && hodo1 && hodo2)) continue;
@@ -297,37 +268,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       // if(!(t3h && t3v)) continue;
     }
     
-  //   //clusters search
-  //   for(Int_t h=0; h<nHits; h++) {
-  //     Int_t mid=fEvent->GetHit(h).GetMcpId();
-  //     Int_t pid=fEvent->GetHit(h).GetPixelId()-1;
-  //     mcpdata[mid][pid]=1;
-  //   }
-  //   getclusters();
-
-  //   Int_t bad(0);
-  //   for(Int_t j=0; j<prt_nmcp; j++){
-  //     for(Int_t i=0; i<65; i++){
-  //   	if(cluster[j][i]>7){
-  // 	  bad=cluster[j][i];
-  // 	  goto lllll;
-  // 	}
-  //     }
-  //   }
-    
-  // lllll:
-  //   std::cout<<"bad  "<<bad <<std::endl;
-    
-  //   if(bad){
-  //     for(Int_t j=0; j<prt_nmcp; j++){
-  //   	for(Int_t i=0; i<65; i++){
-  //   	  mcpdata[j][i]=0;
-  //   	  cluster[j][i]=0;
-  //   	}
-  //     }
-      
-  //     continue;
-  //   }
+    //SearchClusters();
     
     for(Int_t h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
@@ -368,50 +309,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       Int_t pixid=fHit.GetPixelId()-1;
       Int_t mcpid=fHit.GetMcpId();
-      if(reflected) lenz = 2*radiatorL - lenz;
       Int_t ch = map_mpc[mcpid][pixid];
-      if(prt_isBadChannel(ch)) continue;
-      //if(cluster[mcpid][pixid]>8) continue;
-  
-      // Int_t x(0),y(0), piid(pixid) , nedge(0); //new
-      // for(Int_t hh=0; hh<nHits; hh++) {
-      // 	Int_t pid=fEvent->GetHit(hh).GetPixelId();
-      // 	Int_t mid=fEvent->GetHit(hh).GetMcpId();
-      // 	Double_t tdif=fabs(hitTime-fEvent->GetHit(hh).GetLeadTime());
-      // 	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
-      // 	if(pid==piid-1 && piid%8!=0) y-=1;
-      // 	if(pid==piid+1 && piid%8!=7) y+=1;
-
-      // 	if(pid==piid+8 && piid<57) x-=1;
-      // 	if(pid==piid-8 && piid>8)  x+=1;
-      // }
-
-      Int_t x(0),y(0), piid(pixid+1) , nedge(0); //old
-      for(Int_t hh=0; hh<nHits; hh++) {
-      	Int_t pid=fEvent->GetHit(hh).GetPixelId();
-      	Int_t mid=fEvent->GetHit(hh).GetMcpId();
-      	if(mid!=mcpid || pid==piid) continue;
-      	if(pid==piid-1 && piid%8!=1) x-=1;
-      	if(pid==piid+1 && piid%8!=0) x+=1;
-
-      	if(pid==piid+8 && piid<57) y+=1;
-      	if(pid==piid-8 && piid>8)  y-=1;
-      }
-      
-      if(x== 0 && y== 0) nedge=0;
-      if(x==-1 && y== 0) nedge=1;
-      if(x==-1 && y== 1) nedge=2;
-      if(x== 0 && y== 1) nedge=3;
-      if(x== 1 && y== 1) nedge=4;
-      if(x== 1 && y== 0) nedge=5;
-      if(x== 1 && y==-1) nedge=6;
-      if(x== 0 && y==-1) nedge=7;
-      if(x==-1 && y==-1) nedge=8;
-
-      //std::cout<< pixid << " nedge "<<nedge <<" x " <<x << "  y  "<<y<<std::endl;
-      
       Int_t sensorId = 100*mcpid+fHit.GetPixelId();
-      if(sensorId==1) continue;
+      if(reflected) lenz = 2*radiatorL - lenz;
+      if(prt_isBadChannel(ch)) continue;
+      Int_t nedge=GetEdge(mcpid, pixid);
+      //if(cluster[mcpid][pixid]>8) continue;
+      //if(sensorId==1) continue;
 
       Bool_t isGoodHit(0);      
       Int_t size =fLutNode[sensorId]->Entries();
@@ -446,13 +350,14 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
 	  bartime = fabs(lenz/cos(luttheta)/198.);
 	  double totaltime = bartime+evtime;
+	  if(fEvent->GetType()==0) totaltime+=0.3;
 	  double timediff = totaltime-hitTime;
-	  fHist0->Fill(totaltime-hitTime);
+	  fHist0->Fill(timediff);
 	  if(samepath)  fHist0i->Fill(timediff);
 	  //	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
-	  if(fabs(timediff+0.5)>timeRes) continue;	  
+	  if(fabs(timediff)>timeRes) continue;	  
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir)-0.002;
@@ -464,7 +369,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 	    
-	    if(true && tangle>0.4 && tangle<0.9 ){
+	    if(true && tangle>0.4 && tangle<0.9){
 	      sum1 += TMath::Log(gF1->Eval(tangle)+noise);
 	      sum2 += TMath::Log(gF2->Eval(tangle)+noise);
 	    }
@@ -499,22 +404,15 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
     fhNph->Fill(nhhits);
 
-
     if(tofPid==2212) fhNph_p->Fill(nhhits);
     if(tofPid==211) fhNph_pi->Fill(nhhits);
-
-    // for(Int_t j=0; j<prt_nmcp; j++){
-    //   for(Int_t i=0; i<65; i++){
-    // 	mcpdata[j][i]=0;
-    // 	cluster[j][i]=0;
-    //   }
-    // }     
     
     Double_t sum = sum1-sum2;
     if(sum!=0){
       if(tofPid==2212) hLnDiffP->Fill(sum);
       if(tofPid==211) hLnDiffPi->Fill(sum);
       likelihood=sum;
+      events[pid]++;
     }
 
     // if(fVerbose==1){
@@ -549,7 +447,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       nsHits=0;
     }
 
-    if(++nsEvents>=end) break;
+    //if(++nsEvents>=end) break;
   }
 
   nnratio = fhNph->GetEntries()/(double)end;
@@ -614,7 +512,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   file.Write();
 
   if(fVerbose>1) {
-    prt_waitPrimitive("r_time");
+    prt_waitPrimitive("r_time","w");
     prt_canvasSave(1,0);
     prt_canvasDel("*");
   }
@@ -815,24 +713,21 @@ TF1 *lFit = new TF1("lgaus","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]"
 TF1 *lFitPi = new TF1("lgausPi","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2]) +x*[3]+[4]",0.6,0.9);
 
 Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
- if(fHist->GetEntries()>20 ){
-  Int_t pdg[]={11,13,211,321,2212};
-  Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
+  if(fHist->GetEntries()>20 ){
+    Double_t angle1(0), angle2(0), sigma(0.006),range(0.015);
 
-  Double_t angle1(0), angle2(0), sigma(0.006),range(0.015);
+    // //fHist->Scale(1/fHist->GetMaximum());
 
-  // //fHist->Scale(1/fHist->GetMaximum());
+    // Double_t d1,d2, sum1(0),sum2(0);
+    // Int_t sbin = fHist->FindBin(fAngleP-range);
+    // Int_t ebin = fHist->FindBin(fAngleP+range); 
+    // // fHist->GetXaxis()->GetNbins()
+    // for(Int_t i=sbin; i< ebin; i++){
+    //   if(fHist->GetBinContent(i) < 0.01 ) continue;
+    //   d1 = gF1->Eval(fHist->GetBinCenter(i))- fHist->GetBinContent(i);
+    //   d2 = gF1->Eval(fHist->GetBinCenter(i))- fHist->GetBinContent(i);
 
-  // Double_t d1,d2, sum1(0),sum2(0);
-  // Int_t sbin = fHist->FindBin(fAngleP-range);
-  // Int_t ebin = fHist->FindBin(fAngleP+range); 
-  // // fHist->GetXaxis()->GetNbins()
-  // for(Int_t i=sbin; i< ebin; i++){
-  //   if(fHist->GetBinContent(i) < 0.01 ) continue;
-  //   d1 = gF1->Eval(fHist->GetBinCenter(i))- fHist->GetBinContent(i);
-  //   d2 = gF1->Eval(fHist->GetBinCenter(i))- fHist->GetBinContent(i);
-
-  //   std::cout<<"f1 "<< gF1->Eval(fHist->GetBinCenter(i)) << "   f2 "<<gF2->Eval(fHist->GetBinCenter(i)) << "    v "<< fHist->GetBinContent(i) <<std::endl;
+    //   std::cout<<"f1 "<< gF1->Eval(fHist->GetBinCenter(i)) << "   f2 "<<gF2->Eval(fHist->GetBinCenter(i)) << "    v "<< fHist->GetBinContent(i) <<std::endl;
     
   //   // if(d1>0) sum1+=TMath::Log(d1);
   //   // if(d2>0) sum2+=TMath::Log(d2);
@@ -912,9 +807,6 @@ Double_t PrtLutReco::fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom){
 
 Double_t PrtLutReco::fillLnDiffPPi2(Double_t cangle, Int_t tofPid, Double_t mom){
  if(fHist->GetEntries()>20 ){
-  Int_t pdg[]={11,13,211,321,2212};
-  Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
-
   Double_t angle1(0), angle2(0), sigma(0.006),range(0.03);
 
   Double_t d1,d2, sum1(0),sum2(0);
@@ -1026,10 +918,6 @@ void PrtLutReco::FitRing(Double_t& x0, Double_t& y0, Double_t& theta){
 }
 
 Int_t PrtLutReco::FindPdg(Double_t mom, Double_t cangle){
-  // Int_t pdg[]={11,13,211,321,2212};
-  // Double_t mass[] = {0.000511,0.1056584,0.139570,0.49368,0.9382723};
-  // Int_t pdg[]={211,321,2212};
-  // Double_t mass[] = {0.139570,0.49368,0.9382723};
   cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
   
   Int_t pdg[]={211,2212};
@@ -1044,6 +932,86 @@ Int_t PrtLutReco::FindPdg(Double_t mom, Double_t cangle){
     }
   }
   return pdg[minid]; 
+}
+
+Int_t PrtLutReco::GetEdge(Int_t mcpid, Int_t pixid){
+  // Int_t x(0),y(0), piid(pixid) , nedge(0); //new
+  // for(Int_t h=0; h<fEvent->GetHitSize(); h++) {
+  // 	Int_t pid=fEvent->GetHit(h).GetPixelId();
+  // 	Int_t mid=fEvent->GetHit(h).GetMcpId();
+  // 	Double_t tdif=fabs(hitTime-fEvent->GetHit(h).GetLeadTime());
+  // 	if(mid!=mcpid || pid==piid || tdif>0.3) continue;
+  // 	if(pid==piid-1 && piid%8!=0) y-=1;
+  // 	if(pid==piid+1 && piid%8!=7) y+=1;
+
+  // 	if(pid==piid+8 && piid<57) x-=1;
+  // 	if(pid==piid-8 && piid>8)  x+=1;
+  // }
+
+  Int_t x(0),y(0),piid(pixid+1),nedge(0); //old
+  for(Int_t h=0; h<fEvent->GetHitSize(); h++) {
+    Int_t pid=fEvent->GetHit(h).GetPixelId();
+    Int_t mid=fEvent->GetHit(h).GetMcpId();
+    if(mid!=mcpid || pid==piid) continue;
+    if(pid==piid-1 && piid%8!=1) x-=1;
+    if(pid==piid+1 && piid%8!=0) x+=1;
+
+    if(pid==piid+8 && piid<57) y+=1;
+    if(pid==piid-8 && piid>8)  y-=1;
+  }
+      
+  if(x== 0 && y== 0) nedge=0;
+  if(x==-1 && y== 0) nedge=1;
+  if(x==-1 && y== 1) nedge=2;
+  if(x== 0 && y== 1) nedge=3;
+  if(x== 1 && y== 1) nedge=4;
+  if(x== 1 && y== 0) nedge=5;
+  if(x== 1 && y==-1) nedge=6;
+  if(x== 0 && y==-1) nedge=7;
+  if(x==-1 && y==-1) nedge=8;
+  
+  return nedge;
+}
+
+Int_t getneighbours(Int_t m, Int_t p){
+  for(Int_t i=0; i<65; i++) if(p==lneighbours[i]) return -1;
+  lneighbours[lsize]=p;
+  lsize++;
+  for(Int_t t=0; t<65; t++){
+    if(mcpdata[m][t]){
+      for(Int_t i=0; i<65; i++) if(t==lneighbours[i]) continue;
+      if((t==p-1 && p%8!=0) || (t==p+1 && p%8!=7) ||
+	 (t==p+8 && p<57) || (t==p-8 && p>8)) getneighbours(m,t);
+    }
+  }
+  return lsize;
+}
+
+void getclusters(){
+  for(Int_t m=0; m<prt_nmcp; m++){
+    for(Int_t p=0; p<65; p++){
+      if(mcpdata[m][p])  cluster[m][p] = getneighbours(m,p);
+      lsize=0;
+      for(Int_t i=0; i<65; i++) lneighbours[i]=0;
+    }
+  }
+}
+  
+void PrtLutReco::SearchClusters(){
+
+  for(Int_t j=0; j<prt_nmcp; j++){
+    for(Int_t i=0; i<65; i++){
+      mcpdata[j][i]=0;
+      cluster[j][i]=0;
+    }
+  }
+  
+  for(Int_t h=0; h<fEvent->GetHitSize(); h++) {
+    Int_t mid=fEvent->GetHit(h).GetMcpId();
+    Int_t pid=fEvent->GetHit(h).GetPixelId()-1;
+    mcpdata[mid][pid]=1;
+  }
+  getclusters();
 }
 
 void PrtLutReco::drawTheoryLines(){
