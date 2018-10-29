@@ -506,9 +506,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     hLnDiffPi->Draw("same");
     if(fVerbose) gROOT->SetBatch(0);
   }
-  
   tree.Fill();
-  tree.Write();
   file.Write();
 
   if(fVerbose>1) {
