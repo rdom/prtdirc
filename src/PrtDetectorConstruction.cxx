@@ -273,10 +273,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double lensMinThikness = 2; 
 
     G4ThreeVector zTrans1(0, 0, -lensrad1+fLens[2]/2.-lensMinThikness);
-    G4Tubs* gfbox = new G4Tubs("Fbox",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
+    G4Tubs* gftub = new G4Tubs("Ftub",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
     G4Sphere* gsphere = new G4Sphere("Sphere",0,lensrad1,0,360*deg,0,360*deg);
-    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Fbox*Sphere", gfbox, gsphere,new G4RotationMatrix(),zTrans1); 
-    G4SubtractionSolid* gLens2 = new G4SubtractionSolid("Fbox-Sphere", gfbox, gsphere,new G4RotationMatrix(),zTrans1);
+    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Ftub*Sphere", gftub, gsphere,new G4RotationMatrix(),zTrans1); 
+    G4SubtractionSolid* gLens2 = new G4SubtractionSolid("Ftub-Sphere", gftub, gsphere,new G4RotationMatrix(),zTrans1);
     lLens1 = new G4LogicalVolume(gLens1,Nlak33aMaterial,"lLens1",0,0,0); //Nlak33aMaterial  
     lLens2 = new G4LogicalVolume(gLens2,BarMaterial,"lLens2",0,0,0);
   }
@@ -342,14 +342,14 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +lensMinThikness*2);
 
     G4Box* gfbox0 = new G4Box("Fbox0",0.5*fLens[0]+1,0.5*fLens[1]+1,0.5*fLens[2]);
-    G4Tubs* gfbox = new G4Tubs("Fbox",0,0.5*fLens[0],0.5*fLens[2],0.*deg,360.*deg);
+    G4Tubs* gftub = new G4Tubs("Ftub",0,0.5*fLens[0],0.5*fLens[2],0.*deg,360.*deg);
     G4Box* gfsbox = new G4Box("Fsbox",0.5*shight,0.5*fLens[1],0.5*fLens[2]);
     G4Tubs* gfstube = new G4Tubs("ftube",0,0.5*shight,0.5*fLens[2],0.*deg,360.*deg);
 
     G4Sphere* gsphere1 = new G4Sphere("Sphere1",0,r1,0,360*deg,0,360*deg);
     G4Sphere* gsphere2 = new G4Sphere("Sphere2",0,r2,0,360*deg,0,360*deg);
 
-    G4IntersectionSolid* gbbox = new G4IntersectionSolid("bbox", gfbox, gfbox0,new G4RotationMatrix(),G4ThreeVector(0,0,lensMinThikness*2)); 
+    G4IntersectionSolid* gbbox = new G4IntersectionSolid("bbox", gftub, gfbox0,new G4RotationMatrix(),G4ThreeVector(0,0,lensMinThikness*2)); 
     G4IntersectionSolid* gsbox = new G4IntersectionSolid("sbox", gfstube, gfbox0,new G4RotationMatrix(),G4ThreeVector(0,0,-lensMinThikness*2)); 
 
     G4UnionSolid* gubox = new G4UnionSolid("unionbox", gbbox, gsbox,new G4RotationMatrix(),G4ThreeVector(0,0,0)); 
@@ -372,9 +372,9 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double lensMinThikness = 2; 
 
     G4ThreeVector zTrans1(0, 0, -lensrad1+fLens[2]/2.-lensMinThikness);
-    G4Tubs* gfbox = new G4Tubs("Fbox",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
+    G4Tubs* gftub = new G4Tubs("Ftub",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
     G4Sphere* gsphere = new G4Sphere("Sphere",0,lensrad1,0,360*deg,0,360*deg);
-    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Fbox*Sphere", gfbox, gsphere,new G4RotationMatrix(),zTrans1); 
+    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Ftub*Sphere", gftub, gsphere,new G4RotationMatrix(),zTrans1); 
     lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0); //Nlak33aMaterial
   }
 
@@ -384,10 +384,10 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4double lensMinThikness = 2; 
 
     G4ThreeVector zTrans1(0, 0, -lensrad1+fLens[2]/2.-lensMinThikness);
-    G4Tubs* gfbox = new G4Tubs("Fbox",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
+    G4Tubs* gftub = new G4Tubs("Ftub",0,fLens[0]/2.,fLens[2]/2.,0.*deg,360.*deg);
     G4Sphere* gsphere = new G4Sphere("Sphere",0,lensrad1,0,360*deg,0,360*deg);
-    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Fbox*Sphere", gfbox, gsphere,new G4RotationMatrix(),zTrans1);
-    G4SubtractionSolid* gLens2 = new G4SubtractionSolid("Fbox-Sphere", gfbox, gsphere,new G4RotationMatrix(),zTrans1);
+    G4IntersectionSolid* gLens1 = new G4IntersectionSolid("Ftub*Sphere", gftub, gsphere,new G4RotationMatrix(),zTrans1);
+    G4SubtractionSolid* gLens2 = new G4SubtractionSolid("Ftub-Sphere", gftub, gsphere,new G4RotationMatrix(),zTrans1);
     lLens1 = new G4LogicalVolume(gLens1,BarMaterial,"lLens1",0,0,0); //Nlak33aMaterial
     lLens2 = new G4LogicalVolume(gLens2,defaultMaterial,"lLens2",0,0,0);
   }
@@ -418,11 +418,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +lensMinThikness);
     G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +layer12);
 
-    G4Box* gfbox = new G4Box("fbox",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
+    G4Box* gftub = new G4Box("ftub",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
     G4Box* gcbox = new G4Box("cbox",0.5*fLens[0],0.5*fLens[1]+1,0.5*fLens[2]);
     G4ThreeVector tTrans1( 0.5*(fLens[0]+shight),0,-fLens[2]+layer12);
     G4ThreeVector tTrans0(-0.5*(fLens[0]+shight),0,-fLens[2]+layer12);
-    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfbox, gcbox,new G4RotationMatrix(),tTrans1);
+    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gftub, gcbox,new G4RotationMatrix(),tTrans1);
     G4SubtractionSolid*  gubox = new G4SubtractionSolid("gubox", tubox, gcbox,new G4RotationMatrix(),tTrans0);
 
     G4Tubs* gcylinder1  = new G4Tubs("Cylinder1",0,r1,0.5*fLens[1],0*deg,360*deg);
@@ -464,11 +464,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +lensMinThikness);
     G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +lensMinThikness*2);
 
-    G4Box* gfbox = new G4Box("fbox",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
+    G4Box* gfboxx = new G4Box("fboxx",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
     G4Box* gcbox = new G4Box("cbox",0.5*fLens[0],0.5*fLens[1]+1,0.5*fLens[2]);
     G4ThreeVector tTrans1( 0.5*(fLens[0]+shight),0,-fLens[2]+lensMinThikness);
     G4ThreeVector tTrans0(-0.5*(fLens[0]+shight),0,-fLens[2]+lensMinThikness);
-    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfbox, gcbox,new G4RotationMatrix(),tTrans1);
+    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfboxx, gcbox,new G4RotationMatrix(),tTrans1);
     G4SubtractionSolid*  gubox = new G4SubtractionSolid("gubox", tubox, gcbox,new G4RotationMatrix(),tTrans0);
 
     G4Tubs* gcylinder1  = new G4Tubs("Cylinder1",0,r1,0.5*fLens[1],0*deg,360*deg);
@@ -513,11 +513,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     G4ThreeVector zTrans1(0, 0, -r1-fLens[2]/2.+r1-sqrt(r1*r1-shight/2.*shight/2.) +3.0); //1.5
     G4ThreeVector zTrans2(0, 0, -r2-fLens[2]/2.+r2-sqrt(r2*r2-shight/2.*shight/2.) +3.0+5);// 3.5
 
-    G4Box* gfbox = new G4Box("fbox",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
+    G4Box* gfboxx = new G4Box("fboxx",0.5*fLens[0],0.5*fLens[1],0.5*fLens[2]);
     G4Box* gcbox = new G4Box("cbox",0.5*fLens[0],0.5*fLens[1]+1,0.5*fLens[2]);
     G4ThreeVector tTrans1( 0.5*(fLens[0]+shight),0,-fLens[2]);
     G4ThreeVector tTrans0(-0.5*(fLens[0]+shight),0,-fLens[2]);
-    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfbox, gcbox,new G4RotationMatrix(),tTrans1);
+    G4SubtractionSolid*  tubox = new G4SubtractionSolid("tubox", gfboxx, gcbox,new G4RotationMatrix(),tTrans1);
     G4SubtractionSolid*  gubox = new G4SubtractionSolid("gubox", tubox, gcbox,new G4RotationMatrix(),tTrans0);
 
     G4Tubs* gcylinder1  = new G4Tubs("Cylinder1",0,r1,0.5*fLens[1],0*deg,360*deg);
@@ -638,61 +638,61 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	}
 
 	if(fMcpLayout==2015){
-	  Double_t ms = 9;//(fPrizm[2]-5*fMcpTotal[0])/4.;
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	  Double_t msh = 9;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.;
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
 	  if(j==1) shiftx -= (3/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
 	if(fMcpLayout==2016){ //9MCP
-	  Double_t ms = 13;//(fPrizm[2]-5*fMcpTotal[0])/4.;
-	  shiftx = 3+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	  Double_t msh = 13;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = 3+i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.;
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
 	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.; //i*(fMcpTotal[0]+3)-fPrizm[3]/2+fMcpActive[0]/2.+2*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 	
 	if(fMcpLayout==201612){ //12MCP
-	  Double_t ms = 3;//(fPrizm[2]-5*fMcpTotal[0])/4.;
-	  shiftx = 0+i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.;
+	  Double_t msh = 3;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = 0+i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.;
 	  //if(j==1) shiftx -= 3*fMcpActive[0]/8.;
 	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
 	if(fMcpLayout==20171){
-	  Double_t ms = 11.2;//(fPrizm[2]-5*fMcpTotal[0])/4.;
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  Double_t msh = 11.2;//(fPrizm[2]-5*fMcpTotal[0])/4.;
+	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 	  if(j==1) shiftx += (3/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
 	if(fMcpLayout==2017){
-	  Double_t ms = 3;
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  Double_t msh = 3;
+	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
 	if(fMcpLayout==2018){
-	  Double_t ms = 3;
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  Double_t msh = 3;
+	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1)+0.5*fMcpTotal[0]+1.5;
 	}
 	
 	if(fMcpLayout==20171){
-	  Double_t ms = 3;
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  Double_t msh = 3;
+	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 	  //	  if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1)+fMcpActive[0]/2.+7;
 	}
 
 	if(fMcpLayout==2021){
-	  // Double_t ms = 0; // true 2021
-	  Double_t ms = 3; // 2021 layout for 2017 prototupe
-	  shiftx = i*(fMcpTotal[0]+ms)-fPrizm[3]/2+fMcpActive[0]/2.+3;
+	  // Double_t msh = 0; // true 2021
+	  Double_t msh = 3; // 2021 layout for 2017 prototupe
+	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 
 	  //shifty = (fMcpTotal[0]+1)*(j-1); 
 	  shifty = (fMcpTotal[0]+3)*(j-1); // 2021 layout for 2017 prototupe
