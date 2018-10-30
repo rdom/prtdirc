@@ -25,7 +25,6 @@ class PrtManager
   TFile *fRootFile;
   TTree *fTree;
   PrtEvent *fEvent;
-  PrtTrackInfo *fTrackInfo;
   PrtHit *fHit;
   TH1F *fHist;
 
@@ -37,8 +36,7 @@ public:
   void Fill();
   void FillLut();
   void AddEvent(PrtEvent event);
-  void AddHit(PrtHit hit);
-  void AddTrackInfo(PrtTrackInfo trackinfo);
+  void AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position);
   PrtEvent* Event(){ return fEvent; }
   
   // Mutators

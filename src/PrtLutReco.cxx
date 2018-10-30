@@ -62,13 +62,9 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fChain->Add(infile);
   fChain->SetBranchAddress("PrtEvent", &fEvent);
 
-  fChain->SetBranchStatus("fHitArray.fLocalPos", 0);
-  fChain->SetBranchStatus("fHitArray.fGlobalPos", 0);
-  fChain->SetBranchStatus("fHitArray.fDigiPos", 0);
   fChain->SetBranchStatus("fHitArray.fParentParticleId", 0);
   fChain->SetBranchStatus("fHitArray.fNreflectionsInPrizm", 0);
   fChain->SetBranchStatus("fHitArray.fCherenkovMC", 0);
-  fChain->SetBranchStatus("fPosition", 0);
  
   fFile = new TFile(lutfile);
   fTree=(TTree *) fFile->Get("prtlut") ;
@@ -198,10 +194,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     
   for (Int_t ievent=start; ievent<start+nEvents && (events[2]<end || events[4]<end); ievent++){
 
+    if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;
     Int_t nhhits(0);
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
-    if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;
+    if(fEvent->GetType()==1) lenz = radiatorL/2.-fEvent->GetPosition().Z();
+    else lenz = fEvent->GetPosition().Z();
     
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
@@ -209,6 +207,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       phi = fEvent->GetPhi(); //prt_data_info.getPhi(); //
       studyId = fEvent->GetGeometry();      
       mom = fEvent->GetMomentum().Mag();
+
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
       if(fEvent->GetType()==0){
@@ -300,9 +299,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	}
       }
       //================================================== 
-
-      if(fEvent->GetType()==1) lenz = radiatorL/2.-fHit.GetPosition().Z();
-      else lenz = fHit.GetPosition().Z();
       
       if(fVerbose==3){
 	// TVector3 cd = fHit.GetMomentum();

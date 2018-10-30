@@ -27,11 +27,11 @@ public:
   Int_t GetParentParticleId()  { return fParentParticleId; }  
   Int_t GetNreflectionsInPrizm()  { return fNreflectionsInPrizm; }
   Double_t GetPathInPrizm()  { return fPathInPrizm; }
-  TVector3 GetLocalPos()     { return fLocalPos; }
-  TVector3 GetGlobalPos()     { return fGlobalPos; }
-  TVector3 GetDigiPos()     { return fDigiPos; }
-  TVector3 GetMomentum()     { return fMomentum; }
-  TVector3 GetPosition()     { return fPosition; }
+  // TVector3 GetLocalPos()     { return fLocalPos; }
+  // TVector3 GetGlobalPos()     { return fGlobalPos; }
+  // TVector3 GetDigiPos()     { return fDigiPos; }
+  // TVector3 GetMomentum()     { return fMomentum; }
+  // TVector3 GetPosition()     { return fPosition; }
   Double_t GetCherenkovMC()  { return fCherenkovMC;}
   
   Int_t GetMcpId()       { return fMcpId; }
@@ -49,11 +49,11 @@ public:
   void SetParentParticleId(Int_t val)  { fParentParticleId = val; }  
   void SetNreflectionsInPrizm(Int_t val)  { fNreflectionsInPrizm = val; }
   void SetPathInPrizm(Double_t val) { fPathInPrizm = val; }
-  void SetLocalPos(TVector3 val)   { fLocalPos = val; }
-  void SetGlobalPos(TVector3 val)  { fGlobalPos = val; }
-  void SetDigiPos(TVector3 val)    { fDigiPos = val; }
-  void SetMomentum(TVector3 val)    { fMomentum = val; }
-  void SetPosition(TVector3 val)    { fPosition = val; }
+  // void SetLocalPos(TVector3 val)   { fLocalPos = val; }
+  // void SetGlobalPos(TVector3 val)  { fGlobalPos = val; }
+  // void SetDigiPos(TVector3 val)    { fDigiPos = val; }
+  // void SetMomentum(TVector3 val)    { fMomentum = val; }
+  // void SetPosition(TVector3 val)    { fPosition = val; }
   void SetCherenkovMC(Double_t val)    { fCherenkovMC = val; }
 
   
@@ -73,11 +73,11 @@ protected:
   Int_t fParentParticleId;
   Int_t fNreflectionsInPrizm;
   Double_t fPathInPrizm;
-  TVector3 fLocalPos;
-  TVector3 fGlobalPos;
-  TVector3 fDigiPos;
-  TVector3 fMomentum;
-  TVector3 fPosition;
+  // TVector3 fLocalPos;
+  // TVector3 fGlobalPos;
+  // TVector3 fDigiPos;
+  // TVector3 fMomentum;
+  // TVector3 fPosition;
   Double_t fCherenkovMC;
   
   Int_t fMcpId;
@@ -89,7 +89,7 @@ protected:
   Double_t fLeadTime;    
   Double_t fTotTime;  
 
-  ClassDef(PrtHit,4)
+  ClassDef(PrtHit,5)
 };
 
 #endif

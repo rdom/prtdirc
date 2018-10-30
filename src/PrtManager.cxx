@@ -33,15 +33,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
       new((fLuta)[n]) PrtLutNode(n);
     }    
   }
-
-  // if(fRunType==2){
-  //   fTree = new TTree("recodata","Reconstructed info for the prototype");
-  //   fTrackInfoArray = new TClonesArray("PrtTrackInfo");
-  //   fTree->Branch("PrtTrackInfo",&fTrackInfoArray,256000,2); 
-  // }
   
-  // fHist = new TH1F("id", "name", 100, 0., 100);
-
   fPhysList = 0;
   fParticle = 0;
   fStudy = 0;
@@ -118,14 +110,16 @@ void PrtManager::AddEvent(PrtEvent event){
 }
 
 
-void PrtManager::AddHit(PrtHit hit){
+void PrtManager::AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position){
   if(fRunType==0 || fRunType==6){
     if(fEvent){
+      fEvent->SetPosition(position);
       fEvent->AddHit(hit);
     }else{
       std::cout<<"Event does not exist. Create it first. "<<std::endl;
     }
   }
+  
   if(fRunType==1 || fRunType==5 || fRunType==11){
     if(fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle){
       Int_t id = 100*hit.GetMcpId() + hit.GetPixelId();
@@ -134,26 +128,16 @@ void PrtManager::AddHit(PrtHit hit){
       ((PrtLutNode*)(fLut->At(id)))->
 	AddEntry(id, fMomentum, hit.GetPathInPrizm(),
 		 hit.GetNreflectionsInPrizm(),
-		 time,hit.GetLocalPos(),hit.GetDigiPos());
+		 time,localpos,digipos);
     }
   }
 }
-
-void PrtManager::AddTrackInfo(PrtTrackInfo trackinfo){
-  // new ((*fTrackInfoArray)[fTrackInfoArray->GetEntriesFast()]) PrtTrackInfo(trackinfo);
-}
-
-
 
 void PrtManager::Fill(){
   if(fRunType==0 || fRunType==6){
     fTree->Fill();
     fEvent->Clear();
   }
-  // if(fRunType==2){
-  //   fTree->Fill();
-  //   fTrackInfoArray->Clear();
-  // }
 }
 
 void PrtManager::FillLut(){

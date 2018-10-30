@@ -278,15 +278,15 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   
   hit.SetMcpId(mcpid);
   hit.SetPixelId(pixid);
-  hit.SetGlobalPos(globalPos);
-  hit.SetLocalPos(localPos);
-  hit.SetDigiPos(digiPos);
-  hit.SetPosition(position);
-  hit.SetMomentum(momentum);
+  // hit.SetGlobalPos(globalPos);
+  // hit.SetLocalPos(localPos);
+  // hit.SetDigiPos(digiPos);
+  // hit.SetPosition(position);
+  // hit.SetMomentum(momentum);
   if(PrtManager::Instance()->GetRunType()==6){
     G4ThreeVector mominend = step->GetPostStepPoint()->GetMomentum();
     TVector3 mominendv(mominend.x(),mominend.y(),mominend.z());
-    hit.SetMomentum(mominendv);
+    //hit.SetMomentum(mominendv);
   }
   hit.SetParticleId(track->GetTrackID());
   hit.SetParentParticleId(track->GetParentID());
@@ -304,7 +304,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
   if(PrtManager::Instance()->GetRunType()==1 || PrtManager::Instance()->GetRunType()==5 || PrtManager::Instance()->GetRunType()==11 || PrtManager::Instance()->GetRunType()==6){
-    PrtManager::Instance()->AddHit(hit);
+    PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
     return true;
   }
   
@@ -348,13 +348,13 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   Bool_t is_hit(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) {
-      if(fMultHit[mcpid][pixid]==0 || !dead_time) PrtManager::Instance()->AddHit(hit);
+      if(fMultHit[mcpid][pixid]==0 || !dead_time) PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
       //else std::cout<<"fMultHit["<<mcpid<<"]["<<pixid<<"] "<<fMultHit[mcpid][pixid] <<std::endl;      
       fMultHit[mcpid][pixid]++;
     }else is_hit=false;
     
   }else{
-    if(fMultHit[mcpid][pixid]==0 || !dead_time)PrtManager::Instance()->AddHit(hit);
+    if(fMultHit[mcpid][pixid]==0 || !dead_time)PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
     fMultHit[mcpid][pixid]++;
   }
 
@@ -384,7 +384,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
  
     if(ok) {
       hit.SetPixelId(p);
-      if(fMultHit[mcpid][p]==0 || !dead_time) PrtManager::Instance()->AddHit(hit);
+      if(fMultHit[mcpid][p]==0 || !dead_time) PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
       fMultHit[mcpid][p]++;
     }
   }
