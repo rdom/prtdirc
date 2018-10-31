@@ -120,7 +120,7 @@ PrtLutReco::~PrtLutReco(){
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(Int_t start, Int_t end){
   TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
-  Double_t mom, cangle,spr,tangle,likelihood(0),boxPhi,weight,evtime,bartime, lenz,dirz,luttheta, barHitTime, hitTime;
+  Double_t mom, cangle,spr,tangle,likelihood(0),boxPhi,weight,evtime,bartime,lenz,posz,dirz,luttheta, barHitTime, hitTime;
   Int_t  tofPid(0),distPid(0),likePid(0),pdgcode, evpointcount=0;
   int events[5]={0};
   Bool_t reflected = kFALSE;
@@ -198,8 +198,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     Int_t nhhits(0);
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
-    if(fEvent->GetType()==1) lenz = radiatorL/2.-fEvent->GetPosition().Z();
-    else lenz = fEvent->GetPosition().Z();
+    if(fEvent->GetType()==1) posz = radiatorL/2.-fEvent->GetPosition().Z();
+    else posz = fEvent->GetPosition().Z();
     
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
@@ -249,10 +249,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t gch, ndirc(0), t2(0), t3h(0), t3v(0),
 	str1(0),stl1(0),str2(0),stl2(0);
       Int_t hodo1(0), hodo2(0);
-      // if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-      // 	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
-      // 	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
-      // }
+      if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
+      	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
+      	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
+      }
       for(auto h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
@@ -315,7 +315,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t mcpid=fHit.GetMcpId();
       Int_t ch = map_mpc[mcpid][pixid];
       Int_t sensorId = 100*mcpid+fHit.GetPixelId();
-      if(reflected) lenz = 2*radiatorL - lenz;
+      if(reflected) lenz = 2*radiatorL - posz;
+      else lenz = posz;
       if(prt_isBadChannel(ch)) continue;
       Int_t nedge=GetEdge(mcpid, pixid);
       //if(cluster[mcpid][pixid]>8) continue;
@@ -513,13 +514,12 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   tree.Fill();
   file.Write();
 
-  if(fVerbose>1) {
-    prt_waitPrimitive("r_time","w");
+  if(fVerbose>1) prt_waitPrimitive("r_time","w");
+  if(fVerbose>0){
     prt_canvasSave(1,0);
     prt_canvasDel("*");
   }
-
-  
+    
   if(fVerbose) ResetHists(); 
 }
 
