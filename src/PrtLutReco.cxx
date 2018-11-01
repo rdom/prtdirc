@@ -200,7 +200,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
     if(fEvent->GetType()==1) posz = radiatorL/2.-fEvent->GetPosition().Z();
-    else posz = fEvent->GetPosition().Z();
+    else posz = fEvent->GetPosition().Z()-15; // 15 mm - lens thickness  
     
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
@@ -212,11 +212,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
       if(fEvent->GetType()==0){
-      	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
-      	momInBar.RotateZ(phi*CLHEP::deg+test2);
+      	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
+      	momInBar.RotateZ(phi*CLHEP::deg);
       }else{
-        momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
-       	momInBar.RotateZ(phi*CLHEP::deg+test1);
+        momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
+       	momInBar.RotateZ(phi*CLHEP::deg);
       }
 
       if(fVerbose==3){
@@ -356,7 +356,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
 	  bartime = fabs(lenz/cos(luttheta)/198.);
 	  double totaltime = bartime+evtime;
-	  if(fEvent->GetType()==0) totaltime+=0.3;
+	  //if(fEvent->GetType()==0) totaltime+=0.3;
 	  double timediff = totaltime-hitTime;
 	  fHist0->Fill(timediff);
 	  if(samepath)  fHist0i->Fill(timediff);

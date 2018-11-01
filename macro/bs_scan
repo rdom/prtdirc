@@ -1,18 +1,17 @@
 #!/bin/bash
 
 threads=30
-jpath="/d/proc/jun15/151"
-#jpath="/data.local/data/jun15/"
+jpath="/d/proc/jul18/403"
 
 waitForMe (){
     while : 
     do 
-	activth=$(ps aux | grep "[p]rtdirc" | grep "b_" | wc -l)
-	printf "\r$statusline [$activth] ---- [$(($(date +%s) - start_time)) s] "
-	sleep .1
+	activth=$(ps aux | grep "root.exe.*[p]rocData\|[p]rtdirc -[^m,^c]" | wc -l)
+	#printf "\r$statusline [$activth] ---- [$(($(date +%s) - start_time)) s] "
 	if [ "$activth" -lt "$1" ]; then 
 	    break  
 	fi
+	sleep .5
     done
 }
 
@@ -25,11 +24,11 @@ if [ ${1} == "0" ]; then
     for i in `seq 12 0.25 22` ; do
 	for j in `seq 60 0.25 75` ; do	
 	    ../build/prtdirc -o b_l${i}_${j}.root \
-			     -p 7 -h 1 -l 3 -a 125 -gz 378 -gx 85 -gsx ${j} -gsy ${i} -z 10  -g 2015 -c 2015 \
+			     -h 1 -l 3 -p 7.00 -a 19.71 -phi 0 -gz 442.00 -gx 85.00 -gsx ${j} -gsy ${i} -z 10.00 -g 2018 -c 2018 -study 403 \
 			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 \
 			     > l_b$i.log && \
 		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}_${j}.root\")" && \
-		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${jpath}/beam_15177135523C.root -o b_r_${i}_${j}.root -t1 1.5 -f -1 -e 2000 -v 0 -b 1 -t2 $i  -t3 $j > /dev/null 2> /dev/null &
+		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${jpath}/beam_18215163732C.root -o b_r_${i}_${j}.root -tr 1.5 -f 0 -e 1000 -v 0 -b 1 -t2 $i -t3 $j > /dev/null 2> /dev/null &
 	done
     done
     waitForMe "1"
