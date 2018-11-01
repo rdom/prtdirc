@@ -131,7 +131,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   bool testTrRes = false;
   Double_t angdiv,dtheta,dtphi,prtangle;
 
-  TString outFile = PrtManager::Instance()->GetOutName()+"_spr.root";
+  TString outFile = PrtManager::Instance()->GetOutName()+".root";
   Double_t theta(0),phi(0), trr(0),  nph(0),nph_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
     separation(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
@@ -143,7 +143,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   prt_setRootPalette(1);
   prt_createMap();
   prt_initDigi();
-  
+
+  outFile.ReplaceAll("reco_",Form("reco_%d_",prt_data_info.getFileId()));
   TFile file(outFile,"recreate");
   TTree tree("dirc","SPR");
   tree.Branch("mom", &mom,"mom/D");
