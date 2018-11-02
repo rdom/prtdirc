@@ -28,7 +28,7 @@ if [ ${1} == "0" ]; then
 			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 && \
 		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}_${j}.root\")" && \
 		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${jpath}/beam_18215163732C.root -o b_r_${i}_${j}.root -tr 1.5 -f 0 -e 1000 -v 0 -b 1 -t2 $i -t3 $j &
-	    waitForMe $threads
+	    waitForMe $threads 
 	done
     done
     waitForMe "1"
