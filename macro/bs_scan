@@ -25,10 +25,9 @@ if [ ${1} == "0" ]; then
 	for j in `seq 60 0.25 75` ; do	
 	    ../build/prtdirc -o b_l${i}_${j}.root \
 			     -h 1 -l 3 -p 7.00 -a 19.71 -phi 0 -gz 442.00 -gx 85.00 -gsx ${j} -gsy ${i} -z 10.00 -g 2018 -c 2018 -study 403 \
-			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 \
-			     > l_b$i.log && \
-		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}_${j}.root\")" && \
-		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${jpath}/beam_18215163732C.root -o b_r_${i}_${j}.root -tr 1.5 -f 0 -e 1000 -v 0 -b 1 -t2 $i -t3 $j > /dev/null 2> /dev/null &
+			     -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 2000000 -b 1 && \
+		root -q -b loadlib.C lutmean_cs.C"(\"b_l${i}_${j}.root\")" \
+		../build/prtdirc -s 2 -u b_l${i}_${j}_cs_avr.root -i ${jpath}/beam_18215163732C.root -o b_r_${i}_${j}.root -tr 1.5 -f 0 -e 1000 -v 0 -b 1 -t2 $i -t3 $j &
 	done
     done
     waitForMe "1"
