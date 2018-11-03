@@ -9,8 +9,8 @@ echo $tseed
 
 if [ "$1" == "0" ] ; then 
     for i in {1..5}; do ../build/prtdirc -o b_h$i.root \
-					 -h 1 -l 3 -p 7.00 -a 20.00 -phi 5.00 -gz 442.00 -gx 85.00 -gsx 70.00 -gsy 16.45 -z 10.00 -g 2018 -c 2018 -study 406 \
-					 -s 1 -z 0 -a 180 -phi 5 -x "opticalphoton" -p "3.18 eV" -e 1000000 -b 1 \
+					 -h 1 -l 3 -p 7.00 -a 20.00 -phi 0.00 -gz 442.00 -gx 85.00 -gsx 66.10 -gsy 16.80 -z 10.00 -g 2018 -c 2018 -study 403 \
+					 -s 1 -z 0 -a 180 -phi 0 -x "opticalphoton" -p "3.18 eV" -e 2000000 -b 1 \
 					 -r $tseed$i > b_l$i.log & done
     
 else

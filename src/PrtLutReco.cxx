@@ -318,6 +318,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t sensorId = 100*mcpid+fHit.GetPixelId();
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
+      
       if(prt_isBadChannel(ch)) continue;
       Int_t nedge=GetEdge(mcpid, pixid);
       //if(cluster[mcpid][pixid]>8) continue;
@@ -352,16 +353,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
 	  luttheta = dir.Theta();  
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
-
+	  
 	  bartime = fabs(lenz/cos(luttheta)/198.);
 	  double totaltime = bartime+evtime;
 	  //if(fEvent->GetType()==0) totaltime+=0.3;
 	  double timediff = totaltime-hitTime;
 	  fHist0->Fill(timediff);
 	  if(samepath)  fHist0i->Fill(timediff);
-	  //	  fHist1->Fill(hitTime);
-	  fHist2->Fill(totaltime);
-
 	  if(fabs(timediff)>timeRes) continue;
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
@@ -380,9 +378,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	    }
 	    
 	    // //if(samepath) fHist->Fill(tangle ,weight);
-	    if(fRadiator==1 && fabs(tangle-0.815)<0.05) isGoodHit=true;
-	    if(fRadiator==2 && fabs(tangle-0.815)<0.2)  isGoodHit=true;
-
+	    if((fRadiator==1 && fabs(tangle-0.815)<0.05) || (fRadiator==2 && fabs(tangle-0.815)<0.2)){
+	      isGoodHit=true;
+	      fHist2->Fill(totaltime);
+	    }
 	    if(fVerbose==3){
 	      TVector3 rdir = TVector3(-dir.X(),dir.Y(),dir.Z());
 	      rdir.RotateUz(cz);	      
@@ -400,7 +399,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
       fHist1->Fill(hitTime);
       if(isGoodHit){
-	fHist6->Fill(hitTime);
 	nhhits++;
 	nsHits++;
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
@@ -606,12 +604,11 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       drawTheoryLines();
       std::cout<<"here0 "<<std::endl;
       prt_canvasAdd("r_time",800,400);
-      prt_normalize(fHist1,fHist6);
+      prt_normalize(fHist1,fHist2);
       fHist1->SetTitle(Form("theta %3.1f", a));
       fHist1->SetLineColor(2);
       fHist1->Draw();
-      fHist6->Draw("same");
-      //fHist2->Draw("same");
+      fHist2->Draw("same");
 
       prt_canvasAdd("r_nph"+nid,800,400);
       fhNph->Draw();
