@@ -213,10 +213,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       
       if(fEvent->GetType()==0){
       	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
-      	momInBar.RotateZ(phi*CLHEP::deg);
+	momInBar.RotateZ(phi*CLHEP::deg);
       }else{
         momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
-       	momInBar.RotateZ(phi*CLHEP::deg);
+	momInBar.RotateZ(phi*CLHEP::deg);
       }
 
       if(fVerbose==3){
@@ -250,10 +250,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t gch, ndirc(0), t2(0), t3h(0), t3v(0),
 	str1(0),stl1(0),str2(0),stl2(0);
       Int_t hodo1(0), hodo2(0);
-      if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-      	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
-      	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
-      }
+      // if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
+      // 	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
+      // 	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
+      // }
       for(auto h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
@@ -343,7 +343,6 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
 	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
-
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
 	  if(u == 2) dir.SetXYZ( dird.X(), -dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
@@ -363,7 +362,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  //	  fHist1->Fill(hitTime);
 	  fHist2->Fill(totaltime);
 
-	  if(fabs(timediff)>timeRes) continue;	  
+	  if(fabs(timediff)>timeRes) continue;
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir)-0.002;

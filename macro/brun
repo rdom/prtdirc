@@ -8,9 +8,9 @@ tseed=$(($(date +%s%N)/1000000-1393400000000))
 echo $tseed
 
 if [ "$1" == "0" ] ; then 
-    for i in {0..4}; do ../build/prtdirc -o b_h$i.root \
-					 -p 7 -h 2 -l 0 -a 20 -gz 364 -gx 85 -gsx 0 -gsy 0 -z 10 -g 2016 -c 2016 \
-					 -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 500000 -b 1 \
+    for i in {1..5}; do ../build/prtdirc -o b_h$i.root \
+					 -h 1 -l 3 -p 7.00 -a 20.00 -phi 5.00 -gz 442.00 -gx 85.00 -gsx 70.00 -gsy 16.45 -z 10.00 -g 2018 -c 2018 -study 406 \
+					 -s 1 -z 0 -a 180 -phi 5 -x "opticalphoton" -p "3.18 eV" -e 1000000 -b 1 \
 					 -r $tseed$i > b_l$i.log & done
     
 else
