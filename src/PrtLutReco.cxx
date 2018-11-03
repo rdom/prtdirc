@@ -212,11 +212,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
       if(fEvent->GetType()==0){
-      	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
-	momInBar.RotateZ(phi*CLHEP::deg);
+      	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
+	momInBar.RotateZ(phi*CLHEP::deg+test2);
       }else{
-        momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg);
-	momInBar.RotateZ(phi*CLHEP::deg);
+        momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+test1);
+	momInBar.RotateZ(phi*CLHEP::deg+test2);
       }
 
       if(fVerbose==3){
