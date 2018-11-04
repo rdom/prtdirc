@@ -287,11 +287,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       {
 	Double_t cut1(7);
 	{ //time cuts
-	  if(prtangle<=80){
+	  if(prtangle<=75){
 	    if(hitTime<cut1 || hitTime>45) continue;
 	    reflected = kTRUE;
-	  }else if(prtangle>94){
-	    if(hitTime<3 || hitTime>20) continue;
+	  }else if(prtangle>105){
+	    if(hitTime<3 || hitTime>40) continue;
 	    reflected = kFALSE;
 	  }else{
 	    if(hitTime<14)  reflected = kFALSE; //13.5
@@ -364,6 +364,9 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir)-0.002;
+	  if(prtangle>70) tangle+=0.004;
+	  if(prtangle>90) tangle+=0.008;
+	  
 	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
