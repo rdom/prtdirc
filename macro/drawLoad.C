@@ -4,8 +4,8 @@
 #include "../../prttools/datainfo.C"
 #include "../../prttools/prttools.C"
 
-const Double_t prismangle = 45;
-Double_t prismSize[] = {50+300*tan(prismangle*TMath::Pi()/180.),170};
+const Double_t prismangle = 33;
+Double_t prismSize[] = {50+300*tan(prismangle*TMath::Pi()/180.),175};
 Double_t prismShift = (prismSize[0])/2. -50/2.;
 void drawPrism(Double_t x, Double_t y){
   gPad->cd();
@@ -17,41 +17,34 @@ void drawPrism(Double_t x, Double_t y){
 }
 
 void drawLoad(TString infile="../build/hits.root"){
-  gStyle->SetOptStat(0);
-  fSavePath = "load";
+  if(!prt_init(infile,1,"data/load")) return;
   
-  PrtInit(infile,0); //digi
-  
-  TH2F* hHits = new TH2F("hHits",";x, [mm];y, [mm]",500,-40,350,500,-100,100);
-  Int_t angle(0), step(0);
-  Double_t test(0);
-  PrtHit fHit;
-  for (Int_t ievent=0; ievent<fCh->GetEntries(); ievent++){
-    PrtNextEvent(ievent,1000);
-    if(ievent==0){
-      angle = prt_event->GetAngle() + 0.01;
-      test = prt_event->GetTest1();
-      fInfo +=  prt_event->PrintInfo();
-    }
-    for(Int_t h=0; h<prt_event->GetHitSize(); h++){
-      fHit = prt_event->GetHit(h);
-      Int_t mcpid = fHit.GetMcpId();
-      Int_t pixid = fHit.GetPixelId()-1;
-      TVector3 pos = fHit.GetGlobalPos();
-      
-      Double_t time = fHit.GetLeadTime();
+  TH2F* hHits = new TH2F("hHits",";x [mm];y [mm]",500,-40,230,500,-100,100);
+  TH2F* hTime = new TH2F("hTime",";x [mm];time [ns]",500,-40,230,250,0,25);
+  int angle(0), step(0);
+
+  for (int ievent=0; ievent<prt_entries; ievent++){
+    prt_nextEvent(ievent,1000);
+    for(auto hit : prt_event->GetHits()){
+      int mcp = hit.GetMcpId();
+      int pix = hit.GetPixelId()-1;
+      TVector3 pos = hit.GetPosition();      
+      Double_t time = hit.GetLeadTime();
+
+      if(fabs(pos.Y()-20)>3) continue;
       hHits->Fill(pos.X(),pos.Y());
+      hTime->Fill(pos.X(),time);      
     }
   }
+
+  gStyle->SetOptStat(0);
+
+  prt_canvasAdd(Form("time_%d",angle),800,500);
+  hTime->Draw("colz");
   
-  canvasAdd(Form("load_%d",angle),800,500);
-  hHits->SetStats(0);
-  hHits->GetXaxis()->SetTitleOffset(0.85);
-  hHits->GetYaxis()->SetTitleOffset(0.85);
-  hHits->GetXaxis()->SetTitleSize(0.05);
-  hHits->GetYaxis()->SetTitleSize(0.05);
-  //hHits->SetTitle(Form("#theta_{track} = %d#circ",angle));
+  prt_canvasAdd(Form("load_%d",angle),800,500);
   hHits->Draw("colz");
+  
   drawPrism(prismShift,0);
-  canvasSave(1,0);
+  prt_canvasSave(1,0);
 }

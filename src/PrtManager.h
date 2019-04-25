@@ -17,7 +17,6 @@
 
 #include "PrtEvent.h"
 #include "PrtHit.h"
-#include "PrtTrackInfo.h"
 
 class PrtManager
 {

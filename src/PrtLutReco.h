@@ -20,7 +20,9 @@
 #include "TF1.h"
 #include "TSpectrum.h"
 #include "TRandom.h"
-
+#include "TVirtualFitter.h"
+#include "TArc.h"
+#include "CLHEP/Units/SystemOfUnits.h"
 
 class PrtLutReco{
 

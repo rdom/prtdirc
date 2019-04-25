@@ -8,13 +8,6 @@
 #include "PrtLutReco.h"
 #include "PrtManager.h"
 #include "PrtLutNode.h"
-#include "PrtTrackInfo.h"
-#include "PrtPhotonInfo.h"
-#include "PrtAmbiguityInfo.h"
-
-#include "TVirtualFitter.h"
-#include "TArc.h"
-#include "CLHEP/Units/SystemOfUnits.h"
 
 #define prt__sim
 #include "../../prttools/datainfo.C"
@@ -139,6 +132,8 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   Double_t maxChangle(1);  
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
   Double_t radiatorL = (fRadiator==2)? 1224.9 : 1200; //plate : bar
+  Double_t radiatorW = (fRadiator==2)? 174.8 : 35.9;  //plate : bar
+  Double_t radiatorH = (fRadiator==2)? 1224.9 : 17.1;  //plate : bar
 
   prt_setRootPalette(1);
   prt_createMap();
@@ -250,10 +245,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t gch, ndirc(0), t2(0), t3h(0), t3v(0),
 	str1(0),stl1(0),str2(0),stl2(0);
       Int_t hodo1(0), hodo2(0);
-      // if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-      // 	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
-      // 	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
-      // }
+      if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
+      	if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
+      	if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
+      }
       for(auto h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
@@ -339,7 +334,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
-	
+
 	for(int u=0; u<4; u++){
 	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
 	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
@@ -347,14 +342,28 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
 	  if(u == 2) dir.SetXYZ( dird.X(), -dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
-	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z()); //no need when no divergence in vertical plane
+	  if(u == 3) dir.SetXYZ( -dird.X(),-dird.Y(), dird.Z());  //no need when no divergence in vertical plane
 	  if(reflected) dir.SetXYZ( dir.X(), dir.Y(), -dir.Z());
 	  if(dir.Angle(fnX1) < criticalAngle || dir.Angle(fnY1) < criticalAngle) continue;
 
 	  luttheta = dir.Theta();  
 	  if(luttheta > TMath::PiOver2()) luttheta = TMath::Pi()-luttheta;
+
+	  double len = lenz/cos(luttheta);
+	  double lenx = len*dir.X();
+	  double leny = len*dir.Y();
+	  int nx = round(lenx/radiatorH);
+	  int ny = round(leny/radiatorW);
+
+	  //	  std::cout<<"lenx="<<lenx<<" leny="<<leny <<" nx="<<nx<<" w="<<ny <<"           "<<2*lenz/nx<<"           "<<2*lenz/ny<<std::endl;
 	  
-	  bartime = fabs(lenz/cos(luttheta)/198.);
+	  // if(nx%2==0 && u==1 && 2*lenz/nx>60) continue;
+	  // if(nx%2==0 && u==3 && 2*lenz/nx>60) continue;
+	  
+	  // if(ny%2==0 && u==2 && 2*lenz/ny>150) continue;
+	  // if(ny%2==0 && u==3 && 2*lenz/ny>150) continue; 
+	  
+	  bartime = fabs(len/198.);
 	  double totaltime = bartime+evtime;
 	  //if(fEvent->GetType()==0) totaltime+=0.3;
 	  double timediff = totaltime-hitTime;
@@ -364,9 +373,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  
 	  fHist3->Fill(fabs(totaltime),hitTime);
 	  tangle = momInBar.Angle(dir)-0.002;
-	  if(prtangle>70) tangle+=0.004;
-	  if(prtangle>90) tangle+=0.008;
-	  
+	  if(prtangle>70) tangle+=0.004;	  
 	  
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
@@ -517,7 +524,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   if(fVerbose>1) prt_waitPrimitive("r_time","w");
   if(fVerbose>0){
-    prt_canvasSave(1,0);
+    prt_canvasSave(0,0);
     prt_canvasDel("*");
   }
     
@@ -548,7 +555,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
     Int_t status(0);
     if(fMethod==3) status = fHist->Fit("fgaus","lq","",0.6,1);
-    else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);    
+    else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
     Double_t chi = fFit->GetChisquare()/fFit->GetNDF();
     
     // if(fFit->GetParError(1)>0.0035){
@@ -596,7 +603,8 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       prt_normalize(fHist,fHistPi);
       fHistPi->SetLineColor(4);
       fHist->SetLineColor(1);
-      
+
+      fHistPi->Fit("fgaus","lq","",cangle-0.06,cangle+0.06);
       fHist->Draw();
       fHistPi->Draw("same");
       // gF1->Draw("same");

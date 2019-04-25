@@ -41,13 +41,17 @@ G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
     }
   }
 
-  if(PrtManager::Instance()->GetRunType() == 1 && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){
+  if(PrtManager::Instance()->GetRunType() == 1 && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){    
     particleChange->ProposeTrackStatus(fStopAndKill);
   }
-
-  // if(PrtManager::Instance()->GetRunType() == 0 && pPostStepPoint->GetPhysicalVolume()->GetName()=="wPrizm" && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){
-  //   particleChange->ProposeTrackStatus(fStopAndKill);
-  // }
+  
+  // kill reflections from FP
+  if(PrtManager::Instance()->GetRunType() == 0 && pPreStepPoint->GetPhysicalVolume()->GetName()=="wPrizm"){
+    auto touchable = (G4TouchableHistory*)(pPreStepPoint->GetTouchable());
+    auto pos1 = touchable->GetHistory()->GetTopTransform().TransformPoint(pPreStepPoint->GetPosition());
+    auto pos2 = touchable->GetHistory()->GetTopTransform().TransformPoint(pPostStepPoint->GetPosition());
+    if(pos2.y()>pos1.y()) particleChange->ProposeTrackStatus(fStopAndKill);
+  }
 
   if(PrtManager::Instance()->GetRunType() == 5 &&  pPreStepPoint->GetPhysicalVolume()->GetName()=="wDirc" && pPostStepPoint->GetPhysicalVolume()->GetName()=="wPrizm" && GetStatus() == FresnelRefraction){
     particleChange->ProposeTrackStatus(fStopAndKill);

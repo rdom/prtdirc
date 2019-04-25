@@ -201,7 +201,8 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
   //PrtManager::Instance()->AddEvent(PrtEvent());
 }
 
-G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){  
+G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
+  
   // // energy deposit
   // G4double edep = step->GetTotalEnergyDeposit();
   
@@ -226,7 +227,18 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   const G4DynamicParticle* dynParticle = track->GetDynamicParticle();
   G4ParticleDefinition* particle = dynParticle->GetDefinition();  
   G4String ParticleName = particle->GetParticleName();
-   
+
+  // auto th = track->GetTouchableHandle();
+  //   std::ostringstream oss;
+  // G4int depth = th->GetHistoryDepth();
+  // for (G4int i = depth; i >= 0; --i) {
+  //   oss << th->GetVolume(i)->GetName()
+  // 	<< ':' << th->GetCopyNumber(i);
+  //   if (i != 0) oss << '/';
+  // }
+  // std::cout<<"oss.str() "<<oss.str()<<std::endl;
+ 
+  
   G4ThreeVector globalpos = step->GetPostStepPoint()->GetPosition();
   G4ThreeVector localpos = touchable->GetHistory()->GetTopTransform().TransformPoint(globalpos);
   G4ThreeVector translation = touchable->GetHistory()->GetTopTransform().Inverse().TransformPoint(G4ThreeVector(0,0,0));
@@ -270,8 +282,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     }
   }
 
-  //std::cout<<"Number of reflections: "<<refl <<std::endl;
-
   PrtHit hit;
   Int_t mcpid=touchable->GetReplicaNumber(1);
   Int_t pixid = touchable->GetReplicaNumber(0);
@@ -281,7 +291,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // hit.SetGlobalPos(globalPos);
   // hit.SetLocalPos(localPos);
   // hit.SetDigiPos(digiPos);
-  // hit.SetPosition(position);
+  hit.SetPosition(globalPos);
   // hit.SetMomentum(momentum);
   if(PrtManager::Instance()->GetRunType()==6){
     G4ThreeVector mominend = step->GetPostStepPoint()->GetMomentum();
@@ -354,7 +364,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     }else is_hit=false;
     
   }else{
-    if(fMultHit[mcpid][pixid]==0 || !dead_time)PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
+    if(fMultHit[mcpid][pixid]==0 || !dead_time || PrtManager::Instance()->GetMcpLayout()==0) PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
     fMultHit[mcpid][pixid]++;
   }
 

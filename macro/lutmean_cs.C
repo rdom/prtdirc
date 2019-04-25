@@ -5,11 +5,7 @@
 #include <TInterpreter.h>
 #include <TClonesArray.h>
 
-
 void lutmean_cs(TString baseFile = "../data/lut.root"){
-  //gROOT->ProcessLine(".L ../src/PrtLutNode.cxx+");
-  gInterpreter->GenerateDictionary("vector<TVector3>","TVector3.h"); 
-  
   TString inFile =baseFile;
   TString outFile = baseFile.Remove(baseFile.Last('.'))+"_cs_avr.root";
 
@@ -55,7 +51,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
       pathid = node->GetPathId(i);
 
       bool newid = true;
-      for(int j=0; j<pArray.size(); j++){
+      for(uint j=0; j<pArray.size(); j++){
 	if(pathid == pArray[j]){
 	  vArray[j].push_back(dir);
 	  lArray[j].push_back(pos);
@@ -71,14 +67,14 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
       }
     }
   
-    for(int j=0; j<pArray.size(); j++){
+    for(uint j=0; j<pArray.size(); j++){
       for(Int_t s=0; s<9; s++) {
 	weight[s]=0;
 	sum[s] = TVector3(0,0,0);	
       }
       
       sumt=0;
-      for(int v=0; v<vArray[j].size(); v++) {
+      for(uint v=0; v<vArray[j].size(); v++) {
 	sum[0] += vArray[j][v];
 	weight[0]++;
 	if(lArray[j][v].X()<cut) {
@@ -118,10 +114,11 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
 	sumt += tArray[j][v]; 
       }
       
-      if(weight[0]<10) continue;      
-      for(Int_t s=0; s<9; s++) {
-	//std::cout<<s<<" "<<weight[s] <<std::endl;
+      if(weight[0]<10) continue;
+      
+      for(int s=0; s<9; s++) {
 	sum[s] *= 1/weight[s];
+	sum[s] = sum[s].Unit();
       }
       
       sumt *= 1/weight[0];

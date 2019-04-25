@@ -94,7 +94,7 @@ void PrtManager::AddEvent(PrtEvent event){
     //fEvent->SetRadiatorW(fRadiatorW);
     //fEvent->SetRadiatorH(fRadiatorH);
     fEvent->SetParticle(fParticle);
-    fEvent->SetMomentum(fMomentum);
+    fEvent->SetMomentum(0.001*fMomentum);
     fEvent->SetGeometry(fGeometry);
     fEvent->SetLens(fLens);
     fEvent->SetTest1(fTest1);

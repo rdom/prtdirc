@@ -22,7 +22,6 @@ find_package(ROOT REQUIRED)
 
 #----------------------------------------------------------------------------
 # Locate sources and headers for this project
-#
 include_directories(SYSTEM ${Geant4_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
@@ -34,25 +33,20 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
 
 #----------------------------------------------------------------------------
 # Generate dictionary for root
-#
-execute_process(COMMAND rootcint -f PrtDict.cxx -c ../src/PrtHit.h ../src/PrtEvent.h ../src/PrtLutNode.h ../src/PrtTrackInfo.h  ../src/PrtPhotonInfo.h ../src/PrtAmbiguityInfo.h ../src/PrtLinkDef.h)
+ROOT_GENERATE_DICTIONARY(PrtDict  PrtHit.h PrtEvent.h PrtLutNode.h LINKDEF src/PrtLinkDef.h MODULE Prt)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
-#
-
 #set(CMAKE_CXX_FLAGS "-std=gnu++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
 add_executable(prtdirc PrtDirc.cxx ${sources} PrtDict.cxx ${headers})
+#add_library(prtdirclib SHARED  ${sources} ${headers} PrtDict.cxx)
 target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} -lSpectrum -lHistPainter )
-
-# add_library(prtdirclib SHARED ../src/PrtHit.cxx ../src/PrtEvent.cxx ../src/PrtLutNode.cxx ../src/PrtTrackInfo.cxx  ../src/PrtPhotonInfo.cxx ../src/PrtAmbiguityInfo.cxx PrtDict.cxx ../src/PrtHit.h ../src/PrtEvent.h ../src/PrtLutNode.h ../src/PrtTrackInfo.h  ../src/PrtPhotonInfo.h ../src/PrtAmbiguityInfo.h ../src/PrtLutReco.h ../src/PrtLutReco.cxx  ../src/PrtManager.h ../src/PrtManager.cxx )
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
 # build Prt. This is so that we can run the executable directly because it
 # relies on these scripts being in the current working directory.
-#
 set(Prt_SCRIPTS
     prt.mac
     gui.mac
@@ -71,6 +65,5 @@ endforeach()
 
 #----------------------------------------------------------------------------
 # Install the executable to 'bin' directory under CMAKE_INSTALL_PREFIX
-#
 install(TARGETS prtdirc DESTINATION bin)
 
