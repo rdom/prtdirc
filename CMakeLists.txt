@@ -33,15 +33,16 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
 
 #----------------------------------------------------------------------------
 # Generate dictionary for root
-ROOT_GENERATE_DICTIONARY(PrtDict  PrtHit.h PrtEvent.h PrtLutNode.h LINKDEF src/PrtLinkDef.h MODULE Prt)
+ROOT_GENERATE_DICTIONARY(G__Prt PrtHit.h PrtEvent.h PrtLutNode.h LINKDEF src/PrtLinkDef.h MODULE Prt)
+add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtLutNode.cxx G__Prt.cxx)
+#target_link_libraries(Prt ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #set(CMAKE_CXX_FLAGS "-std=gnu++11")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
-add_executable(prtdirc PrtDirc.cxx ${sources} PrtDict.cxx ${headers})
-#add_library(prtdirclib SHARED  ${sources} ${headers} PrtDict.cxx)
-target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} -lSpectrum -lHistPainter )
+add_executable(prtdirc PrtDirc.cxx ${sources})
+target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Prt -lSpectrum -lHistPainter)
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we
