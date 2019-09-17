@@ -6,6 +6,7 @@
 #include "G4ios.hh"
 #include "G4RunManager.hh"
 #include <TVector3.h>
+#include "G4TransportationManager.hh"
 
 #include "PrtEvent.h"
 #include "PrtPrizmHit.h"
@@ -237,7 +238,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   //   if (i != 0) oss << '/';
   // }
   // std::cout<<"oss.str() "<<oss.str()<<std::endl;
- 
   
   G4ThreeVector globalpos = step->GetPostStepPoint()->GetPosition();
   G4ThreeVector localpos = touchable->GetHistory()->GetTopTransform().TransformPoint(globalpos);
@@ -257,6 +257,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     globalPos = TVector3(globalpos.x(),globalpos.y(),globalpos.z());
     localPos = TVector3(g4pos.x(),g4pos.y(),g4pos.z());
   }
+  localPos = TVector3(g4pos.x(),g4pos.y(),g4pos.z());  
   
   translation=touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
@@ -282,6 +283,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     }
   }
 
+    
   PrtHit hit;
   Int_t mcpid=touchable->GetReplicaNumber(1);
   Int_t pixid = touchable->GetReplicaNumber(0);
@@ -291,7 +293,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // hit.SetGlobalPos(globalPos);
   // hit.SetLocalPos(localPos);
   // hit.SetDigiPos(digiPos);
-  hit.SetPosition(globalPos);
+  // hit.SetPosition(globalPos);
   // hit.SetMomentum(momentum);
   if(PrtManager::Instance()->GetRunType()==6){
     G4ThreeVector mominend = step->GetPostStepPoint()->GetMomentum();
@@ -303,8 +305,24 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetNreflectionsInPrizm(refl-1);
   hit.SetPathInPrizm(pathId);
   hit.SetCherenkovMC(PrtManager::Instance()->GetCurrentCherenkov());
-  // time since track created
 
+  // get normal to pixel surface --------------------------
+  G4Navigator* theNavigator 
+    = G4TransportationManager::GetTransportationManager()
+    ->GetNavigatorForTracking();
+  Double_t normalId = 0;
+  G4bool valid;
+  G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
+  if (valid ){
+    G4ThreeVector pmom = -touchable->GetHistory()->GetTransform(1).TransformAxis(g4mom);
+    double angle = theLocalNormal.angle(pmom);
+    std::cout<<"angle "<<angle<<" "<<pmom.theta()<<" "<<theLocalNormal<<std::endl;
+    hit.SetPosition(TVector3(pmom.x(),pmom.y(),pmom.z()));
+    hit.SetMultiplicity(1000*angle*TMath::RadToDeg()); // mdeg
+  }
+  // ------------------------------------------------------
+
+  // time since track created
   G4double time = step->GetPreStepPoint()->GetLocalTime();
   if(PrtManager::Instance()->GetRunType()==0) time = G4RandGauss::shoot(time,PrtManager::Instance()->GetTimeRes()); //resolution [ns]
   hit.SetLeadTime(time);
