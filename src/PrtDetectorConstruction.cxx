@@ -40,7 +40,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   fNRow = 3;
   fNCol = 5;
   
-  fHall[0] = 1000; fHall[1] = 500; fHall[2] = 6000;
+  fHall[0] = 1500; fHall[1] = 500; fHall[2] = 6000;
 
   // fBar[0] = 17; fBar[1] = 32; fBar[2] =1250;
   fBar[0] = 17.1; fBar[1] = 35.9; fBar[2] =1200; // InSync // 2018
