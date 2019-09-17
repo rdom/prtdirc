@@ -316,7 +316,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   if (valid ){
     G4ThreeVector pmom = -touchable->GetHistory()->GetTransform(1).TransformAxis(g4mom);
     double angle = theLocalNormal.angle(pmom);
-    std::cout<<"angle "<<angle<<" "<<pmom.theta()<<" "<<theLocalNormal<<std::endl;
     hit.SetPosition(TVector3(pmom.x(),pmom.y(),pmom.z()));
     hit.SetMultiplicity(1000*angle*TMath::RadToDeg()); // mdeg
   }

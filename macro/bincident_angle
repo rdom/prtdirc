@@ -34,6 +34,9 @@ for theta in `LANG=en_us seq 20 5 140`; do
     done
 done   
 
+
+waitForMe 1
+	
 sleep 2
 
 hadd -f iahits.root b_iah*.root
