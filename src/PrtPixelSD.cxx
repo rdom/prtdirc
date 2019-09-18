@@ -257,7 +257,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     globalPos = TVector3(globalpos.x(),globalpos.y(),globalpos.z());
     localPos = TVector3(g4pos.x(),g4pos.y(),g4pos.z());
   }
-  localPos = TVector3(g4pos.x(),g4pos.y(),g4pos.z());  
   
   translation=touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
@@ -290,10 +289,10 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   
   hit.SetMcpId(mcpid);
   hit.SetPixelId(pixid);
-  // hit.SetGlobalPos(globalPos);
+  // hit.SetGlobalPos(globalPos;)
   // hit.SetLocalPos(localPos);
   // hit.SetDigiPos(digiPos);
-  // hit.SetPosition(globalPos);
+  hit.SetPosition(globalPos);
   // hit.SetMomentum(momentum);
   if(PrtManager::Instance()->GetRunType()==6){
     G4ThreeVector mominend = step->GetPostStepPoint()->GetMomentum();
