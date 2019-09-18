@@ -306,20 +306,20 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   hit.SetPathInPrizm(pathId);
   hit.SetCherenkovMC(PrtManager::Instance()->GetCurrentCherenkov());
 
-  // get normal to pixel surface --------------------------
-  G4Navigator* theNavigator 
-    = G4TransportationManager::GetTransportationManager()
-    ->GetNavigatorForTracking();
-  Double_t normalId = 0;
-  G4bool valid;
-  G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
-  if (valid ){
-    G4ThreeVector pmom = -touchable->GetHistory()->GetTransform(1).TransformAxis(g4mom);
-    double angle = theLocalNormal.angle(pmom);
-    hit.SetPosition(TVector3(pmom.x(),pmom.y(),pmom.z()));
-    hit.SetMultiplicity(1000*angle*TMath::RadToDeg()); // mdeg
-  }
-  // ------------------------------------------------------
+  // // get normal to pixel surface --------------------------
+  // G4Navigator* theNavigator 
+  //   = G4TransportationManager::GetTransportationManager()
+  //   ->GetNavigatorForTracking();
+  // Double_t normalId = 0;
+  // G4bool valid;
+  // G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
+  // if (valid ){
+  //   G4ThreeVector pmom = -touchable->GetHistory()->GetTransform(1).TransformAxis(g4mom);
+  //   double angle = theLocalNormal.angle(pmom);
+  //   hit.SetPosition(TVector3(pmom.x(),pmom.y(),pmom.z()));
+  //   hit.SetMultiplicity(1000*angle*TMath::RadToDeg()); // mdeg
+  // }
+  // // ------------------------------------------------------
 
   // time since track created
   G4double time = step->GetPreStepPoint()->GetLocalTime();
