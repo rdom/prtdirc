@@ -54,7 +54,8 @@ example:
 		2016
 		2017 3x4 layout
 		20171 2x4 layout
-                2021 3x3+2 layout - Barrel DIRC baseline design 
+                2021 3x3+2 layout - Barrel DIRC baseline design
+		2030 3x4 EIC layout with 3mm x 3mm pixels 
 
 -l    focusing system
                 0    no lens

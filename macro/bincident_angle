@@ -1,6 +1,6 @@
 #!/bin/bash
 
-threads=4
+threads=3
 
 rm b_iah*.root 
 rm b_ial*.log
@@ -8,6 +8,7 @@ rm b_ial*.log
 tseed=$(($(date +%s%N)/1000000-1393400000000))
 
 echo $tseed
+start_time=$(date +%s)
 
 waitForMe (){
     while : 
@@ -28,7 +29,7 @@ for theta in `LANG=en_us seq 20 5 140`; do
 	((tseed++))
 	../build/prtdirc -o b_iah_${theta}_${phi}.root \
 			 -h 1 -l 3 -p 7.00 -a $theta -phi $phi -gz 442.00 -gx 85.00 -gsx 66.10 -gsy 16.80 -z 10.00 -g 2018 -c 2018 -study 403 \
-    			 -z 10 -e 1000 -x "mix" -b 1 -r $tseed > b_ial${tseed}.log &
+    			 -e 1000 -x "mix" -b 1 -r $tseed > b_ial_${theta}_${phi}.log &
 
 	waitForMe $threads
     done

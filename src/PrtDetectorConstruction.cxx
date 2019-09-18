@@ -75,7 +75,7 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fPrizm[2] = 30+fPrizm[1]*tan(30*deg); fPrizm[3] = 30;
   }
 
-  if(fMcpLayout == 2017){
+  if(fMcpLayout == 2017 || fMcpLayout == 2030){
     fNCol = 4;
   }
 
@@ -605,6 +605,11 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
     // The MCP Pixel
     int mcpDimx = 8;
     int mcpDimy = 8;
+    if(fMcpLayout==2030){
+      mcpDimx=16;
+      mcpDimy=16;
+    }
+    
     if(fGeomId>101 && fGeomId < 2000) {
       mcpDimx = fGeomId/100;
       mcpDimy = fGeomId%100;
@@ -669,7 +674,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 
-	if(fMcpLayout==2017){
+	if(fMcpLayout==2017 || fMcpLayout==2030){
 	  Double_t msh = 3;
 	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
 	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
