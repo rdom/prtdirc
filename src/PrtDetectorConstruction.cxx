@@ -622,7 +622,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	// if(i!=4 || j !=4 )continue; // for lut visualization
 	double shiftx = i*(fMcpActive[0]/(double)mcpDimx)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimx);
 	double shifty = j*(fMcpActive[0]/(double)mcpDimy)-fMcpActive[0]/2.+fMcpActive[0]/(2*(double)mcpDimy);
-	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,8*j+i+1);      
+	new G4PVPlacement(0,G4ThreeVector(shiftx,shifty,0),lPixel,"wPixel", lMcp,false,mcpDimx*j+i+1);      
       }
     }
  
