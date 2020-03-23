@@ -23,7 +23,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
   fLutNew = new TClonesArray("PrtLutNode");
   fTreeNew->Branch("LUT",&fLutNew,256000,2); 
 
-  Int_t Nnodes = 5000;
+  Int_t Nnodes = 15*64;
   TClonesArray &fLutaNew = *fLutNew;
   for (Long64_t n=0; n<Nnodes; n++) {
     new((fLutaNew)[n]) PrtLutNode(-1);
