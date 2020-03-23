@@ -200,6 +200,17 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
   // }
  
   //PrtManager::Instance()->AddEvent(PrtEvent());
+
+
+  //create MPC map
+  for(int ch=0; ch<15*64; ch++){
+    int mcp = ch/64;
+    int pix = ch%64;	
+    int col = pix/2 - 8*(pix/16);
+    int row = pix%2 + 2*(pix/16);
+    pix = col+8*row;    
+    fMap_Mpc[mcp][pix]=ch;
+  }   
 }
 
 G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
@@ -281,14 +292,15 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
       pathId += phit->GetNormalId()*1000*refl;
     }
   }
-
     
   PrtHit hit;
   Int_t mcpid=touchable->GetReplicaNumber(1);
   Int_t pixid = touchable->GetReplicaNumber(0);
+  Int_t ch = fMap_Mpc[mcpid][pixid-1];
   
   hit.SetMcpId(mcpid);
   hit.SetPixelId(pixid);
+  hit.SetChannel(ch);
   // hit.SetGlobalPos(globalPos;)
   // hit.SetLocalPos(localPos);
   // hit.SetDigiPos(digiPos);
@@ -341,7 +353,10 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   Bool_t transport_efficiency(true);
   
   if(PrtManager::Instance()->GetGeometry()==2021) charge_sharing=false; //no cs in mfield
-  if(PrtManager::Instance()->GetGeometry()==2030) charge_sharing=false;
+  if(PrtManager::Instance()->GetMcpLayout()==2030){
+    charge_sharing=false;
+    quantum_efficiency=false;
+  }
 
   if(transport_efficiency){
     Double_t pi(4*atan(1));

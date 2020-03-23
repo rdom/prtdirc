@@ -68,7 +68,7 @@
 #/vis/scene/add/axes -0.285 0 0122 1 m
 #/vis/scene/add/axes 0 0 0 0.1 m
 #/vis/scene/add/axes 105.843 -2.5 -254.496 100 mm
-/vis/scene/add/axes -301 0 0 200 mm
+#/vis/scene/add/axes -301 0 0 200 mm
 #/vis/scene/add/axes 0.4 0 0.15 0.1 m
 #
 # Draw smooth trajectories at end of event, showing trajectory points
@@ -136,7 +136,7 @@
 # /vis/viewer/zoomTo 1.5
 # /vis/viewer/scaleTo 1 1 1
 # /vis/viewer/set/targetPoint 0 0 0 cm
-# #/vis/viewer/set/background white
+# /vis/viewer/set/background white
 
 # # side 25 degree
 #/vis/viewer/set/upThetaPhi 65  -180  deg
@@ -150,13 +150,14 @@
 # /vis/viewer/set/background white
 
 
-# #tdr
-# /vis/geometry/set/lineWidth all 0 1.4
-# /vis/modeling/trajectories/drawByParticleID-0/setRGBA opticalphoton 1 0.8 0 0.3
-# /vis/modeling/trajectories/drawByParticleID-0/setRGBA e+ 1 0 1 0.6
-# /vis/modeling/trajectories/drawByParticleID-0/setRGBA pi+ 0 0 1 1
-# /vis/modeling/trajectories/drawByParticleID-0/setRGBA proton 1 0 0 1
-# /vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 0.5
+#tdr
+/vis/geometry/set/lineWidth all 0 1.4
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA opticalphoton 1 0.8 0 0.3
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA e+ 1 0 1 0.6
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA pi+ 0 0 1 1
+/vis/modeling/trajectories/drawByParticleID-0/setRGBA proton 1 0 0 1
+/vis/modeling/trajectories/drawByParticleID-0/default/setStepPtsSize 0.5
+/vis/viewer/set/background white
 
 # /vis/viewer/set/upVector 0 1 0
 # /vis/viewer/set/viewpointThetaPhi 90 30 deg
@@ -178,17 +179,17 @@
 # /vis/viewer/set/targetPoint -37.1947 5 -7.42294 cm
 # #/vis/viewer/zoomTo 50
 
-#mcp layout
-/vis/viewer/set/viewpointThetaPhi 90 -180
-/vis/viewer/zoomTo 10
-/vis/viewer/set/targetPoint 0 0 2 cm
+# #mcp layout
+# /vis/viewer/set/viewpointThetaPhi 90 -180
+# /vis/viewer/zoomTo 10
+# /vis/viewer/set/targetPoint 0 0 2 cm
 
 #export
 #/vis/open VRML2FILE
 #/vis/modeling/trajectories/drawByParticleID-0/default/setDrawStepPts false
 /vis/ogl/set/displayListLimit 1000000
 
-# for lut visualization
+# #for lut visualization
 # /vis/scene/endOfEventAction accumulate 1000000
 # /vis/multithreading/maxEventQueueSize 100000
 # /vis/filtering/trajectories/create/encounteredVolumeFilter

@@ -79,4 +79,3 @@ void PrtPrizmSD::EndOfEvent(G4HCofThisEvent*){
     for ( G4int i=0; i<nofHits; i++ ) (*fHitsCollection)[i]->Print();
   }
 }
-

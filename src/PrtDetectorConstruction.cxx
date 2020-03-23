@@ -132,7 +132,9 @@ PrtDetectorConstruction::PrtDetectorConstruction()
     fOffset=146;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
-  }    
+  }
+  std::cout<<"fPrizm[2] "<<fPrizm[2]<<std::endl;
+  
   
   if(fGeomId == 2021){ 
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));
@@ -677,7 +679,6 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
 	if(fMcpLayout==2017 || fMcpLayout==2030){
 	  Double_t msh = 3;
 	  shiftx = i*(fMcpTotal[0]+msh)-fPrizm[3]/2+fMcpActive[0]/2.+3;
-	  //if(j==1) shiftx += (1/2.)*fMcpActive[0]/8.;
 	  shifty = (fMcpTotal[0]+3)*(j-1);
 	}
 

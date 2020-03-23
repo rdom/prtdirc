@@ -37,10 +37,10 @@ TF1 *gF2= new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
 
 Int_t gg_i(0), gg_ind(0);
 TGraph gg_gr;
-PrtLutNode *fLutNode[5000];
+PrtLutNode *fLutNode[prt_maxdircch];
 
 TH1F*  fHistMcp[15];
-TH1F*  fHistCh[960];
+TH1F*  fHistCh[prt_maxdircch];
 
 //cluster search
 Int_t mcpdata[15][65];
@@ -89,8 +89,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     
   }else prt_savepath="data/sim";
   std::cout<<"prt_savePath  "<< prt_savepath <<std::endl;    
-
-  for(Int_t i=0; i<5000; i++){
+ 
+  for(Int_t i=0; i<prt_maxdircch; i++){
     fLutNode[i] = (PrtLutNode*) fLut->At(i);
   }
   cout << "-I- PrtLutReco: Intialization successfull" << endl;
@@ -99,7 +99,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     fHistMcp[i] = new TH1F(Form("fHistMcp_%d",i),Form("fHistMcp_%d;#theta_{C} [rad];entries [#]",i), 160,0.6,1); //150
   }
 
-  for(Int_t i=0; i<960; i++){
+  for(Int_t i=0; i<prt_maxdircch; i++){
     fHistCh[i] = new TH1F(Form("fHistCh_%d",i),Form("fHistCh_%d;#theta_{C} [rad];entries [#]",i), 100,0.6,1); //150
   }
 
@@ -310,27 +310,26 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       Int_t pixid=fHit.GetPixelId()-1;
       Int_t mcpid=fHit.GetMcpId();
       Int_t ch = map_mpc[mcpid][pixid];
-      Int_t sensorId = 100*mcpid+fHit.GetPixelId();
+            
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
       if(prt_isBadChannel(ch)) continue;
       Int_t nedge=GetEdge(mcpid, pixid);
       //if(cluster[mcpid][pixid]>8) continue;
-      //if(sensorId==1) continue;
 
-      Bool_t isGoodHit(0);      
-      Int_t size =fLutNode[sensorId]->Entries();
+      Bool_t isGoodHit(0);
+      Int_t size =fLutNode[ch]->Entries();
 
       for(Int_t i=0; i<size; i++){
-	weight = 1; //fLutNode[sensorId]->GetWeight(i);
-	dird   = fLutNode[sensorId]->GetEntryCs(i,nedge); // nedge=0
-        //dird   = fLutNode[sensorId]->GetEntry(i);
-	evtime = fLutNode[sensorId]->GetTime(i);
-	Int_t pathid = fLutNode[sensorId]->GetPathId(i);
+	weight = 1; //fLutNode[ch]->GetWeight(i);
+	dird   = fLutNode[ch]->GetEntryCs(i,nedge); // nedge=0
+        //dird   = fLutNode[ch]->GetEntry(i);
+	evtime = fLutNode[ch]->GetTime(i);
+	Int_t pathid = fLutNode[ch]->GetPathId(i);
 	Bool_t samepath(false);
 	if(pathid==fHit.GetPathInPrizm()) samepath=true;
-	//if(fLutNode[sensorId]->GetNRefl(i)!=1 ) continue;
+	//if(fLutNode[ch]->GetNRefl(i)!=1 ) continue;
 	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
@@ -588,7 +587,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       // 	drawTheoryLines();
       // }
 
-      // for(Int_t i=0; i<960; i++){
+      // for(Int_t i=0; i<prt_maxdircch; i++){
       // 	prt_canvasAdd(Form("r_tangle_ch_%d",i),800,400);
       // 	fHistCh[i]->Fit("fgaus","lq","",fAngleP-0.03,fAngleP+0.03);
       // 	std::cout<<"if(ch=="<< i<<") tangle += "<<fAngleP-fFit->GetParameter(1)<<";" <<std::endl;	

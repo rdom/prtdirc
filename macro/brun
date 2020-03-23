@@ -19,7 +19,7 @@ else
     # 					 -z 10 -e 1000 -x "mix" -b 1 -r $tseed$i > b_l$i.log & done
 
     for i in {1..4}; do ../build/prtdirc -o b_h$i.root \
-					 -h 1 -l 3 -p 7.00 -a 19.7 -phi 0.80 -gz 442.00 -gx 85.00 -gsx 66.10 -gsy 16.80 -z  5.00 -g 2018 -c 2030 \
+					 -h 1 -l 3 -p 7.00 -a 19.7 -phi 0.80 -gz 442.00 -gx 85.00 -gsx 66.10 -gsy 16.80 -z  1.00 -g 2017 -c 2030 \
     					 -e 11250 -x "mix" -b 1 -r $tseed$i > b_l$i.log & done    
 fi
 
