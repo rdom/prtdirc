@@ -108,7 +108,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
   
   // read corrections
-  fCorrFile = lutfile.ReplaceAll("lut","corr");
+  fCorrFile = infile.ReplaceAll("beam","corr");
   int pmt;
   double corr;
   TChain ch; ch.SetName("corr"); ch.Add(fCorrFile);
