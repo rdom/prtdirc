@@ -11,7 +11,7 @@ PrtLutNode::PrtLutNode(){
 PrtLutNode::PrtLutNode(Int_t nodeId):fDetectorId(nodeId),fSize(0){ 
 }
 
-void PrtLutNode::AddEntry(Int_t detectorId, TVector3 dir, Double_t pathid, Int_t nrefl, Double_t time, TVector3 hitpos, TVector3 digipos, Double_t weight) {
+void PrtLutNode::AddEntry(Int_t detectorId, TVector3 dir, Double_t pathid, Int_t nrefl, Double_t time, TVector3 hitpos, TVector3 digipos, Double_t weight, TVector3 vertexpos) {
   fDetectorId = detectorId; 
   fNodeArray.push_back(dir);
   fPathIdArray.push_back(pathid);
@@ -19,12 +19,13 @@ void PrtLutNode::AddEntry(Int_t detectorId, TVector3 dir, Double_t pathid, Int_t
   fNRefl.push_back(nrefl);
   fTimeArray.push_back(time);
   fHitPos.push_back(hitpos);
+  fVertexPos.push_back(vertexpos);
   fDigiPos = digipos;
   fSize++;
 }
 
 void PrtLutNode::AddEntry(Int_t detectorId, TVector3 dir, Double_t pathid, Int_t nrefl, Double_t time, TVector3 hitpos, TVector3 digipos, Double_t weight,
-			  TVector3 d1,TVector3 d2,TVector3 d3,TVector3 d4, TVector3 d5,TVector3 d6,TVector3 d7,TVector3 d8) {
+			  TVector3 d1,TVector3 d2,TVector3 d3,TVector3 d4, TVector3 d5,TVector3 d6,TVector3 d7,TVector3 d8, TVector3 vertexpos) {
   fDetectorId = detectorId; 
   fNodeArray.push_back(dir);
   fNodeArrayCs[0].push_back(dir);
@@ -42,6 +43,7 @@ void PrtLutNode::AddEntry(Int_t detectorId, TVector3 dir, Double_t pathid, Int_t
   fNRefl.push_back(nrefl);
   fTimeArray.push_back(time);
   fHitPos.push_back(hitpos);
+  fVertexPos.push_back(vertexpos);
   fDigiPos = digipos;
   fSize++;
 }

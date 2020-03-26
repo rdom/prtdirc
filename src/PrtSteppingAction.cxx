@@ -63,6 +63,11 @@ void PrtSteppingAction::UserSteppingAction(const G4Step* step)
   //if(step->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="Bar" && step->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="ExpHall" ) track->SetTrackStatus(fStopAndKill);
   //if(step->GetPreStepPoint()->GetPosition().z()>1200 ) track->SetTrackStatus(fStopAndKill);
 
+  // stop photons at the edge of the lens for LUT
+ if(PrtManager::Instance()->GetRunType()==1 && step->GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wLens3" && step->GetPostStepPoint()->GetPhysicalVolume()->GetName()=="wDirc") {
+   track->SetTrackStatus(fStopAndKill);
+  }
+  
   G4String ParticleName = track->GetDynamicParticle()->
                                  GetParticleDefinition()->GetParticleName();
 

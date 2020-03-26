@@ -53,19 +53,18 @@ G4bool PrtPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
       = G4TransportationManager::GetTransportationManager()
       ->GetNavigatorForTracking();
 
-    Double_t normalId = 0;
+    int nid = 0;
     G4bool valid;
-    G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
+    G4ThreeVector normal = theNavigator->GetLocalExitNormal(&valid);
     if (valid ){
-      // G4ThreeVector theGlobalNormal = theNavigator->GetLocalToGlobalTransform().TransformAxis(theLocalNormal);
-      // normalId = theGlobalNormal.x() + 10*theGlobalNormal.y() + 100*theGlobalNormal.z();
-      normalId = theLocalNormal.x() + 10*theLocalNormal.y() + 100*theLocalNormal.z();
+      // G4ThreeVector gnormal = theNavigator->GetLocalToGlobalTransform().TransformAxis(normal);
+      if(normal.y()> 0.99) nid = 1; // right
+      if(normal.y()<-0.99) nid = 2; // left
+      if(normal.x()<-0.99) nid = 3; // bottom
+      if(fabs(normal.x()-0.838671)<0.4 ) nid = 4; // top
     }
-    newHit->SetNormalId(normalId);
-
-    fHitsCollection->insert( newHit );
-    //newHit->Print();
-
+    newHit->SetNormalId(nid);
+    fHitsCollection->insert(newHit);
   }
 
   return true;

@@ -630,6 +630,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
  
     for(int j=0; j<fNRow; j++){
       for(int i=0; i<fNCol; i++){
+	// if(i!=2 || j !=1 )continue; // for lut visualization
 	double shiftx = i*(fMcpTotal[0]+14)-fPrizm[3]/2+fMcpActive[0]/2.+2.5; // +2.5 adjustment to the prt2014 
 	if(j!=1) shiftx -= 14; //(3/2.)*fMcpActive[0]/8.;
 	double shifty = (fMcpTotal[0]+3)*(j-1); 

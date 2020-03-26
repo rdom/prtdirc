@@ -40,7 +40,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
   PrtLutNode *node;
 
   for (Int_t inode=0; inode<fLut->GetEntriesFast(); inode++){
-    if(inode%1000==0) cout<<"Node # "<<inode<<endl;
+    if(inode%100==0) cout<<"Node # "<<inode<<endl;
     node= (PrtLutNode*) fLut->At(inode);
     Int_t size = node->Entries();    
     if(size<1) continue;
@@ -114,7 +114,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
 	sumt += tArray[j][v]; 
       }
       
-      if(weight[0]<10) continue;
+      if(weight[0]<1) continue;
       
       for(int s=0; s<9; s++) {
 	sum[s] *= 1/weight[s];
@@ -124,7 +124,7 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
       sumt *= 1/weight[0];
       
       ((PrtLutNode*)(fLutNew->At(inode)))->AddEntry(node->GetDetectorId(), sum[0],pArray[j],node->GetNRefl(0),sumt, node->GetDigiPos(),node->GetDigiPos(),vArray[j].size()/(Double_t)size,
-						    sum[1],sum[2],sum[3],sum[4],sum[5],sum[6],sum[7],sum[8]); 
+						    sum[1],sum[2],sum[3],sum[4],sum[5],sum[6],sum[7],sum[8],node->GetDigiPos()); 
     }
     for(int i=0; i<100; i++) {vArray[i].clear();  tArray[i].clear(); lArray[i].clear();}
     pArray.clear();

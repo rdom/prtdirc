@@ -108,7 +108,7 @@ void PrtManager::AddEvent(PrtEvent event){
 }
 
 
-void PrtManager::AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position){
+void PrtManager::AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position, TVector3 vertex){
   if(fRunType==0 || fRunType==6){
     if(fEvent){
       fEvent->SetPosition(position);
@@ -126,7 +126,7 @@ void PrtManager::AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector
       ((PrtLutNode*)(fLut->At(ch)))->
 	AddEntry(ch, fMomentum, hit.GetPathInPrizm(),
 		 hit.GetNreflectionsInPrizm(),
-		 time,localpos,digipos);
+		 time,localpos,digipos,0,vertex);
     }
   }
 }

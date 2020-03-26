@@ -35,7 +35,7 @@ public:
   void Fill();
   void FillLut();
   void AddEvent(PrtEvent event);
-  void AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position);
+  void AddHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position,TVector3 vertex=TVector3(0,0,0));
   PrtEvent* Event(){ return fEvent; }
   
   // Mutators

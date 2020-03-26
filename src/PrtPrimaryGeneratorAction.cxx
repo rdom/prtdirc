@@ -44,7 +44,7 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction():G4VUserPrimaryGeneratorAc
   //     gpix[m][p] = vdirc+(vmcp[m]+vpix[p]).rotateY(PrtManager::Instance()->GetAngle()*deg-180*deg);
   //   }
   // }
-
+  iter=0;
 }
 
 PrtPrimaryGeneratorAction::~PrtPrimaryGeneratorAction(){
@@ -96,11 +96,19 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     fParticleGun->SetParticleMomentumDirection(vec);    
   }
   if(PrtManager::Instance()->GetRunType() == 1){ // LUT generation
-    fParticleGun->SetParticlePosition(G4ThreeVector(radiatorH*(0.5-G4UniformRand()),radiatorW*(0.5-G4UniformRand()),radiatorL/2.-0.1));
+    //fParticleGun->SetParticlePosition(G4ThreeVector(radiatorH*(0.5-G4UniformRand()),radiatorW*(0.5-G4UniformRand()),radiatorL/2.-0.1));
     fParticleGun->SetParticlePosition(G4ThreeVector(PrtManager::Instance()->GetRStepY(),//+5-10*G4UniformRand(),
     						    PrtManager::Instance()->GetRStepX(),//+10-20*G4UniformRand(),
     						    radiatorL/2.-0.1));
 
+    // if(iter>3) iter=0;
+    // double posX[]={-3,3,3,-3};
+    // double posY[]={-6,6,-6,6};
+    // fParticleGun->SetParticlePosition(G4ThreeVector(PrtManager::Instance()->GetRStepY()+posX[iter],//+5-10*G4UniformRand(),
+    // 						    PrtManager::Instance()->GetRStepX()+posY[iter],//+10-20*G4UniformRand(),
+    // 						    radiatorL/2.-0.1));
+    //iter++;
+    
     // fParticleGun->SetParticlePosition(G4ThreeVector(PrtManager::Instance()->GetRStepY()+8-16*G4UniformRand(),
     // 						    PrtManager::Instance()->GetRStepX()+16-32*G4UniformRand(),
     // 						    radiatorL/2.-0.1));

@@ -271,7 +271,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   
   translation=touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(),translation.y(),translation.z());
-  TVector3 momentum(g4mom.x(),g4mom.y(),g4mom.z());
+  TVector3 vertexPos(g4pos.x(),g4pos.y(),g4pos.z());
   G4ThreeVector lp = touchable->GetHistory()->GetTransform(1).TransformPoint(g4pos); //pos in wDirc
   TVector3 position(lp.x(),lp.y(),lp.z());
 
@@ -283,15 +283,15 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4HCofThisEvent* HCofEvent = currentEvent->GetHCofThisEvent();
   PrtPrizmHitsCollection* prizmCol = (PrtPrizmHitsCollection*)(HCofEvent->GetHC(collectionID));
  
-  Double_t pathId = 0;
+  Long_t pathId = 0;
   Int_t refl=0;
-  for (G4int i=0;i<prizmCol->entries();i++){
+  for (G4int i=0;i<prizmCol->entries();i++){    
     PrtPrizmHit* phit = (*prizmCol)[i];
     if(phit->GetTrackID()==track->GetTrackID()) {
+      if(phit->GetNormalId()>0) pathId = pathId*10+phit->GetNormalId();
       refl++;
-      pathId += phit->GetNormalId()*1000*refl;
     }
-  }
+  }  
     
   PrtHit hit;
   Int_t mcpid=touchable->GetReplicaNumber(1);
@@ -342,7 +342,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
   if(PrtManager::Instance()->GetRunType()==1 || PrtManager::Instance()->GetRunType()==5 || PrtManager::Instance()->GetRunType()==11 || PrtManager::Instance()->GetRunType()==6){
-    PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
+    PrtManager::Instance()->AddHit(hit,localPos,digiPos,position,vertexPos);
     return true;
   }
   
