@@ -461,7 +461,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     // }
 	
     if(fVerbose>0 &&  fMethod==3 && nsEvents%ninfit==0){
-      if(nsHits>10){
+      if(nsHits>5){
         // if(tofPid==2212 && sum > 0){
 	//   std::cout<<"p  "<<sum1 << "   pi "<<sum2 << "  s "<< sum<<std::endl;
 	//   if(fVerbose>0)  if(!FindPeak(cangle,spr, prtangle, tofPid)) continue;
