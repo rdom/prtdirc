@@ -73,6 +73,8 @@ private:
   Double_t fAngleP;
   Double_t fAnglePi;
   Double_t fTest;
+  double fCorr[8];
+  TString fCorrFile;
 };
 
 #endif

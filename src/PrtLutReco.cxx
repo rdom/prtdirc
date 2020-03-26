@@ -105,6 +105,20 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
     fHistCh[i] = new TH1F(Form("fHistCh_%d",i),Form("fHistCh_%d;#theta_{C} [rad];entries [#]",i), 150,0.6,1); //150
   }
 
+  for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
+  
+  // read corrections
+  fCorrFile = lutfile.ReplaceAll("lut","corr");
+  int pmt;
+  double corr;
+  TChain ch; ch.SetName("corr"); ch.Add(fCorrFile);
+  ch.SetBranchAddress("pmt",&pmt);
+  ch.SetBranchAddress("corr",&corr);
+  for(int i=0; i<ch.GetEntries(); i++){
+    ch.GetEvent(i);
+    fCorr[pmt] = corr;
+    std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
+  }
 }
 
 // -----   Destructor   ----------------------------------------------------
@@ -378,16 +392,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	  fDiff->Fill(hitTime,tdiff);		 	  
 	  fHist3->Fill(fabs(luttime),hitTime);
 
-	  tangle = momInBar.Angle(dir)-0.001;
-	  
-	  if(mcpid==0) tangle += -0.00266772;
-	  if(mcpid==1) tangle += -0.0027373;
-	  if(mcpid==2) tangle += -0.00160742;
-	  if(mcpid==3) tangle += -0.00465952;
-	  if(mcpid==4) tangle += 0.000917082;
-	  if(mcpid==5) tangle += -0.00303007;
-	  if(mcpid==6) tangle += -0.00126844;
-	  if(mcpid==7) tangle += -0.00140208;
+	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
 	  
 	  double w = 2000/len;
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
@@ -595,17 +600,36 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
       prt_canvasAdd("r_tangle"+nid,800,400);
 
       { // corrections
-	// fFit->SetParLimits(0,100,100000000);    // norm
-	// fFit->SetParameter(1,fAnglePi);    // mean
-	// fFit->SetParLimits(2,0.006,0.009); // width
-	// for(Int_t i=0; i<prt_nmcp; i++){
-	//   prt_canvasAdd(Form("r_tangle_%d",i),800,400);
-	//   fHistMcp[i]->Fit("fgaus","lq","",fAnglePi-0.03,fAnglePi+0.03);
-	//   std::cout<<"if(mcpid=="<< i<<") tangle += "<<fAnglePi-fFit->GetParameter(1)<<";" <<std::endl;	
-	//   fHistMcp[i]->Draw();
-	//   drawTheoryLines();
-	// }
 
+	if(fabs(fCorr[0])<0.00000001){
+	  std::cout<<"Writing "<<fCorrFile<<std::endl;
+	  
+	  TFile fc(fCorrFile,"recreate");
+	  TTree *tc = new TTree("corr","corr");
+	  int pmt;
+	  double corr;
+	  tc->Branch("pmt",&pmt,"pmt/I");
+	  tc->Branch("corr",&corr,"corr/D");
+	
+	  fFit->SetParLimits(0,100,100000000);    // norm
+	  fFit->SetParameter(1,fAnglePi);    // mean
+	  fFit->SetParLimits(2,0.006,0.009); // width		
+	  for(Int_t i=0; i<prt_nmcp; i++){
+	    //prt_canvasAdd(Form("r_tangle_%d",i),800,400);
+	    fHistMcp[i]->Fit("fgaus","lq","",fAnglePi-0.03,fAnglePi+0.03);
+	    pmt = i;
+	    corr= fAnglePi-fFit->GetParameter(1);
+	    tc->Fill();
+	    std::cout<<"if(mcpid=="<< i<<") tangle += "<<corr<<";" <<std::endl;	  
+	    // fHistMcp[i]->Draw();
+	    // drawTheoryLines();	  
+	  }
+	  
+	  tc->Write();
+	  fc.Write();
+	  fc.Close();
+	}
+	
 	// for(Int_t i=0; i<prt_maxdircch; i++){
 	// 	prt_canvasAdd(Form("r_tangle_ch_%d",i),800,400);
 	// 	fHistCh[i]->Fit("fgaus","lq","",fAnglePi-0.03,fAnglePi+0.03);
