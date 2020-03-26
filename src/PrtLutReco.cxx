@@ -54,6 +54,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   fVerbose = verbose;
   fChain = new TChain("data");
   fChain->Add(infile);
+  fEvent = new PrtEvent();
   fChain->SetBranchAddress("PrtEvent", &fEvent);
 
   fChain->SetBranchStatus("fHitArray.fParentParticleId", 0);
@@ -190,11 +191,11 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   }
     
   for (Int_t ievent=start; ievent<start+nEvents && (events[2]<end || events[4]<end); ievent++){
-
-    if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;
     Int_t nhhits(0);
     fChain->GetEntry(ievent);
     nHits = fEvent->GetHitSize();
+    if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;	
+
     if(fEvent->GetType()==1) posz = radiatorL/2.-fEvent->GetPosition().Z();
     else posz = fEvent->GetPosition().Z()-15; // 15 mm - lens thickness  
     
