@@ -475,7 +475,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       nsHits=0;
     }
 
-    if(++nsEvents>=end) break;
+    // if(++nsEvents>=end) break;
   }
 
   nnratio = fhNph->GetEntries()/(double)end;
