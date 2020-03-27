@@ -143,7 +143,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   TString outFile = PrtManager::Instance()->GetOutName()+".root";
   Double_t theta(0),phi(0), trr(0),  nph(0),nph_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
-    separation(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
+    sep(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);  
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
@@ -157,31 +157,35 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 
   outFile.ReplaceAll("reco_",Form("reco_%d_",prt_data_info.getFileId()));
   TFile file(outFile,"recreate");
-  TTree tree("dirc","SPR");
+  TTree tree("reco","PrtLutReco");
   tree.Branch("mom", &mom,"mom/D");
-  tree.Branch("tofPid", &tofPid,"tofPid/I");
-  tree.Branch("distPid", &distPid,"distPid/I");
-  tree.Branch("likePid", &likePid,"likePid/I");
-  tree.Branch("spr", &spr,"spr/D");
-  tree.Branch("trr", &trr,"trr/D");
+  tree.Branch("theta",&theta,"theta/D");
+  tree.Branch("phi",&phi,"phi/D");
   tree.Branch("nph",&nph,"nph/D");
-  tree.Branch("nph_err",&nph_err,"nph_err/D");
+  tree.Branch("nph_err",&nph_err,"nph_err/D");  
+  tree.Branch("sep",&sep,"sep/D");
+  tree.Branch("sep_err",&sep_err,"sep_err/D");
+  tree.Branch("time_res",&timeRes,"timeRes/D");
+
   tree.Branch("cangle",&cangle,"cangle/D");
-  tree.Branch("likelihood",&likelihood,"par3/D");
-  tree.Branch("separation",&separation,"separation/D");
-  tree.Branch("par5",&par5,"par5/D");
-  tree.Branch("par6",&par6,"par6/D");
+  tree.Branch("spr", &spr,"spr/D");
+  tree.Branch("trr", &trr,"trr/D");  
+  
+  tree.Branch("pid_tof", &tofPid,"tofPid/I");
+  tree.Branch("pid_dist", &distPid,"distPid/I");
+  tree.Branch("pid_lh", &likePid,"likePid/I");
+  tree.Branch("likelihood",&likelihood,"likelihood/D");
+  
   tree.Branch("test1",&test1,"test1/D");
   tree.Branch("test2",&test2,"test2/D");
   tree.Branch("test3",&test3,"test3/D");
   tree.Branch("nnratio",&nnratio,"nnratio/D");
   tree.Branch("nnratio_p",&nnratio_p,"nnratio_p/D");
   tree.Branch("nnratio_pi",&nnratio_pi,"nnratio_pi/D");
-  tree.Branch("theta",&theta,"theta/D");
   tree.Branch("beamx",&beamx,"beamx/D");
   tree.Branch("beamz",&beamz,"beamz/D");
-  tree.Branch("phi",&phi,"phi/D");
-  tree.Branch("timeRes",&timeRes,"timeRes/D");
+  tree.Branch("par5",&par5,"par5/D");
+  tree.Branch("par6",&par6,"par6/D");  
   
   test1 = PrtManager::Instance()->GetTest1();
   test2 = PrtManager::Instance()->GetTest2();
@@ -527,13 +531,13 @@ void PrtLutReco::Run(Int_t start, Int_t end){
       m2=ff->GetParameter(1);
       s2=ff->GetParameter(2);
     }
-    separation = (fabs(m2-m1))/(0.5*(s1+s2));
-    std::cout<<"separation "<< separation <<std::endl;
+    sep = (fabs(m2-m1))/(0.5*(s1+s2));
+    std::cout<<"sep "<< sep <<std::endl;
 
     //gStyle->SetOptFit(0);
     //gStyle->SetOptStat(0);
     
-    hLnDiffP->SetName(Form("s_%2.2f",separation));
+    hLnDiffP->SetName(Form("s_%2.2f",sep));
     hLnDiffP->Draw();
     hLnDiffPi->SetLineColor(4);
     hLnDiffPi->Draw("same");
