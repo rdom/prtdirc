@@ -143,7 +143,7 @@ void PrtLutReco::Run(Int_t start, Int_t end){
   TString outFile = PrtManager::Instance()->GetOutName()+".root";
   Double_t theta(0),phi(0), trr(0),  nph(0),nph_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
-    sep(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
+    sep(0),sep_err(0),beamx(0),beamz(0),nnratio(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
   Double_t minChangle(0);
   Double_t maxChangle(1);  
   Double_t criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
@@ -518,21 +518,33 @@ void PrtLutReco::Run(Int_t start, Int_t end){
     prt_normalize(hLnDiffP,hLnDiffPi);
     hLnDiffP->SetLineColor(2);
 
-    Double_t m1,m2,s1,s2; 
+    Double_t m1,m2,s1,s2,dm1,dm2,ds1,ds2;; 
     if(hLnDiffP->GetEntries()>10){
       hLnDiffP->Fit("gaus","S");
       ff = hLnDiffP->GetFunction("gaus");
       m1=ff->GetParameter(1);
       s1=ff->GetParameter(2);
+      dm1=ff->GetParError(1);
+      ds1=ff->GetParError(2);
     }
     if(hLnDiffPi->GetEntries()>10){
       hLnDiffPi->Fit("gaus","S");
       ff = hLnDiffPi->GetFunction("gaus");
       m2=ff->GetParameter(1);
       s2=ff->GetParameter(2);
+      dm2=ff->GetParError(1);
+      ds2=ff->GetParError(2);
     }
     sep = (fabs(m2-m1))/(0.5*(s1+s2));
-    std::cout<<"sep "<< sep <<std::endl;
+    
+    Double_t e1,e2,e3,e4;
+    e1=2/(s1+s2)*dm1;
+    e2=2/(s1+s2)*dm2;
+    e3=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds1;
+    e4=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds2;
+    sep_err=sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
+    
+    std::cout<<"sep "<< sep <<" +/- "<<sep_err <<std::endl;
 
     //gStyle->SetOptFit(0);
     //gStyle->SetOptStat(0);
