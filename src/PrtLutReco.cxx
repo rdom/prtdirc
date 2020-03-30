@@ -116,7 +116,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   ch.SetBranchAddress("corr",&corr);
   for(int i=0; i<ch.GetEntries(); i++){
     ch.GetEvent(i);
-    if(corr<0.008) fCorr[pmt] = corr;
+    fCorr[pmt] = corr;
     std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
   }
 }
@@ -353,14 +353,10 @@ void PrtLutReco::Run(Int_t start, Int_t end){
 	Bool_t samepath(false);
 	if(pathid==fHit.GetPathInPrizm()) samepath=true;
 	//if(fLutNode[ch]->GetNRefl(i)!=1 ) continue;
-	//if(pathid != 130000 && pathid != 199000) continue;
 	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
 
 	for(int u=0; u<4; u++){
-	  // if((pathid==190000 || pathid==210000) && u == 0) continue; //one from left-right
-	  // if((pathid==290000 || pathid==310000) && u == 0) continue; //two from left-right
-	  // if((pathid==130000 || pathid==199000) && u == 0) continue; //from up-bottom
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
 	  if(u == 2) dir.SetXYZ( dird.X(), -dird.Y(),  dird.Z()); //no need when no divergence in vertical plane
@@ -612,12 +608,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 
     if(fMethod==2 && fVerbose>0){
 
-      TString nid = "";//Form("_%2.0f",a);
-      prt_canvasAdd("r_tangle"+nid,800,400);
-
       { // corrections
 
-	if(fabs(fCorr[0])<0.00000001){
+	if(fabs(fCorr[0])<0.00000001 && fabs(fCorr[7])<0.00000001){
 	  std::cout<<"Writing "<<fCorrFile<<std::endl;
 	  
 	  TFile fc(fCorrFile,"recreate");
@@ -628,7 +621,7 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	  tc->Branch("corr",&corr,"corr/D");
 	
 	  fFit->SetParameter(1,fAnglePi);    // mean
-	  fFit->SetParLimits(1,fAnglePi-0.01,fAnglePi+0.01); // width	
+	  fFit->SetParLimits(1,fAnglePi-0.012,fAnglePi+0.012); // width	
 	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(Int_t i=0; i<prt_nmcp; i++){
 	    prt_canvasAdd(Form("r_tangle_%d",i),800,400);
@@ -653,6 +646,9 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	// 	fHistCh[i]->Draw();
 	// }
       }
+      
+      TString nid = "";//Form("_%2.0f",a);
+      prt_canvasAdd("r_tangle"+nid,800,400);
       
       //      TString name = Form("r_tangle_%3.1f",test3);
       fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
