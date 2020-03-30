@@ -30,8 +30,8 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c}", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",90,-60,60);
-TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",90,-60,60);
+TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
+TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
 
 TF1 *gF1 = new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
 TF1 *gF2= new TF1("gaus0","[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
@@ -116,7 +116,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, Int_t verbose){
   ch.SetBranchAddress("corr",&corr);
   for(int i=0; i<ch.GetEntries(); i++){
     ch.GetEvent(i);
-    fCorr[pmt] = corr;
+    if(corr<0.008) fCorr[pmt] = corr;
     std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
   }
 }
@@ -627,18 +627,18 @@ Bool_t PrtLutReco::FindPeak(Double_t& cangle, Double_t& spr, Double_t a, Int_t t
 	  tc->Branch("pmt",&pmt,"pmt/I");
 	  tc->Branch("corr",&corr,"corr/D");
 	
-	  fFit->SetParLimits(0,100,100000000);    // norm
 	  fFit->SetParameter(1,fAnglePi);    // mean
+	  fFit->SetParLimits(1,fAnglePi-0.01,fAnglePi+0.01); // width	
 	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(Int_t i=0; i<prt_nmcp; i++){
-	    //prt_canvasAdd(Form("r_tangle_%d",i),800,400);
-	    fHistMcp[i]->Fit("fgaus","lq","",fAnglePi-0.03,fAnglePi+0.03);
+	    prt_canvasAdd(Form("r_tangle_%d",i),800,400);
+	    fHistMcp[i]->Fit("fgaus","MQ","",fAnglePi-0.03,fAnglePi+0.03);
 	    pmt = i;
 	    corr= fAnglePi-fFit->GetParameter(1);
 	    tc->Fill();
 	    std::cout<<"if(mcpid=="<< i<<") tangle += "<<corr<<";" <<std::endl;	  
-	    // fHistMcp[i]->Draw();
-	    // drawTheoryLines();	  
+	    fHistMcp[i]->Draw();
+	    drawTheoryLines();	  
 	  }
 	  
 	  tc->Write();
