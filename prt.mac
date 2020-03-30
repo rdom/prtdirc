@@ -18,7 +18,7 @@
 #/process/setVerbose 0
 #/process/em/workerVerbose 0
 
-/Prt/geom/prtRotation 90 deg
+#/Prt/geom/prtRotation 90 deg
 /Prt/geom/lensId 0
 /Prt/gun/optPhotonPolar
 
