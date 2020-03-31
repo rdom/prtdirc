@@ -220,8 +220,8 @@ void PrtLutReco::Run(int start, int end){
     
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = fEvent->GetAngle(); // prt_data_info.getAngle();
-      phi = fEvent->GetPhi(); //prt_data_info.getPhi(); //
+      prtangle = prt_data_info.getAngle(); //fEvent->GetAngle(); // prt_data_info.getAngle();
+      phi = 0;//prt_data_info.getPhi(); // fEvent->GetPhi(); //prt_data_info.getPhi();
       studyId = fEvent->GetGeometry();      
       mom = fEvent->GetMomentum().Mag();
 
