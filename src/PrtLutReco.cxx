@@ -628,14 +628,14 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr, double a, int tofpdg){
 	  fFit->SetParLimits(1,-0.012,0.012); // width	
 	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(int i=0; i<prt_nmcp; i++){
-	    prt_canvasAdd(Form("r_tangle_%d",i),800,400);
+	    // prt_canvasAdd(Form("r_tangle_%d",i),800,400);
 	    fHistMcp[i]->Fit("fgaus","MQ","",-0.03,0.03);
 	    pmt = i;
 	    corr= -fFit->GetParameter(1);
 	    tc->Fill();
 	    std::cout<<"if(mcpid=="<< i<<") tangle += "<<corr<<";" <<std::endl;	  
-	    fHistMcp[i]->Draw();
-	    drawTheoryLines();	  
+	    // fHistMcp[i]->Draw();
+	    // drawTheoryLines();	  
 	  }
 	  
 	  tc->Write();
