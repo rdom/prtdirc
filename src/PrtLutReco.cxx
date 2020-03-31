@@ -247,7 +247,7 @@ void PrtLutReco::Run(int start, int end){
     if(events[pid]>end) continue;
     if(fMethod==3 && tofPid!=211) continue; // only pions    
     
-    double angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.008),range(5*sigma),noise(0.3);
+    double angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.0082),range(5*sigma),noise(0.3);
     
     fAngleP = acos(sqrt(momentum*momentum+ prt_mass[4]*prt_mass[4])/momentum/1.4738); //1.4738 = 370 = 3.35
     fAnglePi= acos(sqrt(momentum*momentum + prt_mass[2]*prt_mass[2])/momentum/1.4738); //-0.0014 for 160 25deg
