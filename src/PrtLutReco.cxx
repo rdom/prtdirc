@@ -108,7 +108,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
   
   // read corrections
-  fCorrFile = infile.ReplaceAll("beam","corr");
+  fCorrFile = PrtManager::Instance()->GetOutName().ReplaceAll("rec","corr")+".root";
   std::cout<<"reading  "<<fCorrFile <<std::endl;  
   int pmt;
   double corr;
