@@ -107,7 +107,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
   
   // read corrections
-  fCorrFile = PrtManager::Instance()->GetOutName().ReplaceAll("rec","corr")+".root";
+  fCorrFile = PrtManager::Instance()->GetOutName()+"_corr.root";
   std::cout<<"reading  "<<fCorrFile <<std::endl;  
   int pmt;
   double corr;
