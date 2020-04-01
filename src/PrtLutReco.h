@@ -29,27 +29,27 @@ class PrtLutReco{
 public:
 
   // Standard constructors
-  PrtLutReco(TString infile, TString lutfile, Int_t verbose=0);
+  PrtLutReco(TString infile, TString lutfile, int verbose=0);
 
   // Destructor
   ~PrtLutReco();
-  void Run(Int_t start=0, Int_t end=0);
+  void Run(int start=0, int end=0);
   void drawTheoryLines();
   
 private:
-  Bool_t FindPeak(Double_t& cherenkovreco, Double_t& spr,Double_t a, Int_t tofpid=0);
-  Int_t FindPdg(Double_t mom, Double_t cangle);
-  Int_t GetEdge(Int_t mcpid, Int_t pixid);
+  bool FindPeak(double& cangle, double& spr,double& cangle_pi, double& spr_pi,double a, int tofpid=0);
+  int FindPdg(double mom, double cangle);
+  int GetEdge(int mcpid, int pixid);
   void SearchClusters();
-  void FitRing(Double_t& x0, Double_t& y0, Double_t& theta);
-  Double_t fillLnDiffPPi(Double_t cangle, Int_t tofPid, Double_t mom);
-  Double_t fillLnDiffPPi2(Double_t cangle, Int_t tofPid, Double_t mom);
+  void FitRing(double& x0, double& y0, double& theta);
+  double fillLnDiffPPi(double cangle, int tofPid, double mom);
+  double fillLnDiffPPi2(double cangle, int tofPid, double mom);
   void ResetHists();
-  Int_t fDetectorID;  
-  Double_t fBboxNum,fPipehAngle,fDphi,fBarPhi;
+  int fDetectorID;  
+  double fBboxNum,fPipehAngle,fDphi,fBarPhi;
   TRandom fRand;
-  Int_t fMethod;
-  Int_t fRadiator;
+  int fMethod;
+  int fRadiator;
 
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
@@ -62,17 +62,17 @@ private:
   PrtHit fHit;
   
   // Verbosity level
-  Int_t fVerbose;
-  Int_t nevents;
+  int fVerbose;
+  int nevents;
   TString fInputFile;
   TH1F *fHist;
   TH1F *fHistPi;
   TH1F *fHisti;
   TF1 *fFit;
   TSpectrum *fSpect;
-  Double_t fAngleP;
-  Double_t fAnglePi;
-  Double_t fTest;
+  double fAngleP;
+  double fAnglePi;
+  double fTest;
   double fCorr[8];
   TString fCorrFile;
 };
