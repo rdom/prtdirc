@@ -226,18 +226,18 @@ void PrtLutReco::Run(int start, int end){
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
       prtangle = prt_data_info.getAngle(); //fEvent->GetAngle(); // prt_data_info.getAngle();
-      phi = 0;//prt_data_info.getPhi(); // fEvent->GetPhi(); //prt_data_info.getPhi();
+      phi = 0; //prt_data_info.getPhi(); // fEvent->GetPhi(); //prt_data_info.getPhi();
       studyId = fEvent->GetGeometry();      
       mom = fEvent->GetMomentum().Mag();
 
       std::cout<<"prtangle++  "<<prtangle<< " phi "<<phi<<std::endl;
       
-      if(fEvent->GetType()==0){
-      	momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+0); //test1 
-	momInBar.RotateZ(phi*CLHEP::deg+0); //test2
-      }else{
-        momInBar.RotateY(TMath::Pi()-prtangle*CLHEP::deg+0); //test1
-	momInBar.RotateZ(phi*CLHEP::deg+0); //test2
+      if(fEvent->GetType()==0){ //data
+      	momInBar.RotateY(TMath::Pi()-(prtangle+test1)*CLHEP::deg); //test1
+	momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2
+      }else{ //sim
+        momInBar.RotateY(TMath::Pi()-(prtangle+test1)*CLHEP::deg); //test1
+	momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2
       }
 
       if(fVerbose==3){
