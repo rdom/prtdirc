@@ -103,22 +103,26 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   for(int i=0; i<prt_maxdircch; i++){
     fHistCh[i] = new TH1F(Form("fHistCh_%d",i),Form("fHistCh_%d;#theta_{C} [rad];entries [#]",i), 150,0.6,1); //150
   }
-
-  for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
   
   // read corrections
   fCorrFile = PrtManager::Instance()->GetOutName()+"_corr.root";
-  std::cout<<"reading  "<<fCorrFile <<std::endl;  
-  int pmt;
-  double corr;
-  TChain ch; ch.SetName("corr"); ch.Add(fCorrFile);
-  ch.SetBranchAddress("pmt",&pmt);
-  ch.SetBranchAddress("corr",&corr);
-  for(int i=0; i<ch.GetEntries(); i++){
-    ch.GetEvent(i);
-    fCorr[pmt] = (fabs(corr)<0.011)? corr: 0.00001;
-    std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
+  for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
+  if(!gSystem->AccessPathName(fCorrFile)){  
+    std::cout<<"------- reading  "<<fCorrFile <<std::endl;
+    int pmt;
+    double corr;
+    TChain ch; ch.SetName("corr"); ch.Add(fCorrFile);
+    ch.SetBranchAddress("pmt",&pmt);
+    ch.SetBranchAddress("corr",&corr);
+    for(int i=0; i<ch.GetEntries(); i++){
+      ch.GetEvent(i);
+      fCorr[pmt] = (fabs(corr)<0.011)? corr: 0.00001;
+      std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
+    }
+  }else{
+    std::cout<<"------- corr file not found  "<<fCorrFile <<std::endl;
   }
+  
 }
 
 // -----   Destructor   ----------------------------------------------------
@@ -282,8 +286,8 @@ void PrtLutReco::Run(int start, int end){
 	if(gch==513) t2++;
 	if(gch==514) t3h++;
 	if(gch==515) t3v++;
-	//if(gch>=1094 && gch<=1101) hodo1++;
-	if(gch>=1097 && gch<=1098) hodo1++;
+	if(gch>=1094 && gch<=1101) hodo1++;
+	//if(gch>=1097 && gch<=1098) hodo1++;
 	if(gch==1140) str1++;
 	if(gch==1142) stl1++;
 	if(gch==1144) str2++;
@@ -724,10 +728,10 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
 	  prt_hdigi[m]->Scale(1/(double)max);
 	}
       }
- 
-      prt_drawDigi("m,p,v\n",2018);
-      prt_cdigi->SetName("r_hp"+nid);
-      prt_canvasAdd(prt_cdigi);
+      
+      auto cdigi = prt_drawDigi(2018);
+      cdigi->SetName("hp"+nid);
+      prt_canvasAdd(cdigi);
       		 
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
