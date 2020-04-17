@@ -21,7 +21,7 @@ void drawHP(TString infile="../build/hits.root"){
       if(prt_pid==4 && time<30) prt_hdigi[mcp]->Fill(pix%8, pix/8);
     }
   }
-  
+
   auto cdigi = prt_drawDigi(2018,0,0);
   prt_canvasAdd(cdigi);
   prt_canvasSave("data/drawHP",0);
