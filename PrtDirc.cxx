@@ -192,7 +192,8 @@ int main(int argc,char** argv)
  
   if ( particle.size() ) {
     int pdgid = 0;
-    if(particle=="mix") PrtManager::Instance()->SetMixPiP(true);
+    if(particle=="mix_pip") PrtManager::Instance()->SetMix(1);
+    if(particle=="mix_pik") PrtManager::Instance()->SetMix(2);
     else{
       G4String command = "/gun/particle ";
       UImanager->ApplyCommand(command+particle);

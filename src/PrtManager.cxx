@@ -62,7 +62,7 @@ PrtManager::PrtManager(G4String outfile, G4int runtype){
   fTime=0;
   fTimeRes=0.2;
   fInfo="";
-  fMixPiP=false;
+  fMix=0;
 
   fnX1 = TVector3(1,0,0);   
   fnY1 = TVector3( 0,1,0);

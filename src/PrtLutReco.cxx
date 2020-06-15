@@ -111,7 +111,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     std::cout<<"------- reading  "<<fCorrFile <<std::endl;
     int pmt;
     double corr;
-    TChain ch; ch.SetName("corr"); ch.Add(fCorrFile);
+    TChain ch("corr"); ch.Add(fCorrFile);
     ch.SetBranchAddress("pmt",&pmt);
     ch.SetBranchAddress("corr",&corr);
     for(int i=0; i<ch.GetEntries(); i++){
@@ -633,7 +633,7 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
 	  tc->Branch("corr",&corr,"corr/D");
 	
 	  fFit->SetParameter(1,0);    // mean
-	  fFit->SetParLimits(1,-0.012,0.012); // width	
+	  fFit->SetParLimits(1,-0.012,0.012);
 	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(int i=0; i<prt_nmcp; i++){
 	    // prt_canvasAdd(Form("r_tangle_%d",i),800,400);

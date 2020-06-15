@@ -41,6 +41,38 @@ G4VParticleChange* PrtOpBoundaryProcess::PostStepDoIt(const G4Track& aTrack, con
     }
   }
 
+  // // bar surface scattering
+  // if(1){
+  //   G4String ParticleName = aTrack.GetDynamicParticle()->GetParticleDefinition()->GetParticleName();  
+  //   if (ParticleName == "opticalphoton" && aStep.GetPreStepPoint()->GetPhysicalVolume()->GetName()=="wBar"){
+  //     G4double z = 0.5*PrtManager::Instance()->GetRadiatorL();
+  //     G4double w = 0.5*PrtManager::Instance()->GetRadiatorW();
+  //     G4double h = 0.5*PrtManager::Instance()->GetRadiatorH();
+
+  //     G4ThreeVector theGlobalPoint1 = pPostStepPoint->GetPosition();
+  //     G4TouchableHistory* touchable = (G4TouchableHistory*)(pPostStepPoint->GetTouchable());
+  //     G4ThreeVector lpoint =  touchable->GetHistory()->GetTransform(1).TransformPoint(theGlobalPoint1);     
+  // 	{
+  // 	  std::cout<<w<<" lpoint "<<lpoint<<std::endl;
+	  
+  // 	  if(lpoint.getY() > w-0.01)
+  // 	  {
+  // 	  std::cout<<h<<" lpoint.getX() "<<lpoint.getX()<<" "<<lpoint.getY()<<std::endl;
+	  
+  // 	  G4ThreeVector ww  = pPreStepPoint->GetTouchableHandle()->GetHistory()->
+  // 	    GetTopTransform().Inverse().TransformPoint(G4ThreeVector(lpoint.getX(),lpoint.getY(),lpoint.getZ()));
+	  
+  // 	  G4Navigator* theNavigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
+  // 	  theNavigator->LocateGlobalPointWithinVolume(ww);
+  // 	  aParticleChange.ProposePosition(ww.getX(), ww.getY(),ww.getZ());
+  // 	  // aParticleChange.ProposeMomentumDirection(G4double Px, G4double Py, G4double Pz)
+
+  // 	  return G4VDiscreteProcess::PostStepDoIt(aTrack, aStep);
+  // 	}
+  //     }
+  //   }
+  // }
+
   if(PrtManager::Instance()->GetRunType() == 1 && pPostStepPoint->GetPosition().z()<pPreStepPoint->GetPosition().z()){    
     particleChange->ProposeTrackStatus(fStopAndKill);
   }

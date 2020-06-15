@@ -80,7 +80,8 @@ example:
               "kaon"
                  ...
               "opticalphoton"
-	      "mix" - (mix protons and pions) 
+	      "mix_pip" - (mix pions and protons)
+	      "mix_pik" - (mix pions and kaons ) 
 
 -p    particle momentum [GeV/c]
 

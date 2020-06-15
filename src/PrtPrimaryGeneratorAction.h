@@ -32,6 +32,7 @@ private:
   G4ParticleGun* fParticleGun;
   G4ParticleDefinition* fParticleP;
   G4ParticleDefinition* fParticlePi;
+  G4ParticleDefinition* fParticleKaon;
   PrtPrimaryGeneratorMessenger* fGunMessenger;
 };
 
