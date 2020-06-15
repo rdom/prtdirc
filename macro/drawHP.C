@@ -26,4 +26,3 @@ void drawHP(TString infile="../build/hits.root"){
   prt_canvasAdd(cdigi);
   prt_canvasSave("data/drawHP",0);
 }
-
