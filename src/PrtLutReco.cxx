@@ -106,7 +106,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   
   // read corrections
   fCorrFile = PrtManager::Instance()->GetOutName()+"_corr.root";
-  for(int i=0; i<prt_nmcp; i++) fCorr[i]=0;
+  
+  for(int i=0; i<prt_nmcp; i++) fCorr[i] = 0;
   if(!gSystem->AccessPathName(fCorrFile)){  
     std::cout<<"------- reading  "<<fCorrFile <<std::endl;
     int pmt;
@@ -122,7 +123,6 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   }else{
     std::cout<<"------- corr file not found  "<<fCorrFile <<std::endl;
   }
-  
 }
 
 // -----   Destructor   ----------------------------------------------------
@@ -586,37 +586,43 @@ int g_num =0;
 Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double& spr_pi, double a, int tofpdg){
   cangle=0;
   spr=0;
-  //  gStyle->SetCanvasPreferGL(kTRUE);
+  
   if(fHist->GetEntries()>20 || fHistPi->GetEntries()>20){
     gROOT->SetBatch(1);
     int nfound = fSpect->Search(fHist,1,"",0.9); //0.6
     if(nfound>0) cangle = fSpect->GetPositionX()[0];
     else cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
+
     cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
-
-    if(cangle>0.85) cangle=0.82;
-    fFit->SetParameters(100,cangle,0.010);
+    if(cangle>0.84) cangle=0.82;
+    fFit->SetParameters(100,cangle,0.008);
     fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");      
-    fFit->SetParLimits(0,0.1,1E6);
-    fFit->SetParLimits(1,cangle-0.04,cangle+0.04); 
-    fFit->SetParLimits(2,0.005,0.016); // width 7-10    
-    // fFit->FixParameter(2,0.01); 
-    // fFit->FixParameter(3,0); 
-    // fFit->FixParameter(4,0);
+    fFit->SetParLimits(0,5,1E6);
+    fFit->SetParLimits(1,cangle-0.04,0.84); 
+    fFit->SetParLimits(2,0.005,0.016);
+    
+    if(fMethod==3){
+      fFit->SetParameter(2,0.006);
+      fFit->SetParLimits(2,0.002,0.006);
+      fHist->Fit("fgaus","Mlq","",0.6,1);
 
+      if(fVerbose>2){
+	gROOT->SetBatch(0);
+	prt_canvasAdd("ff",800,400);
+	fHist->Draw();
+	drawTheoryLines();
+	prt_waitPrimitive("ff");
+      }
+    }
+    
     int status(0);
-    if(fMethod==3) status = fHist->Fit("fgaus","Mlq","",0.6,1);
-    else status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
+    status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
     cangle = fFit->GetParameter(1);
     spr = fFit->GetParameter(2);
-
-    if(fMethod==3) status = fHistPi->Fit("fgaus","Mlq","",0.6,1);
-    else status = fHistPi->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
+    
+    status = fHistPi->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
     cangle_pi = fFit->GetParameter(1);
     spr_pi = fFit->GetParameter(2);
-
-    
-    if(fVerbose>1) gROOT->SetBatch(0);
 
     if(fMethod==2 && fVerbose>0){
 
@@ -680,7 +686,6 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
       if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
       drawTheoryLines();
-      std::cout<<"here0 "<<std::endl;
       
       { // time
 	prt_canvasAdd("r_time",800,400);
