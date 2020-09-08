@@ -615,17 +615,16 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
       }
     }
     
-    int status(0);
-    status =fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
-    cangle = fFit->GetParameter(1);
-    spr = fFit->GetParameter(2);
-    
-    status = fHistPi->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
-    cangle_pi = fFit->GetParameter(1);
-    spr_pi = fFit->GetParameter(2);
-
-    if(fMethod==2 && fVerbose>0){
-
+    if(fMethod==2){
+      
+      fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
+      cangle = fFit->GetParameter(1);
+      spr = fFit->GetParameter(2);
+      
+      fHistPi->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
+      cangle_pi = fFit->GetParameter(1);
+      spr_pi = fFit->GetParameter(2);      
+      
       { // corrections
 
 	if(fabs(fCorr[0])<0.00000001 && fabs(fCorr[7])<0.00000001){
@@ -664,80 +663,83 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
 	// 	fHistCh[i]->Draw();
 	// }
       }
+
+      if(fVerbose>0){
       
-      TString nid = "";//Form("_%2.0f",a);
-      prt_canvasAdd("r_tangle"+nid,800,400);
+	TString nid = "";//Form("_%2.0f",a);
+	prt_canvasAdd("r_tangle"+nid,800,400);
       
-      //      TString name = Form("r_tangle_%3.1f",test3);
-      fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
-      fHist->SetMinimum(0);
-      //fHist->Scale(1/fHist->GetMaximum());
+	//      TString name = Form("r_tangle_%3.1f",test3);
+	fHist->SetTitle(Form("theta %3.1f , TOF PID = %d", a, tofpdg));
+	fHist->SetMinimum(0);
+	//fHist->Scale(1/fHist->GetMaximum());
 
-      prt_normalize(fHist,fHistPi);
-      fHistPi->SetLineColor(4);
-      fHist->SetLineColor(1);
+	prt_normalize(fHist,fHistPi);
+	fHistPi->SetLineColor(4);
+	fHist->SetLineColor(1);
 
-      fHistPi->Fit("fgaus","lq","",cangle-0.06,cangle+0.06);
-      fHist->Draw();
-      fHistPi->Draw("same");
-      // gF1->Draw("same");
-      // gF2->Draw("same");
-      fHisti->SetLineColor(kRed+2);
-      if(fHisti->GetEntries()>5) fHisti->Draw("same");
+	fHistPi->Fit("fgaus","lq","",cangle-0.06,cangle+0.06);
+	fHist->Draw();
+	fHistPi->Draw("same");
+	// gF1->Draw("same");
+	// gF2->Draw("same");
+	fHisti->SetLineColor(kRed+2);
+	if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
-      drawTheoryLines();
+	drawTheoryLines();
       
-      { // time
-	prt_canvasAdd("r_time",800,400);
-	prt_normalize(fHist1,fHist2);
-	fHist1->SetTitle(Form("theta %3.1f", a));
-	fHist2->SetLineColor(2);
-	fHist1->Draw();
-	fHist2->Draw("same");
+	{ // time
+	  prt_canvasAdd("r_time",800,400);
+	  prt_normalize(fHist1,fHist2);
+	  fHist1->SetTitle(Form("theta %3.1f", a));
+	  fHist2->SetLineColor(2);
+	  fHist1->Draw();
+	  fHist2->Draw("same");
 
-	prt_canvasAdd("r_diff_time",800,400);
-	fDiff->Draw("colz");
-      }
+	  prt_canvasAdd("r_diff_time",800,400);
+	  fDiff->Draw("colz");
+	}
       
-      prt_canvasAdd("r_nph"+nid,800,400);
-      fhNph_p->SetLineColor(kRed+1);
-      fhNph_p->Draw();
-      fhNph_pi->SetLineColor(kBlue+1);
-      fhNph_pi->Draw("same");
+	prt_canvasAdd("r_nph"+nid,800,400);
+	fhNph_p->SetLineColor(kRed+1);
+	fhNph_p->Draw();
+	fhNph_pi->SetLineColor(kBlue+1);
+	fhNph_pi->Draw("same");
 
-      prt_canvasAdd("r_diff"+nid,800,400);
-      fHist0->SetTitle(Form("theta %3.1f", a));
-      fHist0->Draw();
-      fHist0i->SetLineColor(kRed+2);
-      if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
+	prt_canvasAdd("r_diff"+nid,800,400);
+	fHist0->SetTitle(Form("theta %3.1f", a));
+	fHist0->Draw();
+	fHist0i->SetLineColor(kRed+2);
+	if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
        
-      // prt_canvasAdd("r_cm"+nid,800,400);
-      // fHist3->SetTitle(Form("theta %3.1f", a));
-      // fHist3->Draw("colz");
-      std::cout<<"here1 "<<std::endl;
-      if(false){
-	int tmax, max=0;
-	for(int m=0; m<prt_nmcp;m++){
-	  prt_hdigi[m]->Rebin2D(8,8);
-	  prt_hdigi[m]->GetXaxis()->SetNdivisions(0);
-	  prt_hdigi[m]->GetYaxis()->SetNdivisions(0);
-	  prt_hdigi[m]->GetXaxis()->SetTickLength(0);
-	  prt_hdigi[m]->GetYaxis()->SetTickLength(0);
-	  prt_hdigi[m]->GetXaxis()->SetAxisColor(1);
-	  prt_hdigi[m]->GetYaxis()->SetAxisColor(1);
-	  prt_hdigi[m]->SetMarkerSize(10);
-	  tmax = prt_hdigi[m]->GetMaximum();
-	  if(max<tmax) max = tmax;
+	// prt_canvasAdd("r_cm"+nid,800,400);
+	// fHist3->SetTitle(Form("theta %3.1f", a));
+	// fHist3->Draw("colz");
+	std::cout<<"here1 "<<std::endl;
+	if(false){
+	  int tmax, max=0;
+	  for(int m=0; m<prt_nmcp;m++){
+	    prt_hdigi[m]->Rebin2D(8,8);
+	    prt_hdigi[m]->GetXaxis()->SetNdivisions(0);
+	    prt_hdigi[m]->GetYaxis()->SetNdivisions(0);
+	    prt_hdigi[m]->GetXaxis()->SetTickLength(0);
+	    prt_hdigi[m]->GetYaxis()->SetTickLength(0);
+	    prt_hdigi[m]->GetXaxis()->SetAxisColor(1);
+	    prt_hdigi[m]->GetYaxis()->SetAxisColor(1);
+	    prt_hdigi[m]->SetMarkerSize(10);
+	    tmax = prt_hdigi[m]->GetMaximum();
+	    if(max<tmax) max = tmax;
+	  }
+	  for(int m=0; m<prt_nmcp;m++){	  
+	    prt_hdigi[m]->Scale(1/(double)max);
+	  }
 	}
-	for(int m=0; m<prt_nmcp;m++){	  
-	  prt_hdigi[m]->Scale(1/(double)max);
-	}
+      
+	auto cdigi = prt_drawDigi(2018);
+	cdigi->SetName("hp"+nid);
+	prt_canvasAdd(cdigi);
       }
       
-      auto cdigi = prt_drawDigi(2018);
-      cdigi->SetName("hp"+nid);
-      prt_canvasAdd(cdigi);
-      		 
       if(fVerbose==3){
 	TCanvas* c2 = new TCanvas("c2","c2",0,0,800,400);
 	c2->Divide(2,1);
