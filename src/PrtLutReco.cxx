@@ -408,9 +408,9 @@ void PrtLutReco::Run(int start, int end){
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle ,weight);
-	    
+
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle-fAngleP ,weight);
-	    if(tofPid==212) fHistMcp[mcpid]->Fill(tangle-fAnglePi ,weight);
+	    if(tofPid==211) fHistMcp[mcpid]->Fill(tangle-fAnglePi ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 
 	    if(true && tangle>0.4 && tangle<0.9){
@@ -587,7 +587,7 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
   cangle=0;
   spr=0;
   gROOT->SetBatch(1);
-  
+				       
   if(fHist->GetEntries()>20 || fHistPi->GetEntries()>20){
     int nfound = fSpect->Search(fHist,1,"",0.9); //0.6
     if(nfound>0) cangle = fSpect->GetPositionX()[0];
