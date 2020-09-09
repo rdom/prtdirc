@@ -586,7 +586,7 @@ int g_num =0;
 Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double& spr_pi, double a, int tofpdg){
   cangle=0;
   spr=0;
-  gROOT->SetBatch(0);
+  gROOT->SetBatch(1);
   
   if(fHist->GetEntries()>20 || fHistPi->GetEntries()>20){
     int nfound = fSpect->Search(fHist,1,"",0.9); //0.6
@@ -608,6 +608,7 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
       fHist->Fit("fgaus","Mlq","",0.6,1);
       cangle = fFit->GetParameter(1);
       spr = fFit->GetParameter(2);
+      gROOT->SetBatch(!fVerbose);
       
       if(fVerbose>2){
 	gROOT->SetBatch(0);
@@ -620,8 +621,9 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
     }
     
     if(fMethod==2){
-      
-      fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
+      gROOT->SetBatch(1);
+      fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
+      if(fVerbose>1) gROOT->SetBatch(0);
       cangle = fFit->GetParameter(1);
       spr = fFit->GetParameter(2);
       
@@ -645,15 +647,17 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
 	  fFit->SetParLimits(1,-0.012,0.012);
 	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(int i=0; i<prt_nmcp; i++){
-	    prt_canvasAdd(Form("r_tangle_%d",i),800,400);
+	    
+	    if(fVerbose>2) prt_canvasAdd(Form("r_tangle_%d",i),800,400);
 	    fHistMcp[i]->Fit("fgaus","MQ","",-0.03,0.03);
 	    pmt = i;
 	    corr= -fFit->GetParameter(1);
 	    tc->Fill();
 	    std::cout<<"if(mcpid=="<< i<<") tangle += "<<corr<<";" <<std::endl;	  
-
-	    fHistMcp[i]->Draw();
-	    drawTheoryLines();	  
+	    if(fVerbose>2){
+	      fHistMcp[i]->Draw();
+	      drawTheoryLines();
+	    }
 	  }
 	  
 	  tc->Write();
@@ -669,8 +673,8 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
 	// }
       }
 
-      if(fVerbose>0){
-      
+      if(fVerbose>0){       
+	
 	TString nid = "";//Form("_%2.0f",a);
 	prt_canvasAdd("r_tangle"+nid,800,400);
       
