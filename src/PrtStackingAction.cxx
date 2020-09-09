@@ -33,7 +33,7 @@ PrtStackingAction::PrtStackingAction()
   
     for (Int_t i=1;i<1000;i++) {
       // Std QE (Photonis 2)
-      fCollectionEff = 0.95;
+      fCollectionEff = 0.65;
       lambda[0][i] = 200+i-1;
       fEfficiencyR[0][i]=(i>40 && i<500)? eff_std[i]*0.01*fCollectionEff : 0;
       
@@ -84,6 +84,8 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track * a
       // apply detector efficiency at the production stage:    
       if(true){
 	Double_t ra = fRand->Uniform(0., 1.);
+	std::cout<<"fQEtype "<<fQEtype<<std::endl;
+	
 	if(ra > fDetEff[fQEtype]->Eval(lambda))return fKill;	
       }
     }
