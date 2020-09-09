@@ -84,8 +84,6 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track * a
       // apply detector efficiency at the production stage:    
       if(true){
 	Double_t ra = fRand->Uniform(0., 1.);
-	std::cout<<"fQEtype "<<fQEtype<<std::endl;
-	
 	if(ra > fDetEff[fQEtype]->Eval(lambda))return fKill;	
       }
     }
