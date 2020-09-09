@@ -586,9 +586,9 @@ int g_num =0;
 Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double& spr_pi, double a, int tofpdg){
   cangle=0;
   spr=0;
+  gROOT->SetBatch(0);
   
   if(fHist->GetEntries()>20 || fHistPi->GetEntries()>20){
-    gROOT->SetBatch(1);
     int nfound = fSpect->Search(fHist,1,"",0.9); //0.6
     if(nfound>0) cangle = fSpect->GetPositionX()[0];
     else cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
@@ -597,17 +597,21 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
     if(cangle>0.84) cangle=0.82;
     fFit->SetParameters(100,cangle,0.008);
     fFit->SetParNames("p0","#theta_{c}","#sigma_{c}","p3","p4");      
-    fFit->SetParLimits(0,5,1E6);
+    fFit->SetParLimits(0,10,1E6);
     fFit->SetParLimits(1,cangle-0.04,0.84); 
     fFit->SetParLimits(2,0.005,0.016);
     
     if(fMethod==3){
       fFit->SetParameter(2,0.006);
-      fFit->SetParLimits(2,0.002,0.006);
+      fFit->SetParLimits(2,0.002,0.007);
+      gROOT->SetBatch(1);
       fHist->Fit("fgaus","Mlq","",0.6,1);
-
+      cangle = fFit->GetParameter(1);
+      spr = fFit->GetParameter(2);
+      
       if(fVerbose>2){
 	gROOT->SetBatch(0);
+	fFit->SetNpx(300);
 	prt_canvasAdd("ff",800,400);
 	fHist->Draw();
 	drawTheoryLines();
@@ -641,14 +645,15 @@ Bool_t PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, doubl
 	  fFit->SetParLimits(1,-0.012,0.012);
 	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(int i=0; i<prt_nmcp; i++){
-	    // prt_canvasAdd(Form("r_tangle_%d",i),800,400);
+	    prt_canvasAdd(Form("r_tangle_%d",i),800,400);
 	    fHistMcp[i]->Fit("fgaus","MQ","",-0.03,0.03);
 	    pmt = i;
 	    corr= -fFit->GetParameter(1);
 	    tc->Fill();
 	    std::cout<<"if(mcpid=="<< i<<") tangle += "<<corr<<";" <<std::endl;	  
-	    // fHistMcp[i]->Draw();
-	    // drawTheoryLines();	  
+
+	    fHistMcp[i]->Draw();
+	    drawTheoryLines();	  
 	  }
 	  
 	  tc->Write();
