@@ -50,6 +50,7 @@ private:
   TRandom fRand;
   int fMethod;
   int fRadiator;
+  int fStudyId;
 
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
