@@ -281,7 +281,7 @@ void PrtLutReco::Run(int start, int end){
     int pid = prt_get_pid(tofPid);    
     if(events[pid]>end) continue;
 
-    double angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.0092),range(5*sigma),noise(0.3); //0.0082
+    double angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.0095),range(5*sigma),noise(0.3); //0.0082
     
     fAngleP = acos(sqrt(momentum*momentum+ prt_mass[4]*prt_mass[4])/momentum/1.4738); //1.4738 = 370 = 3.35
     fAnglePi= acos(sqrt(momentum*momentum + prt_mass[2]*prt_mass[2])/momentum/1.4738); //-0.0014 for 160 25deg
@@ -339,7 +339,7 @@ void PrtLutReco::Run(int start, int end){
       hitTime = fHit.GetLeadTime();
       if(fEvent->GetType() == 1) hitTime+=fRand.Gaus(0,0.2); // time resol. in case it was not simulated
       else{
-	if(fStudyId==420) hitTime += 0.9; 
+	if(fStudyId==420) hitTime += 0.7; 
       }
       
       
