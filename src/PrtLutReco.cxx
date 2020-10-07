@@ -264,7 +264,7 @@ void PrtLutReco::Run(int start, int end){
     //if(ievent != start) break;
 
     if(fEvent->GetType()==0){ //data
-      momInBar.RotateY(TMath::Pi()-(prtangle+test1)*CLHEP::deg); //test1
+      momInBar.RotateY(TMath::Pi()-(prtangle+0)*CLHEP::deg); //test1
       momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2
     }else{ //sim
       momInBar.RotateY(TMath::Pi()-(prtangle+0)*CLHEP::deg); //test1
