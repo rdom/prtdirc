@@ -241,7 +241,8 @@ void PrtLutReco::Run(int start, int end){
       mom = fEvent->GetMomentum().Mag();
       beamx = fEvent->GetPosition().X();
       beamz = fEvent->GetPosition().Z();
-
+      if(fEvent->GetType()==1) beamz = 0.5*radiatorL-beamz;
+ 
       std::cout<<fStudyId<<"  prtangle++  "<<prtangle<< " phi "<<phi<<" t1 "<<test1<<" t2 "<<test2<<std::endl;
       
       // if(fEvent->GetType()==0){ //data
