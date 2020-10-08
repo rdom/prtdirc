@@ -279,19 +279,19 @@ void PrtLutReco::Run(int start, int end){
     if( fEvent->GetType()==1) momentum /= 1000;
     tofPid = fEvent->GetParticle();
     int pid = prt_get_pid(tofPid);    
-    if(events[pid]>end) continue;
+    if(events[pid]>=end) continue;
 
-    double angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.0095),range(5*sigma),noise(0.3); //0.0082
+    double angle1(0), angle2(0),sum1(0),sum2(0), sigma(0.0085),range(5*sigma),noise(0.3); //0.0082
     
     fAngleP = acos(sqrt(momentum*momentum+ prt_mass[4]*prt_mass[4])/momentum/1.4738); //1.4738 = 370 = 3.35
-    fAnglePi= acos(sqrt(momentum*momentum + prt_mass[2]*prt_mass[2])/momentum/1.4738); //-0.0014 for 160 25deg
+    fAnglePi= acos(sqrt(momentum*momentum + prt_mass[2]*prt_mass[2])/momentum/1.4738);
 
     gF1->SetParameter(0,1);
     gF2->SetParameter(0,1);
     gF1->SetParameter(1,fAngleP);
     gF2->SetParameter(1,fAnglePi);
     gF1->SetParameter(2,sigma);
-    gF2->SetParameter(2,sigma);
+    gF2->SetParameter(2,sigma-0.0005);
 
     
     // if(fMethod==2 && tofPid!=2212) continue;
@@ -442,7 +442,7 @@ void PrtLutReco::Run(int start, int end){
 	  else fHist0d->Fill(tdiff);
 			  
 	  if(samepath) fHist0i->Fill(tdiff);	  
-	  if(fabs(tdiff)>timeRes+luttime*0.04) continue; //if(fabs(tdiff)>timeRes) continue;
+	  if(fabs(tdiff)>timeRes+luttime*0.04) continue;
 
 	  fDiff->Fill(hitTime,tdiff);		 	  
 	  fHist3->Fill(fabs(luttime),hitTime);
@@ -456,10 +456,11 @@ void PrtLutReco::Run(int start, int end){
 	    else fHist->Fill(tangle ,weight);
 
 	    if(tofPid==2212) fHistMcp[mcpid]->Fill(tangle-fAngleP ,weight);
-	    if(tofPid==211) fHistMcp[mcpid]->Fill(tangle-fAnglePi ,weight);
+	    //if(tofPid==211) fHistMcp[mcpid]->Fill(tangle-fAnglePi ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 
-	    if(true && tangle>0.4 && tangle<0.9){
+	    // if(true && tangle>0.4 && tangle<0.9){
+	    if(fabs(tangle-0.815)<0.05){
 	      sum1 += w*TMath::Log(gF1->Eval(tangle)+noise);
 	      sum2 += w*TMath::Log(gF2->Eval(tangle)+noise);
 	    }
@@ -538,8 +539,6 @@ void PrtLutReco::Run(int start, int end){
       ResetHists();
       nsHits=0;
     }
-
-    // if(++nsEvents>=end) break;
   }
 
   nnratio_pi = fhNph_pi->GetEntries()/(double)end;
@@ -572,7 +571,10 @@ void PrtLutReco::Run(int start, int end){
     trr_pi = spr_pi/sqrt(nph_pi);
     theta = fEvent->GetAngle();
     par3 = fEvent->GetTest1();
-    if(fVerbose) std::cout<<Form("SPR=%2.2F N=%2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;     
+    if(fVerbose) {
+      std::cout<<Form("p  SPR=%2.2F N=%2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;
+      std::cout<<Form("pi SPR=%2.2F N=%2.2f +/- %2.2f",spr_pi,nph_pi,nph_pi_err)<<std::endl;
+    }
 
     // }else{
     if(fVerbose<2) gROOT->SetBatch(1);
