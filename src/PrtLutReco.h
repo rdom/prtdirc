@@ -70,9 +70,9 @@ private:
   TH1F *fHistPi;
   TH1F *fHisti;
   TF1 *fFit;
+  TF1 *fFunc[5];
   TSpectrum *fSpect;
-  double fAngleP;
-  double fAnglePi;
+  double fAngle[5];
   double fTest;
   double fCorr[8];
   TString fCorrFile;
