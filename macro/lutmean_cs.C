@@ -124,7 +124,6 @@ void lutmean_cs(TString baseFile = "../data/lut.root"){
 	sum[s] *= 1/weight[s];
 	sum[s] = sum[s].Unit();
       }
-      for(int s=0; s<9; s++) sum[s].Print();
       
       sumt *= 1/weight[0];
       

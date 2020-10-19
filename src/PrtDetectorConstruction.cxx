@@ -43,7 +43,8 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   fHall[0] = 1500; fHall[1] = 500; fHall[2] = 6000;
 
   // fBar[0] = 17; fBar[1] = 32; fBar[2] =1250;
-  fBar[0] = 17.1; fBar[1] = 35.9; fBar[2] =1200; // InSync // 2018
+  fBar[0] = 17.12; fBar[1] = 34.09; fBar[2] =1200.04;
+  //fBar[0] = 17.1; fBar[1] = 35.9; fBar[2] =1200; // InSync // 2018
   //fBar[0] = 17.9; fBar[1] = 35.9; fBar[2] =1200.7; // Zygo //2017
 
   fMirror[0] = 20; fMirror[1] = 40; fMirror[2] =1;
@@ -125,16 +126,14 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   if(fGeomId == 2017){
     fOffset=146;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
 
   if(fGeomId == 2018){
     fOffset=146;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset-fLens[2]),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
-  std::cout<<"fPrizm[2] "<<fPrizm[2]<<std::endl;
-  
   
   if(fGeomId == 2021){ 
     fCenterShift =  G4ThreeVector(0.5*fBar[2]-96,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-(279-187.5-fBar[0]));

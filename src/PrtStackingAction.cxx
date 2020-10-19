@@ -83,8 +83,8 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track * a
       Double_t lambda = 197.0*2.0*pi/(aTrack->GetMomentum().mag()*1.0E6);          
       // apply detector efficiency at the production stage:    
       if(true){
-	Double_t ra = fRand->Uniform(0., 1.);
-	if(ra > fDetEff[fQEtype]->Eval(lambda))return fKill;	
+	Double_t ra = fRand->Uniform(0, 1);
+	if(ra > fDetEff[fQEtype]->Eval(lambda)) return fKill;
       }
     }
   }
