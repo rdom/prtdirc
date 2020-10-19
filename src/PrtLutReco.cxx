@@ -234,9 +234,9 @@ void PrtLutReco::Run(int start, int end){
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;	
 
     if(bsim) {
-      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(0,1); 
+      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(0,10); 
     }
-    else posz = fEvent->GetPosition().Z()-7;
+    else posz = fEvent->GetPosition().Z();
 
     double momentum = fEvent->GetMomentum().Mag();
     if(bsim) momentum /= 1000;
