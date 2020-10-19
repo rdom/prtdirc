@@ -126,13 +126,13 @@ PrtDetectorConstruction::PrtDetectorConstruction()
   if(fGeomId == 2017){
     fOffset=146;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-fOffset,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
 
   if(fGeomId == 2018){
     fOffset=146;
     fPrizm[0]= 175; fPrizm[1] = 300; fPrizm[3] = 50;  fPrizm[2] = fPrizm[3]+fPrizm[1]*tan(33*deg);
-    fCenterShift =  G4ThreeVector(0.5*fBar[2]-(fOffset),-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
+    fCenterShift =  G4ThreeVector(0.5*fBar[2]-fOffset,-0.5*fPrizm[0]+PrtManager::Instance()->GetBeamX(),-100);
   }
   
   if(fGeomId == 2021){ 

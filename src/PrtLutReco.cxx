@@ -233,10 +233,10 @@ void PrtLutReco::Run(int start, int end){
     
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;	
 
-    if(bsim) posz = 0.5*radiatorL-fEvent->GetPosition().Z();
-    else posz = fEvent->GetPosition().Z();
-    std::cout<<"posz "<<posz<<std::endl;
-    
+    if(bsim) {
+      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(0,1); 
+    }
+    else posz = fEvent->GetPosition().Z()-7;
 
     double momentum = fEvent->GetMomentum().Mag();
     if(bsim) momentum /= 1000;
@@ -285,7 +285,7 @@ void PrtLutReco::Run(int start, int end){
 
     //if(ievent != start) break;
 
-    double speed = 198; // mm/ns
+    double speed = 196.5; // mm/ns
     
     if(bsim){
       speed = 198;      
@@ -339,12 +339,12 @@ void PrtLutReco::Run(int start, int end){
     
     // SearchClusters();
 
-    for(int h=0; h<nHits; h++) {
+    for(int h=0; h<nHits; h++) {      
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
       if(bsim) hitTime+=fRand.Gaus(0,0.25); // time resol. in case it was not simulated
       else{
-	if(fStudyId==420) hitTime += 0.6; //0.7 
+	if(fStudyId==420) hitTime += 0.65; //0.7 
       }
                  
       //======================================== dynamic cuts
@@ -447,11 +447,11 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.010*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.008*tdiff; // chromatic correction
+	  // if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction
+	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction
 	  
 	  //if(reflected) if(fabs(tdiff/hitTime)<0.15) tangle -= 0.22*tdiff/hitTime;
-	 
+	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
 	   
@@ -466,8 +466,8 @@ void PrtLutReco::Run(int start, int end){
 
 	    // if(true && tangle>0.4 && tangle<0.9){
 	    if(fabs(tangle-0.815)<0.05){
-	      sum1 += w*TMath::Log(fFunc[4]->Eval(tangle)+noise);
-	      sum2 += w*TMath::Log(fFunc[2]->Eval(tangle)+noise);
+	      sum1 += TMath::Log(fFunc[4]->Eval(tangle)+noise);
+	      sum2 += TMath::Log(fFunc[2]->Eval(tangle)+noise);
 	    }
 	    
 	    // //if(samepath) fHist->Fill(tangle ,weight);
@@ -577,8 +577,8 @@ void PrtLutReco::Run(int start, int end){
     theta = fEvent->GetAngle();
     par3 = fEvent->GetTest1();
     if(fVerbose) {
-      std::cout<<Form("p  SPR = %2.2F N= %2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;
-      std::cout<<Form("pi SPR = %2.2F N= %2.2f +/- %2.2f",spr_pi,nph_pi,nph_pi_err)<<std::endl;
+      std::cout<<Form("p  SPR = %2.2F N = %2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;
+      std::cout<<Form("pi SPR = %2.2F N = %2.2f +/- %2.2f",spr_pi,nph_pi,nph_pi_err)<<std::endl;
     }
 
     // }else{
