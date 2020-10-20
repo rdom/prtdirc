@@ -257,7 +257,7 @@ void PrtLutReco::Run(int start, int end){
       if(bsim) beamz = 0.5*radiatorL-beamz;
 
       for(int i: {2,4}){
-	fAngle[i] = acos(sqrt(momentum*momentum+ prt_mass[i]*prt_mass[i])/momentum/1.4738); //1.4738 = 370 = 3.35
+	fAngle[i] = acos(sqrt(momentum*momentum+ prt_mass[i]*prt_mass[i])/momentum/1.4725); //1.4738 = 370 = 3.35 // 1.4725 = 380 = 3.26
 	fFunc[i] = new TF1(Form("gaus_%d",i),"[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
 	fFunc[i]->SetParameter(0,1);
 	fFunc[i]->SetParameter(1,fAngle[i]);
@@ -402,7 +402,7 @@ void PrtLutReco::Run(int start, int end){
 	if(bsim && pathid==fHit.GetPathInPrizm()) samepath=true;
 	//if(fLutNode[ch]->GetNRefl(i)!=1 ) continue;
 	// std::cout<<"pathid "<< pathid <<std::endl;
-	// if(!samepath) continue;
+	//if(!samepath) continue;
  
 	double lphi = dird.Phi();
 	double ltheta = dird.Theta();
@@ -643,9 +643,9 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
   gROOT->SetBatch(1);
 
   if(fHist->GetEntries()>20 || fHistPi->GetEntries()>20){
-    int nfound = fSpect->Search(fHist,1,"",0.9); //0.6
-    if(nfound>0) cangle = fSpect->GetPositionX()[0];
-    else cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
+    // int nfound = fSpect->Search(fHist,1,"",0.9); //0.6
+    // if(nfound>0) cangle = fSpect->GetPositionX()[0];
+    // else cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
 
     cangle =  fHist->GetXaxis()->GetBinCenter(fHist->GetMaximumBin());
     if(cangle>0.84) cangle=0.82;
@@ -677,6 +677,7 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
     
     if(fMethod==2){
       gROOT->SetBatch(1);
+        
       fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
       if(fVerbose>1) gROOT->SetBatch(0);
       cangle = fFit->GetParameter(1);
@@ -685,6 +686,14 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
       fHistPi->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
       cangle_pi = fFit->GetParameter(1);
       spr_pi = fFit->GetParameter(2);      
+      	
+      // for(int i=0; i<prt_maxdircch; i++){
+      // 	prt_canvasAdd(Form("r_tangle_ch_%d",i),800,400);
+      // 	fHistCh[i]->Fit("fgaus","lq","",fAngle[2]-0.03,fAngle[2]+0.03);
+      // 	std::cout<<"if(ch=="<< i<<") tangle += "<<fAngle[2]-fFit->GetParameter(1)<<";" <<std::endl;	
+      // 	fHistCh[i]->Draw();
+      // } 
+
       
       { // corrections
 
@@ -718,16 +727,12 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  tc->Write();
 	  fc.Write();
 	  fc.Close();
-	}
-	
-	// for(int i=0; i<prt_maxdircch; i++){
-	// 	prt_canvasAdd(Form("r_tangle_ch_%d",i),800,400);
-	// 	fHistCh[i]->Fit("fgaus","lq","",fAngle[2]-0.03,fAngle[2]+0.03);
-	// 	std::cout<<"if(ch=="<< i<<") tangle += "<<fAngle[2]-fFit->GetParameter(1)<<";" <<std::endl;	
-	// 	fHistCh[i]->Draw();
-	// }
-      }
 
+	  fFit->ReleaseParameter(1);
+	  fFit->ReleaseParameter(2);
+	}
+      }
+            
       if(fVerbose>0){
 	TString nid = "";//Form("_%2.0f",a);
 
@@ -741,7 +746,6 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  prt_normalize(fHist,fHistPi);
 	  fHistPi->SetLineColor(4);
 	  fHist->SetLineColor(1);
-	  fHistPi->Fit("fgaus","lq","",cangle-0.06,cangle+0.06);
 	  fHist->Draw();
 	  fHistPi->Draw("same");
 	  // fFunc[4]->Draw("same");
@@ -828,41 +832,41 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	}
         
 	if(fVerbose==3){
-	TCanvas* cCher = new TCanvas("cCher","cCher",0,0,800,400);
-	cCher->Divide(2,1);
-	cCher->cd(1);
+	  TCanvas* cCher = new TCanvas("cCher","cCher",0,0,800,400);
+	  cCher->Divide(2,1);
+	  cCher->cd(1);
      
-	fHist4->SetStats(0);
-	fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
-	fHist4->Draw("colz");
-	double x0(0), y0(0), theta(cangle);
-	FitRing(x0,y0,theta);
-	TVector3 corr(x0,y0,1-TMath::Sqrt(x0*x0+y0*y0));
-	std::cout<<"Tcorr "<< corr.Theta()*1000<< "  Pcorr "<< corr.Phi() <<std::endl;
+	  fHist4->SetStats(0);
+	  fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
+	  fHist4->Draw("colz");
+	  double x0(0), y0(0), theta(cangle);
+	  FitRing(x0,y0,theta);
+	  TVector3 corr(x0,y0,1-TMath::Sqrt(x0*x0+y0*y0));
+	  std::cout<<"Tcorr "<< corr.Theta()*1000<< "  Pcorr "<< corr.Phi() <<std::endl;
 
-	TLegend *leg = new TLegend(0.5,0.7,0.85,0.87);
-	leg->SetFillStyle(0);
-	leg->SetBorderSize(0);
-	leg->AddEntry((TObject*)0,Form("Entries %0.0f",fHist4->GetEntries()),"");
-	leg->AddEntry((TObject*)0,Form("#Delta#theta_{c} %f [mrad]",corr.Theta()*1000),"");
-	leg->AddEntry((TObject*)0,Form("#Delta#varphi_{c} %f [mrad]",corr.Phi()),"");
-	leg->Draw();
+	  TLegend *leg = new TLegend(0.5,0.7,0.85,0.87);
+	  leg->SetFillStyle(0);
+	  leg->SetBorderSize(0);
+	  leg->AddEntry((TObject*)0,Form("Entries %0.0f",fHist4->GetEntries()),"");
+	  leg->AddEntry((TObject*)0,Form("#Delta#theta_{c} %f [mrad]",corr.Theta()*1000),"");
+	  leg->AddEntry((TObject*)0,Form("#Delta#varphi_{c} %f [mrad]",corr.Phi()),"");
+	  leg->Draw();
 
-	TArc *arc = new TArc(x0,y0,theta);
-	arc->SetLineColor(kRed);
-	arc->SetLineWidth(1);
-	arc->SetFillStyle(0);
-	arc->Draw();
-	gg_i=0;
-	gg_gr.Set(0);
+	  TArc *arc = new TArc(x0,y0,theta);
+	  arc->SetLineColor(kRed);
+	  arc->SetLineWidth(1);
+	  arc->SetFillStyle(0);
+	  arc->Draw();
+	  gg_i=0;
+	  gg_gr.Set(0);
 
-	cCher->cd(2);
-	gStyle->SetOptStat(1110); 
-	fHist5->SetTitle(Form("True from MC, #theta = %3.1f#circ", a));
-	fHist5->Draw("colz");
+	  cCher->cd(2);
+	  gStyle->SetOptStat(1110); 
+	  fHist5->SetTitle(Form("True from MC, #theta = %3.1f#circ", a));
+	  fHist5->Draw("colz");
 	
-	prt_canvasAdd(cCher);
-      }
+	  prt_canvasAdd(cCher);
+	}
 	
       }
     }
@@ -905,115 +909,115 @@ double PrtLutReco::fillLnDiffPPi(double cangle, int tofPid, double mom){
 
     //   std::cout<<"f1 "<< fFunc[4]->Eval(fHist->GetBinCenter(i)) << "   f2 "<<fFunc[2]->Eval(fHist->GetBinCenter(i)) << "    v "<< fHist->GetBinContent(i) <<std::endl;
     
-  //   // if(d1>0) sum1+=TMath::Log(d1);
-  //   // if(d2>0) sum2+=TMath::Log(d2);
-  //   sum1+=TMath::Log(fabs(d1));
-  //   sum2+=TMath::Log(fabs(d2));
+    //   // if(d1>0) sum1+=TMath::Log(d1);
+    //   // if(d2>0) sum2+=TMath::Log(d2);
+    //   sum1+=TMath::Log(fabs(d1));
+    //   sum2+=TMath::Log(fabs(d2));
 
-  // }
+    // }
   
-  lFit->SetRange(fAngle[4]-range,fAngle[2]+range);
-  lFit->FixParameter(0,fHist->GetMaximum()-0.5);
-  lFit->FixParameter(1,fAngle[4]);
-  lFit->FixParameter(2,0.01);
-  lFit->FixParameter(3,0);
-  lFit->FixParameter(4,0.5);
+    lFit->SetRange(fAngle[4]-range,fAngle[2]+range);
+    lFit->FixParameter(0,fHist->GetMaximum()-0.5);
+    lFit->FixParameter(1,fAngle[4]);
+    lFit->FixParameter(2,0.01);
+    lFit->FixParameter(3,0);
+    lFit->FixParameter(4,0.5);
  
 
-  fHist->Fit("lgaus","lq","",fAngle[4]-range,fAngle[2]+range);
-  double amin,amin2,edm,errdef;
-  int nvpar,nparx;
-  TVirtualFitter *fitter = TVirtualFitter::Fitter(fHist);
-  fitter->GetStats(amin,edm,errdef,nvpar,nparx);
+    fHist->Fit("lgaus","lq","",fAngle[4]-range,fAngle[2]+range);
+    double amin,amin2,edm,errdef;
+    int nvpar,nparx;
+    TVirtualFitter *fitter = TVirtualFitter::Fitter(fHist);
+    fitter->GetStats(amin,edm,errdef,nvpar,nparx);
   
-  // lFitPi->SetRange(fAnglePi-range,fAnglePi+range);
-  // lFitPi->SetLineColor(4);
-  // lFitPi->FixParameter(0,fFit->GetParameter(0));
-  // lFitPi->FixParameter(1,fAnglePi);
-  // lFitPi->FixParameter(2,sigma);
-  // lFitPi->FixParameter(3,fFit->GetParameter(3));
-  // lFitPi->FixParameter(4,fFit->GetParameter(4));
+    // lFitPi->SetRange(fAnglePi-range,fAnglePi+range);
+    // lFitPi->SetLineColor(4);
+    // lFitPi->FixParameter(0,fFit->GetParameter(0));
+    // lFitPi->FixParameter(1,fAnglePi);
+    // lFitPi->FixParameter(2,sigma);
+    // lFitPi->FixParameter(3,fFit->GetParameter(3));
+    // lFitPi->FixParameter(4,fFit->GetParameter(4));
 
-  lFitPi->SetRange(fAngle[4]-range,fAngle[2]+range);
-  lFitPi->SetLineColor(4);
-  lFitPi->FixParameter(0,fHist->GetMaximum()-0.5);
-  lFitPi->FixParameter(1,fAngle[2]);
-  lFitPi->FixParameter(2,0.01);
-  lFitPi->FixParameter(3,0);
-  lFitPi->FixParameter(4,0.5);
+    lFitPi->SetRange(fAngle[4]-range,fAngle[2]+range);
+    lFitPi->SetLineColor(4);
+    lFitPi->FixParameter(0,fHist->GetMaximum()-0.5);
+    lFitPi->FixParameter(1,fAngle[2]);
+    lFitPi->FixParameter(2,0.01);
+    lFitPi->FixParameter(3,0);
+    lFitPi->FixParameter(4,0.5);
 
-  fHist->Fit("lgausPi","lq","",fAngle[4]-range,fAngle[2]+range);
-  fitter = TVirtualFitter::Fitter(fHist);
-  fitter->GetStats(amin2,edm,errdef,nvpar,nparx);
+    fHist->Fit("lgausPi","lq","",fAngle[4]-range,fAngle[2]+range);
+    fitter = TVirtualFitter::Fitter(fHist);
+    fitter->GetStats(amin2,edm,errdef,nvpar,nparx);
   
-  if(fVerbose) printf("tofPid %04d | %1.4f (%1.4f/%1.4f) likelihood is %1.2f/%1.2f \n",tofPid,cangle,fAngle[4],fAngle[2], amin, amin2);
-  gg_ind++;
+    if(fVerbose) printf("tofPid %04d | %1.4f (%1.4f/%1.4f) likelihood is %1.2f/%1.2f \n",tofPid,cangle,fAngle[4],fAngle[2], amin, amin2);
+    gg_ind++;
 
-  if(fVerbose==1){
-    prt_canvasAdd("ff",800,400);
-    //prt_canvasAdd(Form("lh_%d",gg_ind),800,400);
-    fHist->SetTitle(Form("%d",tofPid));
-    fHist->Draw();
-    lFit->SetLineColor(2);
-    lFit->Draw("same");
-    // fFunc[4]->Draw("same");
-    // fFunc[2]->SetLineColor(4);
-    // fFunc[2]->Draw("same");
+    if(fVerbose==1){
+      prt_canvasAdd("ff",800,400);
+      //prt_canvasAdd(Form("lh_%d",gg_ind),800,400);
+      fHist->SetTitle(Form("%d",tofPid));
+      fHist->Draw();
+      lFit->SetLineColor(2);
+      lFit->Draw("same");
+      // fFunc[4]->Draw("same");
+      // fFunc[2]->SetLineColor(4);
+      // fFunc[2]->Draw("same");
      
-    //if(fabs(amin-amin2)<5)
-    prt_waitPrimitive("ff");
-    prt_canvasDel("ff");
-    //prt_canvasSave(1,0);
-    //prt_canvasDel(Form("lh_%d",gg_ind));
-  }
+      //if(fabs(amin-amin2)<5)
+      prt_waitPrimitive("ff");
+      prt_canvasDel("ff");
+      //prt_canvasSave(1,0);
+      //prt_canvasDel(Form("lh_%d",gg_ind));
+    }
   
-  return amin-amin2;
- }
- return 1000;
+    return amin-amin2;
+  }
+  return 1000;
 }
 
 double PrtLutReco::fillLnDiffPPi2(double cangle, int tofPid, double mom){
- if(fHist->GetEntries()>20 ){
-  double angle1(0), angle2(0), sigma(0.006),range(0.03);
+  if(fHist->GetEntries()>20 ){
+    double angle1(0), angle2(0), sigma(0.006),range(0.03);
 
-  double d1,d2, sum1(0),sum2(0);
-  int sbin = fHist->FindBin(fAngle[2]-range);
-  int ebin = fHist->FindBin(fAngle[4]+range); 
-  for(int i=sbin; i< ebin; i++){
-    if(fHist->GetBinContent(i)<1 ) continue;
-    d1 = 10*fabs(fHist->GetBinContent(i) *(fAngle[4]  - fHist->GetBinCenter(i)));
-    d2 = 10*fabs(fHist->GetBinContent(i) *(fAngle[2] - fHist->GetBinCenter(i)));
-    if(d1>0 && d2>0){
-      std::cout<<"d1  "<<d1 << "   d2    "<< d2 <<std::endl;
-      sum1+=TMath::Log(d1);
-      sum2+=TMath::Log(d2);
+    double d1,d2, sum1(0),sum2(0);
+    int sbin = fHist->FindBin(fAngle[2]-range);
+    int ebin = fHist->FindBin(fAngle[4]+range); 
+    for(int i=sbin; i< ebin; i++){
+      if(fHist->GetBinContent(i)<1 ) continue;
+      d1 = 10*fabs(fHist->GetBinContent(i) *(fAngle[4]  - fHist->GetBinCenter(i)));
+      d2 = 10*fabs(fHist->GetBinContent(i) *(fAngle[2] - fHist->GetBinCenter(i)));
+      if(d1>0 && d2>0){
+	std::cout<<"d1  "<<d1 << "   d2    "<< d2 <<std::endl;
+	sum1+=TMath::Log(d1);
+	sum2+=TMath::Log(d2);
+      }
     }
-  }
   
-  if(fVerbose) printf("tofPid %04d | %1.4f (%1.4f/%1.4f) likelihood is %1.2f/%1.2f \n",tofPid,cangle,fAngle[4],fAngle[2], sum1, sum2);
-  gg_ind++;
+    if(fVerbose) printf("tofPid %04d | %1.4f (%1.4f/%1.4f) likelihood is %1.2f/%1.2f \n",tofPid,cangle,fAngle[4],fAngle[2], sum1, sum2);
+    gg_ind++;
 
-  if(fVerbose==1){
-    prt_canvasAdd("ff",800,400);
-    //prt_canvasAdd(Form("lh_%d",gg_ind),800,400);
-    fHist->SetTitle(Form("%d",tofPid));
-    fHist->Draw();
-    lFit->SetLineColor(2);
-    lFit->Draw("same");
-    // gFp->Draw("same");
-    // gFpi->SetLineColor(4);
-    // gFpi->Draw("same");
+    if(fVerbose==1){
+      prt_canvasAdd("ff",800,400);
+      //prt_canvasAdd(Form("lh_%d",gg_ind),800,400);
+      fHist->SetTitle(Form("%d",tofPid));
+      fHist->Draw();
+      lFit->SetLineColor(2);
+      lFit->Draw("same");
+      // gFp->Draw("same");
+      // gFpi->SetLineColor(4);
+      // gFpi->Draw("same");
      
-    //if(fabs(amin-amin2)<5)
-    prt_waitPrimitive("ff");
-    prt_canvasDel("ff");
-    //prt_canvasSave(1,0);
-    //prt_canvasDel(Form("lh_%d",gg_ind));
-  }
+      //if(fabs(amin-amin2)<5)
+      prt_waitPrimitive("ff");
+      prt_canvasDel("ff");
+      //prt_canvasSave(1,0);
+      //prt_canvasDel(Form("lh_%d",gg_ind));
+    }
   
-  return sum1-sum2;
- }
- return 1000;
+    return sum1-sum2;
+  }
+  return 1000;
 }
 
 void circleFcn(int &, double *, double &f, double *par, int) {

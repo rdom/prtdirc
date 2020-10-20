@@ -1085,7 +1085,7 @@ void PrtDetectorConstruction::DefineMaterials(){
   QuartzMPT->AddProperty("RINDEX",       PhotonEnergy, QuartzRefractiveIndex,num);
   QuartzMPT->AddProperty("ABSLENGTH",    PhotonEnergy, QuartzAbsorption,           num);
   BarMaterial->SetMaterialPropertiesTable(QuartzMPT);
-
+  
   // Air
   G4MaterialPropertiesTable* AirMPT = new G4MaterialPropertiesTable();
   AirMPT->AddProperty("RINDEX",    PhotonEnergy, AirRefractiveIndex, num);
