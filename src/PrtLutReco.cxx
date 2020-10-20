@@ -234,14 +234,14 @@ void PrtLutReco::Run(int start, int end){
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;	
 
     if(bsim) {
-      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(0,10); 
+      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(-5,5); 
     }
     else posz = fEvent->GetPosition().Z();
 
     double momentum = fEvent->GetMomentum().Mag();
     if(bsim) momentum /= 1000;
     tofPid = fEvent->GetParticle();
-    int pid = prt_get_pid(tofPid);    
+    int pid = prt_get_pid(tofPid);
     if(events[pid]>=end) continue;
 
     double sigma[]={0,0,0.0085,0,0.0085};
@@ -342,7 +342,7 @@ void PrtLutReco::Run(int start, int end){
     for(int h=0; h<nHits; h++) {      
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      if(bsim) hitTime+=fRand.Gaus(0,0.25); // time resol. in case it was not simulated
+      if(bsim) hitTime += fRand.Gaus(0,0.3); // time resol. in case it was not simulated
       else{
 	if(fStudyId==420) hitTime += 0.65; //0.7 
       }
@@ -447,9 +447,9 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction
-	  
+	  if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction
+	  if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
+
 	  //if(reflected) if(fabs(tdiff/hitTime)<0.15) tangle -= 0.22*tdiff/hitTime;
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
