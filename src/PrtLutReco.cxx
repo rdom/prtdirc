@@ -447,8 +447,8 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction
-	  if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
+	  // if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction
+	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
 
 	  //if(reflected) if(fabs(tdiff/hitTime)<0.15) tangle -= 0.22*tdiff/hitTime;
 	  
