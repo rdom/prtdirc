@@ -244,8 +244,8 @@ void PrtLutReco::Run(int start, int end){
     int pid = prt_get_pid(tofPid);
     if(events[pid]>=end) continue;
 
-    //    double sigma[]={0,0,0.0085,0,0.0085};
-    double sigma[]={0,0,0.0082,0,0.0082};
+    double sigma[]={0,0,0.0085,0,0.0085};
+    // double sigma[]={0,0,0.0082,0,0.0082};
     double angle1(0), angle2(0),sum1(0),sum2(0),range(5*sigma[2]),noise(0.2); //0.0082
     
     if(ievent-start==0){
@@ -285,7 +285,7 @@ void PrtLutReco::Run(int start, int end){
 	
     //if(ievent != start) break;
 
-    double speed = 196.5; // mm/ns
+    double speed = 197.0; // mm/ns
     
     if(bsim){
       speed = 198;      
@@ -311,10 +311,10 @@ void PrtLutReco::Run(int start, int end){
 	  if( pid==4 && fEvent->GetTest1()<34.2 ) continue;
 	  if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
 	}
-	// if(fStudyId==420){
-	//   if( pid==4 && fEvent->GetTest1()<36.7 ) continue;
-	//   if( pid==2 && fEvent->GetTest1()>35.8 ) continue;
-	// }
+	if(fStudyId==420){
+	  if( pid==4 && fEvent->GetTest1()<36.7 ) continue;
+	  if( pid==2 && fEvent->GetTest1()>35.8 ) continue;
+	}
       }
       for(int h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
@@ -346,8 +346,8 @@ void PrtLutReco::Run(int start, int end){
       hitTime = fHit.GetLeadTime();
       if(bsim) hitTime += fRand.Gaus(0,0.3); // time resol. in case it was not simulated
       else{
-	if(fStudyId==420) hitTime += 0.65; //0.7
-	if(fStudyId==403) hitTime -= 0.3;
+	if(fStudyId==420) hitTime += 0.62;
+	if(fStudyId==403) hitTime += 0.4;
       }
                  
       //======================================== dynamic cuts
@@ -383,7 +383,7 @@ void PrtLutReco::Run(int start, int end){
       int mcpid=fHit.GetMcpId();
       int ch = map_mpc[mcpid][pixid];
 
-      // if(!reflected) continue;
+      // if(reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
@@ -404,7 +404,6 @@ void PrtLutReco::Run(int start, int end){
 	bool samepath(false);
 	if(bsim && pathid==fHit.GetPathInPrizm()) samepath=true;
 	//if(fLutNode[ch]->GetNRefl(i)!=1 ) continue;
-	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
  
 	double lphi = dird.Phi();
@@ -452,7 +451,9 @@ void PrtLutReco::Run(int start, int end){
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
 	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
 	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
-	  // if(reflected) if(fabs(tdiff/hitTime)<0.15) tangle -= 0.22*tdiff/hitTime;
+
+	  if(fabs(tdiff/hitTime)<0.15) tangle -= 0.14*tdiff/hitTime;
+	  //if(fabs(tdiff)<1.5)  tangle -= 0.008*tdiff;
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
