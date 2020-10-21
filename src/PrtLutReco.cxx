@@ -32,8 +32,8 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
-TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
+TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
+TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
 TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
 
@@ -244,13 +244,14 @@ void PrtLutReco::Run(int start, int end){
     int pid = prt_get_pid(tofPid);
     if(events[pid]>=end) continue;
 
-    double sigma[]={0,0,0.0085,0,0.0085};
+    //    double sigma[]={0,0,0.0085,0,0.0085};
+    double sigma[]={0,0,0.0082,0,0.0082};
     double angle1(0), angle2(0),sum1(0),sum2(0),range(5*sigma[2]),noise(0.2); //0.0082
     
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = fEvent->GetAngle();//prt_data_info.getAngle(); //fEvent->GetAngle(); // prt_data_info.getAngle();
-      phi = 0; //prt_data_info.getPhi(); // fEvent->GetPhi(); //prt_data_info.getPhi();
+      prtangle = prt_data_info.getAngle(); //fEvent->GetAngle(); // prt_data_info.getAngle();
+      phi = prt_data_info.getPhi(); // fEvent->GetPhi(); //prt_data_info.getPhi();
       mom = fEvent->GetMomentum().Mag();
       beamx = fEvent->GetPosition().X();
       beamz = fEvent->GetPosition().Z();
@@ -275,24 +276,23 @@ void PrtLutReco::Run(int start, int end){
       // }
     }
 
-    //smear track
     momInBar = TVector3(0,0,1);
+    // //smear track
     // TVector3 init = momInBar;
-    // double smearangle = 0.002; //test1;// prt_rand.Gaus(0,test1);
+    // double smearangle = 0.005; //test1;// prt_rand.Gaus(0,test1);
     // momInBar.RotateY(smearangle);
-    // //momInBar.Rotate(TMath::PiOver2(),init);
     // momInBar.Rotate(prt_rand.Uniform(0,TMath::TwoPi()),init);
-
+	
     //if(ievent != start) break;
 
     double speed = 196.5; // mm/ns
     
     if(bsim){
       speed = 198;      
-      momInBar.RotateY(TMath::Pi()-(prtangle+0)*CLHEP::deg); //test1
+      momInBar.RotateY(TMath::Pi()-(prtangle)*CLHEP::deg); //test1
       momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
     }else{
-      momInBar.RotateY(TMath::Pi()-(prtangle+0)*CLHEP::deg); //test1
+      momInBar.RotateY(TMath::Pi()-(prtangle)*CLHEP::deg); //test1
       momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
     }
     if(fVerbose==3){
@@ -307,8 +307,10 @@ void PrtLutReco::Run(int start, int end){
 	str1(0),stl1(0),str2(0),stl2(0);
       int hodo1(0), hodo2(0);
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-      	// if( pid==4 && fEvent->GetTest1()<34.4 ) continue;
-      	// if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
+        if(fStudyId==403){
+	  if( pid==4 && fEvent->GetTest1()<34.2 ) continue;
+	  if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
+	}
 	// if(fStudyId==420){
 	//   if( pid==4 && fEvent->GetTest1()<36.7 ) continue;
 	//   if( pid==2 && fEvent->GetTest1()>35.8 ) continue;
@@ -344,7 +346,8 @@ void PrtLutReco::Run(int start, int end){
       hitTime = fHit.GetLeadTime();
       if(bsim) hitTime += fRand.Gaus(0,0.3); // time resol. in case it was not simulated
       else{
-	if(fStudyId==420) hitTime += 0.65; //0.7 
+	if(fStudyId==420) hitTime += 0.65; //0.7
+	if(fStudyId==403) hitTime -= 0.3;
       }
                  
       //======================================== dynamic cuts
@@ -394,14 +397,14 @@ void PrtLutReco::Run(int start, int end){
       for(int i=0; i<size; i++){
 	weight = 1;//fLutNode[ch]->GetWeight(i);
 	dird   = fLutNode[ch]->GetEntryCs(i,nedge); // nedge=0
-        // dird  = fLutNode[ch]->GetEntry(i);
+        //dird  = fLutNode[ch]->GetEntry(i);
 	evtime = fLutNode[ch]->GetTime(i);
 	
 	int pathid = fLutNode[ch]->GetPathId(i);
 	bool samepath(false);
 	if(bsim && pathid==fHit.GetPathInPrizm()) samepath=true;
 	//if(fLutNode[ch]->GetNRefl(i)!=1 ) continue;
-	// std::cout<<"pathid "<< pathid <<std::endl;
+	//std::cout<<"pathid "<< pathid <<std::endl;
 	//if(!samepath) continue;
  
 	double lphi = dird.Phi();
@@ -447,16 +450,15 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
-
-	  //if(reflected) if(fabs(tdiff/hitTime)<0.15) tangle -= 0.22*tdiff/hitTime;
+	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
+	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
+	  // if(reflected) if(fabs(tdiff/hitTime)<0.15) tangle -= 0.22*tdiff/hitTime;
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
 	   
-	  double w = 2000/len;
-	  // w=0.5*(2-fabs(tdiff));
+	  double w = 1; //2000/len;
+	  //w=0.5*(2-fabs(tdiff));
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle ,weight);
@@ -466,8 +468,8 @@ void PrtLutReco::Run(int start, int end){
 
 	    // if(true && tangle>0.4 && tangle<0.9){
 	    if(fabs(tangle-0.815)<0.05){
-	      sum1 += TMath::Log(fFunc[4]->Eval(tangle)+noise);
-	      sum2 += TMath::Log(fFunc[2]->Eval(tangle)+noise);
+	      sum1 += w*TMath::Log(fFunc[4]->Eval(tangle)+noise);
+	      sum2 += w*TMath::Log(fFunc[2]->Eval(tangle)+noise);
 	    }
 	    
 	    // //if(samepath) fHist->Fill(tangle ,weight);
