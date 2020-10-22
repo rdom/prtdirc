@@ -340,11 +340,14 @@ void PrtLutReco::Run(int start, int end){
     }
     
     // SearchClusters();
-
+    
+    //event t0 smearing
+    double t0smear = fRand.Gaus(0,0.35);
+    
     for(int h=0; h<nHits; h++) {      
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      if(bsim) hitTime += fRand.Gaus(0,0.3); // time resol. in case it was not simulated
+      if(bsim) hitTime += fRand.Gaus(0,0.25) + t0smear; // time resol. in case it was not simulated
       else{
 	if(fStudyId==420) hitTime += 0.62;
 	if(fStudyId==403) hitTime += 0.4;
@@ -449,10 +452,10 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
+	  if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
+	  if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
 
-	  if(fabs(tdiff/hitTime)<0.15) tangle -= 0.14*tdiff/hitTime;
+	  // if(fabs(tdiff/hitTime)<0.15) tangle -= 0.14*tdiff/hitTime;
 	  //if(fabs(tdiff)<1.5)  tangle -= 0.008*tdiff;
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
