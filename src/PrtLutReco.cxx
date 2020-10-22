@@ -32,8 +32,8 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
-TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
+TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
+TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
 TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
 
@@ -288,7 +288,7 @@ void PrtLutReco::Run(int start, int end){
     double speed = 197.0; // mm/ns
     
     if(bsim){
-      speed = 198;      
+      speed = 197;      
       momInBar.RotateY(TMath::Pi()-(prtangle)*CLHEP::deg); //test1
       momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
     }else{
@@ -312,8 +312,8 @@ void PrtLutReco::Run(int start, int end){
 	  if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
 	}
 	if(fStudyId==420){
-	  if( pid==4 && fEvent->GetTest1()<36.95 ) continue;
-	  if( pid==2 && fEvent->GetTest1()>35.65 ) continue;
+	  if( pid==4 && fEvent->GetTest1()<36.9 ) continue;
+	  if( pid==2 && fEvent->GetTest1()>35.7 ) continue;
 	}
       }
       for(int h=0; h<nHits; h++) {
@@ -347,7 +347,7 @@ void PrtLutReco::Run(int start, int end){
     for(int h=0; h<nHits; h++) {      
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      if(bsim) hitTime += fRand.Gaus(0,0.3) + t0smear; // time resol. in case it was not simulated
+      if(bsim) hitTime += fRand.Gaus(0,0.25) + t0smear; // time resol. in case it was not simulated
       else{
 	if(fStudyId==420) hitTime += 0.62;
 	if(fStudyId==403) hitTime += 0.4;
@@ -453,10 +453,9 @@ void PrtLutReco::Run(int start, int end){
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
 	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
+	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction 
 
-	  // if(fabs(tdiff/hitTime)<0.15) tangle -= 0.14*tdiff/hitTime;
-	  //if(fabs(tdiff)<1.5)  tangle -= 0.005*tdiff;
+	  // if(fabs(tdiff/hitTime)<0.15) tangle -= 0.1*tdiff/hitTime;
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
