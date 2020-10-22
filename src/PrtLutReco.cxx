@@ -244,7 +244,7 @@ void PrtLutReco::Run(int start, int end){
     int pid = prt_get_pid(tofPid);
     if(events[pid]>=end) continue;
 
-    double sigma[]={0,0,0.0085,0,0.0085};
+    double sigma[]={0,0,0.0081,0,0.0081};
     // double sigma[]={0,0,0.0082,0,0.0082};
     double angle1(0), angle2(0),sum1(0),sum2(0),range(5*sigma[2]),noise(0.2); //0.0082
     
@@ -312,8 +312,8 @@ void PrtLutReco::Run(int start, int end){
 	  if( pid==2 && fEvent->GetTest1()>33.3 ) continue;
 	}
 	if(fStudyId==420){
-	  if( pid==4 && fEvent->GetTest1()<36.7 ) continue;
-	  if( pid==2 && fEvent->GetTest1()>35.8 ) continue;
+	  if( pid==4 && fEvent->GetTest1()<36.95 ) continue;
+	  if( pid==2 && fEvent->GetTest1()>35.65 ) continue;
 	}
       }
       for(int h=0; h<nHits; h++) {
@@ -342,12 +342,12 @@ void PrtLutReco::Run(int start, int end){
     // SearchClusters();
     
     //event t0 smearing
-    double t0smear = fRand.Gaus(0,0.35);
+    double t0smear = fRand.Gaus(0,0.15);
     
     for(int h=0; h<nHits; h++) {      
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      if(bsim) hitTime += fRand.Gaus(0,0.25) + t0smear; // time resol. in case it was not simulated
+      if(bsim) hitTime += fRand.Gaus(0,0.3) + t0smear; // time resol. in case it was not simulated
       else{
 	if(fStudyId==420) hitTime += 0.62;
 	if(fStudyId==403) hitTime += 0.4;
@@ -452,11 +452,11 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
+	  if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
+	  if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction 
 
 	  // if(fabs(tdiff/hitTime)<0.15) tangle -= 0.14*tdiff/hitTime;
-	  //if(fabs(tdiff)<1.5)  tangle -= 0.008*tdiff;
+	  //if(fabs(tdiff)<1.5)  tangle -= 0.005*tdiff;
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
