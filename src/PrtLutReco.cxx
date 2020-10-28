@@ -34,8 +34,8 @@ TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#var
 
 TH1F *hLnDiffP = new TH1F("hLnDiffP",  ";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
 TH1F *hLnDiffPi = new TH1F("hLnDiffPi",";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
-TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
-TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
+TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
+TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#Delta#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
 
 const int nphi=80, ntheta=40;
 TH2F *hLutCorrD = new TH2F("hLutCorrD",";#theta_{l}sin(#varphi_{l});#theta_{l}cos(#varphi_{l})",200,-1,1,200,-1,1);
@@ -343,14 +343,16 @@ void PrtLutReco::Run(int start, int end){
     
     //event t0 smearing
     double t0smear = fRand.Gaus(0,0.15);
-    
+
+    if(!bsim && fStudyId==403) posz -= 15;
     for(int h=0; h<nHits; h++) {      
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
       if(bsim) hitTime += fRand.Gaus(0,0.25) + t0smear; // time resol. in case it was not simulated
       else{
 	if(fStudyId==420) hitTime += 0.62;
-	if(fStudyId==403) hitTime += 0.4;
+	// if(fStudyId==403) hitTime += 0.4;
+	if(fStudyId==403) hitTime -= 0.45;// 0.45
       }
                  
       //======================================== dynamic cuts
@@ -386,7 +388,7 @@ void PrtLutReco::Run(int start, int end){
       int mcpid=fHit.GetMcpId();
       int ch = map_mpc[mcpid][pixid];
 
-      // if(reflected) continue;
+      if(reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
@@ -452,8 +454,8 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction 
+	  if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
+	  if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction 
 
 	  // if(fabs(tdiff/hitTime)<0.15) tangle -= 0.1*tdiff/hitTime;
 	  
@@ -758,6 +760,15 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  fHisti->SetLineColor(kRed+2);
 	  if(fHisti->GetEntries()>5) fHisti->Draw("same");
 
+	  TLegend *leg = new TLegend(0.13,0.68,0.39,0.82);
+	  leg->SetFillColor(0);
+	  leg->SetFillStyle(0);
+	  leg->SetBorderSize(0);
+	  leg->SetFillStyle(0);
+	  leg->AddEntry((TObject*)0,Form("#sigma_{proton} = %2.2f mrad",spr*1000),"");
+	  leg->AddEntry((TObject*)0,Form("#sigma_{#pi}       = %2.2f mrad",spr_pi*1000),"");
+	  leg->Draw();
+	  
 	  drawTheoryLines();
 	}
       
