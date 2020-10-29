@@ -350,7 +350,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   Bool_t charge_sharing(true);
   Bool_t dead_time(true);
   Bool_t dark_counts(true);
-  Bool_t transport_efficiency(true);
+  Bool_t transport_efficiency(false);
   
   if(PrtManager::Instance()->GetGeometry()==2021) charge_sharing=false; //no cs in mfield
   if(PrtManager::Instance()->GetMcpLayout()==2030){
