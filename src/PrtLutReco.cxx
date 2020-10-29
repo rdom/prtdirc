@@ -27,6 +27,8 @@ TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,50)
 TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,50);
 TH1F*  fHist6 = new TH1F("time6",";measured time [ns];entries [#]", 1000,0,50);
 
+TH1F*  hBounce = new TH1F("bounce",";number of bounces [#];photons per event [#]", 150,0,150);
+
 TH2F*  fDiff = new TH2F("diff",";measured time [ns];t_{measured}-t_{calculated} [ns]", 300,0,30,150,-5,5);
 TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500,0,80, 500,0,40);
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
@@ -388,7 +390,7 @@ void PrtLutReco::Run(int start, int end){
       int mcpid=fHit.GetMcpId();
       int ch = map_mpc[mcpid][pixid];
 
-      if(!reflected) continue;
+      if(reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
@@ -397,7 +399,9 @@ void PrtLutReco::Run(int start, int end){
       // if(cluster[mcpid][pixid]>4) continue;
       
       bool isGoodHit(0);
-      int size =fLutNode[ch]->Entries();
+      int bestbounce = 0;
+      double besttdiff = 100;
+      int size = fLutNode[ch]->Entries();
  
       for(int i=0; i<size; i++){
 	weight = 1;//fLutNode[ch]->GetWeight(i);
@@ -431,10 +435,8 @@ void PrtLutReco::Run(int start, int end){
 
 	  double len = lenz/cos(luttheta);
 
-	  // double lenx = len*dir.X();
-	  // double leny = len*dir.Y();
-	  // int nx = round(lenx/radiatorH);
-	  // int ny = round(leny/radiatorW);	  
+
+	  
 	  // if(nx%2==0 && u==1 && 2*lenz/nx>60) continue;
 	  // if(nx%2==0 && u==3 && 2*lenz/nx>60) continue;	  
 	  // if(ny%2==0 && u==2 && 2*lenz/ny>150) continue;
@@ -479,6 +481,15 @@ void PrtLutReco::Run(int start, int end){
 	    
 	    // //if(samepath) fHist->Fill(tangle ,weight);
 	    if((fRadiator==1 && fabs(tangle-0.815)<0.05) || (fRadiator==2 && fabs(tangle-0.815)<0.2)){
+
+	      double lenx = len*dir.X();
+	      double leny = len*dir.Y();
+	      int nx = round(lenx/radiatorH);
+	      int ny = round(leny/radiatorW);
+	      if(fabs(tdiff)<fabs(besttdiff)) {
+		besttdiff = tdiff;
+		bestbounce = nx+ny;
+	      }
 	      isGoodHit=true;
 	      fHist2->Fill(luttime);
 	      hLutCorrD->Fill(ltheta*TMath::Sin(lphi),ltheta*TMath::Cos(lphi));
@@ -498,8 +509,9 @@ void PrtLutReco::Run(int start, int end){
 	}
       }
 
-      fHist1->Fill(hitTime);
       if(isGoodHit){
+	hBounce->Fill(bestbounce);
+	fHist1->Fill(hitTime);
 	nhhits++;
 	nsHits++;
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
@@ -637,7 +649,7 @@ void PrtLutReco::Run(int start, int end){
   prt_set_style();
   if(fVerbose>1) prt_waitPrimitive("time","");
   if(fVerbose>0){
-    prt_canvasSave(0,0,true);
+    prt_canvasSave(1,0,true);
   }
     
   if(fVerbose) ResetHists(); 
@@ -774,12 +786,16 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
       
 	{ // time
 	  prt_canvasAdd("time",800,400);
-	  prt_normalize(fHist1,fHist2);
-	  fHist1->SetTitle(Form("theta %3.1f", a));
-	  fHist2->SetLineColor(2);
-	  fHist1->Draw();
-	  fHist2->Draw("same");
+	  // prt_normalize(fHist1,fHist2);
+	  // fHist1->SetTitle(Form("theta %3.1f", a));
+	  // fHist2->SetLineColor(2);
+	  // fHist1->Draw();
+	  // fHist2->Draw("same");
 
+	  fHist1->Scale(1/4000.);
+	  fHist1->Rebin(10);
+	  fHist1->Draw("p hist");
+	  
 	  prt_canvasAdd("diff_time",800,400);
 	  fDiff->Draw("colz");
 
@@ -798,6 +814,12 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  // fHist3->Draw("colz");
 	}
 
+	{ // bounce
+	  prt_canvasAdd("bounce",800,400);
+	  hBounce->Scale(1/4000.);
+	  hBounce->Draw("hist");
+	}
+	
 	{ // lut corrections
 	  prt_canvasAdd("lutcorrd"+nid,600,600);
 	  TGaxis::SetMaxDigits(3);
