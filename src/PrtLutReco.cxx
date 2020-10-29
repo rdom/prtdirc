@@ -390,7 +390,7 @@ void PrtLutReco::Run(int start, int end){
       int mcpid=fHit.GetMcpId();
       int ch = map_mpc[mcpid][pixid];
 
-      if(reflected) continue;
+      if(!reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
