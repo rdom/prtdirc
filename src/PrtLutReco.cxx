@@ -1009,7 +1009,6 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
       // } 
       
       { // corrections
-
 	if(fabs(fCorr[0])<0.00000001 && fabs(fCorr[7])<0.00000001){
 	  std::cout<<"Writing "<<fCorrPath<<std::endl;
 	  
@@ -1048,8 +1047,6 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
             
     }
   }
-
-  if(fVerbose<2) gROOT->SetBatch(0);
   
   return (cangle>0 && cangle<1);
 }
