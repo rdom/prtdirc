@@ -22,6 +22,7 @@
 #include "TRandom.h"
 #include "TVirtualFitter.h"
 #include "TArc.h"
+#include "TGraph.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
 class PrtLutReco{
@@ -75,7 +76,11 @@ private:
   double fAngle[5];
   double fTest;
   double fCorr[8];
-  TString fCorrFile;
+  TString fCorrPath;
+  TString fPdfPath;
+  TGraph *fPdf2[512],*fPdf4[512];
+  TH1F *fTime2[512], *fTime4[512];
+  
 };
 
 #endif
