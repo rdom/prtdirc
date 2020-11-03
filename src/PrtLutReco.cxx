@@ -19,6 +19,7 @@ using std::endl;
 TH1F*  fHist0 = new TH1F("timediff",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0d = new TH1F("timediffd",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0r = new TH1F("timediffr",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
+TH1F*  fHist0s = new TH1F("timediffs",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0i = new TH1F("timediffi",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 
 TH1F*  fhNph_pi = new TH1F("fhNph_pi",";detected photons [#];entries [#]", 150,0,150);
@@ -34,11 +35,11 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffGe4 = new TH1F("hLnDiffGe4",";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
-TH1F *hLnDiffGe2 = new TH1F("hLnDiffGe2",";ln L(p) - ln L(#pi);entries [#]",120,-50,50);
-TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-30,30);
-TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-30,30);
-TH2F *hLnMap = new TH2F("hLnMap",";ge ln L(p) - ln L(#pi);ti ln L(p) - ln L(#pi); ",120,-30,30,120,-30,30);
+TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
+TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
+TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
+TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
+TH2F *hLnMap = new TH2F("hLnMap",";GR ln L(p) - ln L(#pi);TI ln L(p) - ln L(#pi); ",120,-30,30,120,-30,30);
 
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
 TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#Delta#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
@@ -145,9 +146,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     if(!gSystem->AccessPathName(fPdfPath)){
       std::cout<<"------- reading  "<<fPdfPath <<std::endl;
       TFile pdfFile(fPdfPath);
-      Int_t binfactor = 10;
-      double sigma = 200; // ps
-      binfactor=(int)(sigma/50.+0.1);
+      double sigma = 400; // ps
+      int binfactor=(int)(sigma/50.+0.1);
       for(int i=0; i<prt_maxdircch; i++){  
 	auto hpdf2 = (TH1F*)pdfFile.Get(Form("hs_%d",i));
 	auto hpdf4 = (TH1F*)pdfFile.Get(Form("hf_%d",i));
@@ -191,7 +191,8 @@ void PrtLutReco::Run(int start, int end){
   double theta(0),phi(0),cangle(0),spr(0), trr(0),nph(0),nph_err(0),
     cangle_pi(0),spr_pi(0),trr_pi(0),nph_pi(0),nph_pi_err(0),
     par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0),
-    sep(0),sep_err(0),sep_ti(0),sep_ti_err(0),beamx(0),beamz(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
+    sep_gr(0),sep_gr_err(0),sep_ti(0),sep_ti_err(0),
+    beamx(0),beamz(0),nnratio_p(0),nnratio_pi(0),timeRes(0);
   double minChangle(0);
   double maxChangle(1);  
   double criticalAngle = asin(1.00028/1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
@@ -211,8 +212,10 @@ void PrtLutReco::Run(int start, int end){
   tree.Branch("phi",&phi,"phi/D");
   tree.Branch("nph",&nph,"nph/D");
   tree.Branch("nph_err",&nph_err,"nph_err/D");  
-  tree.Branch("sep",&sep,"sep/D");
-  tree.Branch("sep_err",&sep_err,"sep_err/D");
+  tree.Branch("sep_gr",&sep_gr,"sep_gr/D");
+  tree.Branch("sep_gr_err",&sep_gr_err,"sep_gr_err/D");
+  tree.Branch("sep_ti",&sep_ti,"sep_ti/D");
+  tree.Branch("sep_ti_err",&sep_ti_err,"sep_ti_err/D");
   tree.Branch("time_res",&timeRes,"timeRes/D");
 
   tree.Branch("cangle",&cangle,"cangle/D");
@@ -252,6 +255,8 @@ void PrtLutReco::Run(int start, int end){
   if(end==0) end = nEvents;
   
   int pdfend = 50000;
+  if(fPdfPath.Contains("S.pdf1.root")) pdfend = 4000;
+  
   if(fMethod == 4) {
     start = pdfend;
     pdfend = nEvents;
@@ -368,7 +373,8 @@ void PrtLutReco::Run(int start, int end){
 	if(gch==513) t2++;
 	if(gch==514) t3h++;
 	if(gch==515) t3v++;
-	if(gch>=1089 && gch<=1106) hodo1++;
+	if(gch>=1089 && gch<=1106)
+	  hodo1++;
 	//if(gch>=1094 && gch<=1101) hodo1++;
 	//if(gch>=1097 && gch<=1098) hodo1++;
 	if(gch==1140) str1++;
@@ -446,7 +452,7 @@ void PrtLutReco::Run(int start, int end){
       int bestbounce = 0;
       double besttdiff = 100;
       int size = fLutNode[ch]->Entries();
- 
+      
       for(int i=0; i<size; i++){
 	weight = 1;//fLutNode[ch]->GetWeight(i);
 	dird   = fLutNode[ch]->GetEntryCs(i,nedge); // nedge=0
@@ -524,6 +530,7 @@ void PrtLutReco::Run(int start, int end){
 	    // //if(samepath) fHist->Fill(tangle ,weight);
 	    if((fRadiator==1 && fabs(tangle-0.815)<0.05) || (fRadiator==2 && fabs(tangle-0.815)<0.2)){
 
+	      fHist0s->Fill(tdiff);
 	      double lenx = len*dir.X();
 	      double leny = len*dir.Y();
 	      int nx = round(lenx/radiatorH);
@@ -571,7 +578,7 @@ void PrtLutReco::Run(int start, int end){
 	}
 
 	if(fMethod == 4){ // create pdf 
-
+	  
 	  double t = hitTime;
 	  if(fabs(besttdiff) < 0.3) t -= besttdiff;
 
@@ -590,7 +597,7 @@ void PrtLutReco::Run(int start, int end){
 
     if(fMethod == 2){ // time imaging
 
-      sumti = sumti4-sumti2;
+      sumti = 2*(sumti4-sumti2);
       if(sumti != 0){
 	if(tofPid == 2212) hLnDiffTi4->Fill(sumti);       
 	if(tofPid == 211) hLnDiffTi2->Fill(sumti);
@@ -601,17 +608,17 @@ void PrtLutReco::Run(int start, int end){
     if(sum != 0){
       if(tofPid == 2212){
 	fhNph_p->Fill(nhhits);
-	hLnDiffGe4->Fill(sum);
+	hLnDiffGr4->Fill(sum);
       }
       if(tofPid == 211){
 	fhNph_pi->Fill(nhhits);
-	hLnDiffGe2->Fill(sum);
+	hLnDiffGr2->Fill(sum);
       }
       likelihood = sum;
       events[pid]++;
     }
 
-    if(pid == 2) hLnMap->Fill(sum,sumti);
+    if(pid == 2 && sumti != 0) hLnMap->Fill(sum,sumti);
     
     // if(fVerbose==1){
     //   prt_canvasAdd("ff",800,400);
@@ -690,30 +697,30 @@ void PrtLutReco::Run(int start, int end){
     par3 = fEvent->GetTest1();
 
     double m1,m2,s1,s2,dm1,dm2,ds1,ds2;; 
-    if(hLnDiffGe4->GetEntries()>10){
-      hLnDiffGe4->Fit("gaus","S");
-      ff = hLnDiffGe4->GetFunction("gaus");
+    if(hLnDiffGr4->GetEntries()>10){
+      hLnDiffGr4->Fit("gaus","S");
+      ff = hLnDiffGr4->GetFunction("gaus");
       m1=ff->GetParameter(1);
       s1=ff->GetParameter(2);
       dm1=ff->GetParError(1);
       ds1=ff->GetParError(2);
     }
-    if(hLnDiffGe2->GetEntries()>10){
-      hLnDiffGe2->Fit("gaus","S");
-      ff = hLnDiffGe2->GetFunction("gaus");
+    if(hLnDiffGr2->GetEntries()>10){
+      hLnDiffGr2->Fit("gaus","S");
+      ff = hLnDiffGr2->GetFunction("gaus");
       m2=ff->GetParameter(1);
       s2=ff->GetParameter(2);
       dm2=ff->GetParError(1);
       ds2=ff->GetParError(2);
     }
-    sep = (fabs(m2-m1))/(0.5*(s1+s2));
+    sep_gr = (fabs(m2-m1))/(0.5*(s1+s2));
 
     double e1,e2,e3,e4;
     e1=2/(s1+s2)*dm1;
     e2=2/(s1+s2)*dm2;
     e3=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds1;
     e4=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds2;
-    sep_err=sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
+    sep_gr_err=sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
     
     if(hLnDiffTi4->GetEntries()>10){
       hLnDiffTi4->Fit("gaus","S");
@@ -747,7 +754,7 @@ void PrtLutReco::Run(int start, int end){
       std::cout<<"nnratio_pi "<<nnratio_pi<<" "<<end <<"  "<< fhNph_pi->GetEntries()<<std::endl;	
       std::cout<<Form("p  SPR = %2.2F N = %2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;
       std::cout<<Form("pi SPR = %2.2F N = %2.2f +/- %2.2f",spr_pi,nph_pi,nph_pi_err)<<std::endl;
-      std::cout<<"sep ge "<< sep <<" +/- "<<sep_err <<std::endl;
+      std::cout<<"sep gr "<< sep_gr <<" +/- "<<sep_gr_err <<std::endl;
       std::cout<<"sep ti "<< sep_ti <<" +/- "<<sep_ti_err <<std::endl;
 
       double a = prtangle;
@@ -800,12 +807,15 @@ void PrtLutReco::Run(int start, int end){
 
 	prt_canvasAdd("time_diff"+nid,800,400);
 	fHist0->SetTitle(Form("theta %3.1f", a));
+	fHist0->SetLineColor(kBlack);		
 	fHist0->Draw();
 	fHist0d->SetLineColor(kGreen+1);
 	fHist0d->Draw("same");
 	fHist0r->SetLineColor(kBlue+1);
 	fHist0r->Draw("same");
-	fHist0i->SetLineColor(kRed+2);
+	fHist0s->SetLineColor(kOrange+6);
+	fHist0s->Draw("same");
+	fHist0i->SetLineColor(kRed+1);
 	if(fHist0i->GetEntries()>5)  fHist0i->Draw("same"); 
 
 	// prt_canvasAdd("cm"+nid,800,400);
@@ -815,15 +825,15 @@ void PrtLutReco::Run(int start, int end){
 
       { // likelihood
 	prt_canvasAdd("lhood_ge",800,400);
-	prt_normalize(hLnDiffGe4,hLnDiffGe2);
-	hLnDiffGe4->SetLineColor(2);
-	hLnDiffGe4->SetName(Form("s_%2.2f",sep));
-	hLnDiffGe4->Draw();
-	hLnDiffGe2->SetLineColor(4);
-	hLnDiffGe2->Draw("same");
+	prt_normalize(hLnDiffGr4,hLnDiffGr2);
+	hLnDiffGr4->SetLineColor(2);
+	hLnDiffGr4->SetName(Form("s_%2.2f",sep_gr));
+	hLnDiffGr4->Draw();
+	hLnDiffGr2->SetLineColor(4);
+	hLnDiffGr2->Draw("same");
 	
 	prt_canvasAdd("lhood_ti",800,400);
-	prt_normalize(hLnDiffGe4,hLnDiffTi2);
+	prt_normalize(hLnDiffTi4,hLnDiffTi2);
 	hLnDiffTi4->SetLineColor(2);
 	hLnDiffTi4->SetName(Form("s_%2.2f",sep_ti));
 	hLnDiffTi4->Draw();
