@@ -35,10 +35,10 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
-TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
-TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
-TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-40,40);
+TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
+TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
+TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
+TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
 TH2F *hLnMap = new TH2F("hLnMap",";GR ln L(p) - ln L(#pi);TI ln L(p) - ln L(#pi); ",120,-30,30,120,-30,30);
 
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
@@ -140,7 +140,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     std::cout<<"------- corr file not found  "<<fCorrPath <<std::endl;
   }
 
-
+  fTimeImaging = false;
   fPdfPath = infile.ReplaceAll(".root",".pdf1.root");
   if(fMethod == 2) { // read pdf
     if(!gSystem->AccessPathName(fPdfPath)){
@@ -156,6 +156,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
 
 	fPdf2[i] = new TGraph(hpdf2);
 	fPdf4[i] = new TGraph(hpdf4);
+	fTimeImaging = true;
       }
     }    
   }
@@ -302,7 +303,7 @@ void PrtLutReco::Run(int start, int end){
       beamx = fEvent->GetPosition().X();
       beamz = fEvent->GetPosition().Z();
       if(bsim) beamz = 0.5*radiatorL-beamz;
-
+      
       for(int i: {2,4}){
 	fAngle[i] = acos(sqrt(momentum*momentum+ prt_mass[i]*prt_mass[i])/momentum/1.4725); //1.4738 = 370 = 3.35 // 1.4725 = 380 = 3.26
 	fFunc[i] = new TF1(Form("gaus_%d",i),"[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
@@ -353,7 +354,7 @@ void PrtLutReco::Run(int start, int end){
 	str1(0),stl1(0),str2(0),stl2(0);
       int hodo1(0), hodo2(0);
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-        if(fStudyId==403){
+        if(fStudyId==403 && fMethod != 4){
 	  if( pid == 4 && fEvent->GetTest1()<34.2 ) continue;
 	  if( pid == 2 && fEvent->GetTest1()>33.3 ) continue;
 	}
@@ -373,8 +374,7 @@ void PrtLutReco::Run(int start, int end){
 	if(gch==513) t2++;
 	if(gch==514) t3h++;
 	if(gch==515) t3v++;
-	if(gch>=1089 && gch<=1106)
-	  hodo1++;
+	if(gch>=1089 && gch<=1106) hodo1++;
 	//if(gch>=1094 && gch<=1101) hodo1++;
 	//if(gch>=1097 && gch<=1098) hodo1++;
 	if(gch==1140) str1++;
@@ -504,10 +504,10 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	  if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction	  
+	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
+	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction	  
 
-	  // if(fabs(tdiff/hitTime)<0.15) tangle -= 0.1*tdiff/hitTime;
+	  if(fabs(tdiff/hitTime)<0.15) tangle -= 0.03*tdiff/hitTime;
 
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
@@ -566,7 +566,7 @@ void PrtLutReco::Run(int start, int end){
 	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
       
       
-	if(fMethod == 2){ // time imaging
+	if(fMethod == 2 && fTimeImaging){ // time imaging
 
 	  double t = hitTime;
 	  if(fabs(besttdiff) < 0.3) t -= besttdiff;
@@ -595,7 +595,7 @@ void PrtLutReco::Run(int start, int end){
       }
     }
 
-    if(fMethod == 2){ // time imaging
+    if(fMethod == 2 && fTimeImaging){ // time imaging
 
       sumti = 2*(sumti4-sumti2);
       if(sumti != 0){
@@ -721,30 +721,32 @@ void PrtLutReco::Run(int start, int end){
     e3=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds1;
     e4=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds2;
     sep_gr_err=sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
+
+    if(fTimeImaging){
+      if(hLnDiffTi4->GetEntries()>10){
+	hLnDiffTi4->Fit("gaus","S");
+	ff = hLnDiffTi4->GetFunction("gaus");
+	m1=ff->GetParameter(1);
+	s1=ff->GetParameter(2);
+	dm1=ff->GetParError(1);
+	ds1=ff->GetParError(2);
+      }
+      if(hLnDiffTi2->GetEntries()>10){
+	hLnDiffTi2->Fit("gaus","S");
+	ff = hLnDiffTi2->GetFunction("gaus");
+	m2=ff->GetParameter(1);
+	s2=ff->GetParameter(2);
+	dm2=ff->GetParError(1);
+	ds2=ff->GetParError(2);
+      }
+      sep_ti = (fabs(m2-m1))/(0.5*(s1+s2));
     
-    if(hLnDiffTi4->GetEntries()>10){
-      hLnDiffTi4->Fit("gaus","S");
-      ff = hLnDiffTi4->GetFunction("gaus");
-      m1=ff->GetParameter(1);
-      s1=ff->GetParameter(2);
-      dm1=ff->GetParError(1);
-      ds1=ff->GetParError(2);
+      e1=2/(s1+s2)*dm1;
+      e2=2/(s1+s2)*dm2;
+      e3=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds1;
+      e4=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds2;
+      sep_ti_err=sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
     }
-    if(hLnDiffTi2->GetEntries()>10){
-      hLnDiffTi2->Fit("gaus","S");
-      ff = hLnDiffTi2->GetFunction("gaus");
-      m2=ff->GetParameter(1);
-      s2=ff->GetParameter(2);
-      dm2=ff->GetParError(1);
-      ds2=ff->GetParError(2);
-    }
-    sep_ti = (fabs(m2-m1))/(0.5*(s1+s2));
-    
-    e1=2/(s1+s2)*dm1;
-    e2=2/(s1+s2)*dm2;
-    e3=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds1;
-    e4=-((2*(m1 + m2))/((s1 + s2)*(s1 + s2)))*ds2;
-    sep_ti_err=sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
     
 
     nnratio_pi = fhNph_pi->GetEntries()/(double)end;
@@ -831,15 +833,17 @@ void PrtLutReco::Run(int start, int end){
 	hLnDiffGr4->Draw();
 	hLnDiffGr2->SetLineColor(4);
 	hLnDiffGr2->Draw("same");
-	
-	prt_canvasAdd("lhood_ti",800,400);
-	prt_normalize(hLnDiffTi4,hLnDiffTi2);
-	hLnDiffTi4->SetLineColor(2);
-	hLnDiffTi4->SetName(Form("s_%2.2f",sep_ti));
-	hLnDiffTi4->Draw();
-	hLnDiffTi2->SetLineColor(4);
-	hLnDiffTi2->Draw("same");
 
+	if(fTimeImaging){
+	  prt_canvasAdd("lhood_ti",800,400);
+	  prt_normalize(hLnDiffTi4,hLnDiffTi2);
+	  hLnDiffTi4->SetLineColor(2);
+	  hLnDiffTi4->SetName(Form("s_%2.2f",sep_ti));
+	  hLnDiffTi4->Draw();
+	  hLnDiffTi2->SetLineColor(4);
+	  hLnDiffTi2->Draw("same");
+	}
+	
 	prt_canvasAdd("lhood_map",800,400);
 	hLnMap->Draw("colz");
       }

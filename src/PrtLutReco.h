@@ -52,6 +52,7 @@ private:
   int fMethod;
   int fRadiator;
   int fStudyId;
+  bool fTimeImaging;
 
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
