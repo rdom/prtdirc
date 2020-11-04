@@ -35,10 +35,10 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 100,-1,1, 100,-1,1);
 
-TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
-TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
-TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
-TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-80,80);
+TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
+TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
+TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
+TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
 TH2F *hLnMap = new TH2F("hLnMap",";GR ln L(p) - ln L(#pi);TI ln L(p) - ln L(#pi); ",120,-30,30,120,-30,30);
 
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
@@ -292,7 +292,6 @@ void PrtLutReco::Run(int start, int end){
     if(events[pid]>=end) continue;
 
     double sigma[]={0,0,0.0081,0,0.0081};
-    // double sigma[]={0,0,0.0082,0,0.0082};
     double angle1(0), angle2(0),sum1(0),sum2(0),sumti(0),sumti2(0),sumti4(0),range(5*sigma[2]),noise(0.2); //0.0082
     
     if(ievent-start==0){
@@ -354,17 +353,18 @@ void PrtLutReco::Run(int start, int end){
 	str1(0),stl1(0),str2(0),stl2(0);
       int hodo1(0), hodo2(0);
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
+	double tof = fEvent->GetTest1();
         if(fStudyId==403 && fMethod != 4){
-	  if( pid == 4 && fEvent->GetTest1()<34.2 ) continue;
-	  if( pid == 2 && fEvent->GetTest1()>33.3 ) continue;
+	  if( pid == 4 && tof < 34.2 ) continue;
+	  if( pid == 2 && tof > 33.3 ) continue;
 	}
 	if(fStudyId == 420 && fMethod != 4){
-	  if( pid == 4 && fEvent->GetTest1()<36.9 ) continue;
-	  if( pid == 2 && fEvent->GetTest1()>35.7 ) continue;
+	  if( pid == 4 && tof < 36.9 ) continue;
+	  if( pid == 2 && tof > 35.7 ) continue;
 	}
 	if(fStudyId == 420 && fMethod == 4){
-	  if( pid == 4 && fEvent->GetTest1()<36.6 ) continue;
-	  if( pid == 2 && fEvent->GetTest1()>36.0 ) continue;
+	  if( pid == 4 && tof < 36.6 ) continue;
+	  if( pid == 2 && tof > 36.0 ) continue;
 	}
       }
       for(int h=0; h<nHits; h++) {
@@ -396,7 +396,11 @@ void PrtLutReco::Run(int start, int end){
     //event t0 smearing
     double t0smear = fRand.Gaus(0,0.15);
 
-    if(!bsim && fStudyId==403) posz -= 15;
+    if(!bsim && fStudyId==403){
+      
+      posz -= 15;
+    }
+    
     for(int h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
@@ -404,8 +408,20 @@ void PrtLutReco::Run(int start, int end){
       else{
 	if(fStudyId == 420) hitTime += 0.62;
 	// if(fStudyId == 403) hitTime += 0.4;
-	if(fStudyId == 403 && fabs(prtangle-20)<1) hitTime -= 0.45;// 0.45
-	if(fStudyId == 403 && prtangle>28) hitTime += 0.05;
+	if(fStudyId == 403){
+	  double o = 0;
+	  if(fabs(prtangle-70)<1) o = -0.3;
+	  if(fabs(prtangle-75)<1) o = -0.3;
+	  if(fabs(prtangle-80)<1) o = -0.4;
+	  if(fabs(prtangle-85)<1) o = -0.4;
+	  if(fabs(prtangle-90)<1) o = -0.45;
+	  if(fabs(prtangle-95)<1) o = -0.4;
+	  if(fabs(prtangle-100)<1) o = -0.45;
+	  if(fabs(prtangle-105)<1) o = -0.45;
+	  if(fabs(prtangle-110)<1) o = -0.3;
+	  if(prtangle>133) o = 0.35;
+	  hitTime += o;
+	}
       }
       
       //======================================== dynamic cuts
@@ -505,11 +521,13 @@ void PrtLutReco::Run(int start, int end){
 	  fHist3->Fill(fabs(luttime),hitTime);
 
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  // if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	  // if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.007*tdiff; // chromatic correction	  
-
-	  if(fabs(tdiff/hitTime)<0.15) tangle -= 0.035*tdiff/hitTime;
-
+	  if(fabs(prtangle-90)<13){
+	    if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
+	    if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
+	  }else{	  
+	    if(fabs(tdiff/hitTime)<0.15) tangle -= 0.035*tdiff/hitTime;
+	  }
+	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
 	   
