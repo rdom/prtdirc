@@ -39,7 +39,7 @@ TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,
 TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
 TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
 TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
-TH2F *hLnMap = new TH2F("hLnMap",";GR ln L(p) - ln L(#pi);TI ln L(p) - ln L(#pi); ",120,-30,30,120,-30,30);
+TH2F *hLnMap = new TH2F("hLnMap",";GR ln L(p) - ln L(#pi);TI ln L(p) - ln L(#pi); ",120,-60,60,120,-60,60);
 
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
 TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#Delta#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
@@ -409,7 +409,7 @@ void PrtLutReco::Run(int start, int end){
 	if(fStudyId == 420) hitTime += 0.62;
 	// if(fStudyId == 403) hitTime += 0.4;
 	if(fStudyId == 403){
-	  double o = 0;
+	  double o = -0.2;
 	  if(fabs(prtangle-70)<1) o = -0.3;
 	  if(fabs(prtangle-75)<1) o = -0.3;
 	  if(fabs(prtangle-80)<1) o = -0.4;
@@ -417,7 +417,7 @@ void PrtLutReco::Run(int start, int end){
 	  if(fabs(prtangle-90)<1) o = -0.45;
 	  if(fabs(prtangle-95)<1) o = -0.4;
 	  if(fabs(prtangle-100)<1) o = -0.45;
-	  if(fabs(prtangle-105)<1) o = -0.45;
+	  if(fabs(prtangle-105)<1) o = -0.35;
 	  if(fabs(prtangle-110)<1) o = -0.3;
 	  if(prtangle>133) o = 0.35;
 	  hitTime += o;
@@ -457,7 +457,7 @@ void PrtLutReco::Run(int start, int end){
       int mcpid=fHit.GetMcpId();
       int ch = map_mpc[mcpid][pixid];
 
-      // if(reflected) continue;
+      // if(!reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
@@ -845,7 +845,7 @@ void PrtLutReco::Run(int start, int end){
       }
 
       { // likelihood
-	prt_canvasAdd("lhood_ge",800,400);
+	prt_canvasAdd("lhood_gr",800,400);
 	prt_normalize(hLnDiffGr4,hLnDiffGr2);
 	hLnDiffGr4->SetLineColor(2);
 	hLnDiffGr4->SetName(Form("s_%2.2f",sep_gr));
@@ -863,10 +863,10 @@ void PrtLutReco::Run(int start, int end){
 	  hLnDiffTi2->Draw("same");
 	}
 	
-	prt_canvasAdd("lhood_map",800,400);
+	prt_canvasAdd("lhood_map",800,800);
 	hLnMap->Draw("colz");
       }
-
+      
       { // bounce
 	prt_canvasAdd("bounce",800,400);
 	hBounce->Scale(1/4000.);
