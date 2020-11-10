@@ -39,7 +39,7 @@ TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,
 TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
 TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
 TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-60,60);
-TH2F *hLnMap = new TH2F("hLnMap",";GR ln L(p) - ln L(#pi);TI ln L(p) - ln L(#pi); ",120,-60,60,120,-60,60);
+TH2F *hLnMap = new TH2F("hLnMap",";GR     ln L(p) - ln L(#pi);TI     ln L(p) - ln L(#pi); ",120,-60,60,120,-60,60);
 
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.5,1.5, 100,-30,30);
 TH2F *hChromL = new TH2F("chroml",";(t_{measured}-t_{calculated})/t_{measured};#Delta#theta_{C} [mrad]", 100,-0.15,0.15, 100,-30,30);
@@ -133,7 +133,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     ch.SetBranchAddress("corr",&corr);
     for(int i=0; i<ch.GetEntries(); i++){
       ch.GetEvent(i);
-      fCorr[pmt] = (fabs(corr)<0.011)? corr: 0.00001;
+      fCorr[pmt] = (fabs(corr)<0.031)? corr: 0.00001;
       std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
     }
   }else{
@@ -296,8 +296,8 @@ void PrtLutReco::Run(int start, int end){
     
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = prt_data_info.getAngle(); //fEvent->GetAngle(); // prt_data_info.getAngle();
-      phi = prt_data_info.getPhi(); // fEvent->GetPhi(); //prt_data_info.getPhi();
+      prtangle = fEvent->GetAngle(); // prt_data_info.getAngle();
+      phi = fEvent->GetPhi(); //prt_data_info.getPhi();
       mom = fEvent->GetMomentum().Mag();
       beamx = fEvent->GetPosition().X();
       beamz = fEvent->GetPosition().Z();
@@ -338,7 +338,7 @@ void PrtLutReco::Run(int start, int end){
       momInBar.RotateY(TMath::Pi()-(prtangle)*CLHEP::deg); //test1
       momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
     }else{
-      momInBar.RotateY(TMath::Pi()-(prtangle)*CLHEP::deg); //test1
+      momInBar.RotateY(TMath::Pi()-(prtangle+test1)*CLHEP::deg); //test1
       momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
     }
     if(fVerbose==3){
@@ -410,7 +410,7 @@ void PrtLutReco::Run(int start, int end){
 	// if(fStudyId == 403) hitTime += 0.4;
 	if(fStudyId == 403){
 	  double o = -0.2;
-	  if(fabs(prtangle-70)<1) o = -0.3;
+	  if(fabs(prtangle-70)<1) o = -0.4;
 	  if(fabs(prtangle-75)<1) o = -0.3;
 	  if(fabs(prtangle-80)<1) o = -0.4;
 	  if(fabs(prtangle-85)<1) o = -0.4;
@@ -637,7 +637,7 @@ void PrtLutReco::Run(int start, int end){
       events[pid]++;
     }
 
-    if(pid == 2 && sumti != 0) hLnMap->Fill(sum,sumti);
+    if(pid == 4 && sumti != 0) hLnMap->Fill(sum,sumti);
     
     // if(fVerbose==1){
     //   prt_canvasAdd("ff",800,400);
@@ -864,6 +864,7 @@ void PrtLutReco::Run(int start, int end){
 	}
 	
 	prt_canvasAdd("lhood_map",800,800);
+	hLnMap->SetStats(0);
 	hLnMap->Draw("colz");
       }
       
@@ -1043,7 +1044,7 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  tc->Branch("corr",&corr,"corr/D");
 	
 	  fFit->SetParameter(1,0);    // mean
-	  fFit->SetParLimits(1,-0.012,0.012);
+	  fFit->SetParLimits(1,-0.032,0.032);
 	  fFit->SetParLimits(2,0.006,0.010); // width		
 	  for(int i=0; i<prt_nmcp; i++){
 	    if(fHistMcp[i]->GetEntries()<10000) continue;
