@@ -335,11 +335,11 @@ void PrtLutReco::Run(int start, int end){
     
     if(bsim){
       speed = 197;      
-      momInBar.RotateY(TMath::Pi()-(prtangle)*CLHEP::deg); //test1
-      momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
+      momInBar.RotateY(TMath::Pi() - prtangle*CLHEP::deg);
+      momInBar.RotateZ((phi)*CLHEP::deg);
     }else{
-      momInBar.RotateY(TMath::Pi()-(prtangle+test1)*CLHEP::deg); //test1
-      momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2      
+      momInBar.RotateY(TMath::Pi() - prtangle*CLHEP::deg + test1); //test1
+      momInBar.RotateZ(phi*CLHEP::deg + test2); //test2
     }
     if(fVerbose==3){
       cz = momInBar.Unit();
