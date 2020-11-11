@@ -465,9 +465,9 @@ void PrtLutReco::Run(int start, int end){
       int nedge=GetEdge(mcpid, pixid);
       // if(cluster[mcpid][pixid]>4) continue;
       
-      bool isGoodHit(0);
-      int bestbounce = 0;
-      double besttdiff = 100;
+      bool isGoodHit_gr(0), isGoodHit_ti(0);
+      int bestbounce = 0;      
+      double besttangle = 0, besttdiff = 100;
       int size = fLutNode[ch]->Entries();
       
       for(int i=0; i<size; i++){
@@ -489,7 +489,7 @@ void PrtLutReco::Run(int start, int end){
 	int iphi = nphi*(lphi)/TMath::TwoPi();
 	int itheta = ntheta*(ltheta)/TMath::PiOver2();
 	
-	for(int u=0; u<4; u++){
+	for(int u=0; u<2; u++){
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
 	  if(u == 2) dir.SetXYZ( dird.X(), -dird.Y(), dird.Z()); //no need when no divergence in vertical plane
@@ -513,26 +513,26 @@ void PrtLutReco::Run(int start, int end){
 	  fHist0->Fill(tdiff);
 	  if(reflected) fHist0r->Fill(tdiff);
 	  else fHist0d->Fill(tdiff);
-			  
 	  if(samepath) fHist0i->Fill(tdiff);
-	  if(fabs(tdiff)>timeRes+luttime*0.04) continue;
-
-	  fDiff->Fill(hitTime,tdiff);
-	  fHist3->Fill(fabs(luttime),hitTime);
-
+	  
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
 	  if(fabs(prtangle-90)<13){
 	    if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
 	    if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
-	  }else{	  
+	  }else{
 	    if(fabs(tdiff/hitTime)<0.15) tangle -= 0.035*tdiff/hitTime;
 	  }
+	  	  
+	  if(fabs(tdiff)<1.5+luttime*0.04 && fabs(tangle-0.815)<0.05) isGoodHit_ti = true;
+	  if(fabs(tdiff)>timeRes+luttime*0.04) continue;
+
+	  fDiff->Fill(hitTime,tdiff);
+	  fHist3->Fill(fabs(luttime),hitTime);	  
 	  
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
 	   
-	  double w = 1; //2000/len;
-	  //w=0.5*(2-fabs(tdiff));
+	  double w = 1; //2000/len; //w=0.5*(2-fabs(tdiff));
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle ,weight);
@@ -542,12 +542,10 @@ void PrtLutReco::Run(int start, int end){
 
 	    // if(true && tangle>0.4 && tangle<0.9){
 	    if(fabs(tangle-0.815)<0.05){
+	      isGoodHit_gr = true;
+
 	      sum1 += w*TMath::Log(fFunc[4]->Eval(tangle)+noise);
-	      sum2 += w*TMath::Log(fFunc[2]->Eval(tangle)+noise);
-	    }
-	    
-	    // //if(samepath) fHist->Fill(tangle ,weight);
-	    if((fRadiator==1 && fabs(tangle-0.815)<0.05) || (fRadiator==2 && fabs(tangle-0.815)<0.2)){
+	      sum2 += w*TMath::Log(fFunc[2]->Eval(tangle)+noise);	   
 
 	      fHist0s->Fill(tdiff);
 	      double lenx = len*dir.X();
@@ -557,8 +555,9 @@ void PrtLutReco::Run(int start, int end){
 	      if(fabs(tdiff)<fabs(besttdiff)) {
 		besttdiff = tdiff;
 		bestbounce = nx+ny;
+		besttangle = tangle;
 	      }
-	      isGoodHit=true;
+
 	      fHist2->Fill(luttime);
 	      hLutCorrD->Fill(ltheta*TMath::Sin(lphi),ltheta*TMath::Cos(lphi));
 	    }
@@ -577,16 +576,9 @@ void PrtLutReco::Run(int start, int end){
 	}
       }
 
-      if(isGoodHit){
-	hBounce->Fill(bestbounce);
-	fHist1->Fill(hitTime);
-	nhhits++;
-	nsHits++;
-	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);
-      
-      
-	if(fMethod == 2 && fTimeImaging){ // time imaging
+      if(fTimeImaging && isGoodHit_ti){
 
+	if(fMethod == 2){
 	  double t = hitTime;
 	  if(fabs(besttdiff) < 0.3) t -= besttdiff;
 	  double noiseti = 1e-5;
@@ -596,11 +588,9 @@ void PrtLutReco::Run(int start, int end){
 	  sumti2 += TMath::Log((aminti2+noiseti));
 	}
 
-	if(fMethod == 4){ // create pdf 
-	  
+	if(fMethod == 4){ // create pdf 		  
 	  double t = hitTime;
 	  if(fabs(besttdiff) < 0.3) t -= besttdiff;
-
 	  if(pid == 4){
 	    total4++;
 	    fTime4[ch]->Fill(t);
@@ -610,7 +600,14 @@ void PrtLutReco::Run(int start, int end){
 	    fTime2[ch]->Fill(t);
 	  }	  
 	}
-	
+      }
+
+      if(isGoodHit_gr){
+	hBounce->Fill(bestbounce);
+	fHist1->Fill(hitTime);
+	nhhits++;
+	nsHits++;
+	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);	
       }
     }
 
@@ -688,7 +685,6 @@ void PrtLutReco::Run(int start, int end){
     std::cout<<"total2 "<<total2 <<" total4 "<<total4<<std::endl;
   }
 
-  
   if(fMethod==2){
     TF1 *ff;
     gROOT->SetBatch(1);
