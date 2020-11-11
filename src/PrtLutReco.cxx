@@ -133,7 +133,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     ch.SetBranchAddress("corr",&corr);
     for(int i=0; i<ch.GetEntries(); i++){
       ch.GetEvent(i);
-      fCorr[pmt] = (fabs(corr)<0.031)? corr: 0.00001;
+      fCorr[pmt] = (fabs(corr)<0.041)? corr: 0.00001;
       std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
     }
   }else{
@@ -1030,7 +1030,7 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  tc->Branch("corr",&corr,"corr/D");
 	
 	  fFit->SetParameter(1,0);    // mean
-	  fFit->SetParLimits(1,-0.032,0.032);
+	  fFit->SetParLimits(1,-0.042,0.042);
 	  fFit->SetParLimits(2,0.006,0.010); // width		
 	  for(int i=0; i<prt_nmcp; i++){
 	    if(fHistMcp[i]->GetEntries()<10000) continue;
