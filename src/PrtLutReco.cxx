@@ -176,7 +176,7 @@ PrtLutReco::~PrtLutReco(){
 
 //-------------- Loop over tracks ------------------------------------------
 void PrtLutReco::Run(int start, int end){
-  TVector3 dird, dir, momInBar(0,0,1),posInBar,cz;
+  TVector3 dird, dir, momInBar,momInBar0,posInBar,cz;
   double mom,tangle,likelihood(0),boxPhi,weight,evtime,bartime,lenz,posz,dirz,luttheta,
     barHitTime, hitTime,angdiv,dtheta,dtphi,prtangle;
   int  tofPid(0),distPid(0),likePid(0),pdgcode, evpointcount(0),total2(0),total4(0);
@@ -291,13 +291,14 @@ void PrtLutReco::Run(int start, int end){
     int pid = prt_get_pid(tofPid);
     if(events[pid]>=end) continue;
 
+    double speed = 197.0; // mm/ns
     double sigma[]={0,0,0.0081,0,0.0081};
     double angle1(0), angle2(0),sum1(0),sum2(0),sumti(0),sumti2(0),sumti4(0),range(5*sigma[2]),noise(0.2); //0.0082
-    
+        
     if(ievent-start==0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = fEvent->GetAngle(); // prt_data_info.getAngle();
-      phi = fEvent->GetPhi(); //prt_data_info.getPhi();
+      prtangle = fEvent->GetAngle() + test1*TMath::RadToDeg(); // prt_data_info.getAngle();
+      phi = fEvent->GetPhi() + test2*TMath::RadToDeg(); //prt_data_info.getPhi();
       mom = fEvent->GetMomentum().Mag();
       beamx = fEvent->GetPosition().X();
       beamz = fEvent->GetPosition().Z();
@@ -312,35 +313,25 @@ void PrtLutReco::Run(int start, int end){
       }
  
       std::cout<<fStudyId<<"  prtangle++  "<<prtangle<< " phi "<<phi<<" t1 "<<test1<<" t2 "<<test2<<std::endl;
-      
-      // if(bsim){
-      //   momInBar.RotateY(TMath::Pi()-(prtangle+0)*CLHEP::deg); //test1
-      // 	momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2
-      // }else{
-      // 	momInBar.RotateY(TMath::Pi()-(prtangle+0)*CLHEP::deg); //test1
-      // 	momInBar.RotateZ((phi+test2)*CLHEP::deg); //test2
-      // }
+
+      momInBar = TVector3(0,0,1);
+      if(bsim){
+	speed = 197;      
+	momInBar.RotateY(TMath::Pi() - prtangle*TMath::DegToRad());
+	momInBar.RotateZ(phi*TMath::DegToRad());
+      }else{
+	momInBar.RotateY(TMath::Pi() - prtangle*TMath::DegToRad());
+	momInBar.RotateZ(phi*TMath::DegToRad());
+      }
+      TVector3 momInBar0 = momInBar;
     }
 
-    momInBar = TVector3(0,0,1);
     // //smear track
-    // TVector3 init = momInBar;
-    // double smearangle = 0.005; //test1;// prt_rand.Gaus(0,test1);
+    // momInBar = momInBar0;
+    // double smearangle = 0.005; // prt_rand.Gaus(0,test1);
     // momInBar.RotateY(smearangle);
-    // momInBar.Rotate(prt_rand.Uniform(0,TMath::TwoPi()),init);
-	
-    //if(ievent != start) break;
+    // momInBar.Rotate(prt_rand.Uniform(0,TMath::TwoPi()),momInBar0);
 
-    double speed = 197.0; // mm/ns
-    
-    if(bsim){
-      speed = 197;      
-      momInBar.RotateY(TMath::Pi() - prtangle*CLHEP::deg);
-      momInBar.RotateZ((phi)*CLHEP::deg);
-    }else{
-      momInBar.RotateY(TMath::Pi() - prtangle*CLHEP::deg + test1); //test1
-      momInBar.RotateZ(phi*CLHEP::deg + test2); //test2
-    }
     if(fVerbose==3){
       cz = momInBar.Unit();
       cz = TVector3(-cz.X(),cz.Y(),cz.Z());
@@ -407,14 +398,13 @@ void PrtLutReco::Run(int start, int end){
       if(bsim) hitTime += fRand.Gaus(0,0.25) + t0smear; // time resol. in case it was not simulated
       else{
 	if(fStudyId == 420) hitTime += 0.62;
-	// if(fStudyId == 403) hitTime += 0.4;
 	if(fStudyId == 403){
 	  double o = -0.2;
 	  if(fabs(prtangle-70)<1) o = -0.4;
 	  if(fabs(prtangle-75)<1) o = -0.3;
 	  if(fabs(prtangle-80)<1) o = -0.4;
 	  if(fabs(prtangle-85)<1) o = -0.4;
-	  if(fabs(prtangle-90)<1) o = -0.45;
+	  if(fabs(prtangle-90)<1) o = -0.1;
 	  if(fabs(prtangle-95)<1) o = -0.4;
 	  if(fabs(prtangle-100)<1) o = -0.45;
 	  if(fabs(prtangle-105)<1) o = -0.35;
