@@ -140,7 +140,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     std::cout<<"------- corr file not found  "<<fCorrPath <<std::endl;
   }
 
-  fTimeImaging = false;
+  fTimeImaging = (fMethod == 4)? true : false;
   fPdfPath = infile.ReplaceAll(".root",".pdf1.root");
   if(fMethod == 2) { // read pdf
     if(!gSystem->AccessPathName(fPdfPath)){
@@ -323,7 +323,7 @@ void PrtLutReco::Run(int start, int end){
 	momInBar.RotateY(TMath::Pi() - prtangle*TMath::DegToRad());
 	momInBar.RotateZ(phi*TMath::DegToRad());
       }
-      TVector3 momInBar0 = momInBar;
+      momInBar0 = momInBar;
     }
 
     // //smear track
@@ -399,17 +399,32 @@ void PrtLutReco::Run(int start, int end){
       else{
 	if(fStudyId == 420) hitTime += 0.62;
 	if(fStudyId == 403){
-	  double o = -0.2;
-	  if(fabs(prtangle-70)<1) o = -0.4;
+	  double o = 0.1;
+	  if(fabs(prtangle-20)<1) o = -0.2;
+	  if(fabs(prtangle-25)<1) o = -0.05;
+	  if(fabs(prtangle-30)<1) o =  0.08;
+	  if(fabs(prtangle-35)<1) o =  0.2;
+	  if(fabs(prtangle-40)<1) o =  0.2;
+	  if(fabs(prtangle-45)<1) o =  0.2;
+	  if(fabs(prtangle-50)<1) o =  0.1;
+	  if(fabs(prtangle-55)<1) o =  0.1;
+	  if(fabs(prtangle-60)<1) o =  -0.1;
+	  if(fabs(prtangle-65)<1) o =  -0.2;
+	  if(fabs(prtangle-70)<1) o = -0.3;
 	  if(fabs(prtangle-75)<1) o = -0.3;
 	  if(fabs(prtangle-80)<1) o = -0.4;
 	  if(fabs(prtangle-85)<1) o = -0.4;
-	  if(fabs(prtangle-90)<1) o = -0.1;
+	  if(fabs(prtangle-90)<1) o = -0.4;
 	  if(fabs(prtangle-95)<1) o = -0.4;
-	  if(fabs(prtangle-100)<1) o = -0.45;
+	  if(fabs(prtangle-100)<1) o = -0.4;
 	  if(fabs(prtangle-105)<1) o = -0.35;
 	  if(fabs(prtangle-110)<1) o = -0.3;
-	  if(prtangle>133) o = 0.35;
+	  if(fabs(prtangle-115)<1) o = -0.1;
+	  if(fabs(prtangle-120)<1) o =  0.0;
+	  if(fabs(prtangle-120)<1) o =  0.0;
+	  if(fabs(prtangle-130)<1) o = +0.1;
+	  if(fabs(prtangle-135)<1) o = +0.3;
+	  if(fabs(prtangle-140)<1) o = +0.4;
 	  hitTime += o;
 	}
       }
@@ -447,7 +462,7 @@ void PrtLutReco::Run(int start, int end){
       int mcpid=fHit.GetMcpId();
       int ch = map_mpc[mcpid][pixid];
 
-      // if(!reflected) continue;
+      // if(reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
       
@@ -479,7 +494,7 @@ void PrtLutReco::Run(int start, int end){
 	int iphi = nphi*(lphi)/TMath::TwoPi();
 	int itheta = ntheta*(ltheta)/TMath::PiOver2();
 	
-	for(int u=0; u<2; u++){
+	for(int u=0; u<4; u++){
 	  if(u == 0) dir = dird;
 	  if(u == 1) dir.SetXYZ( -dird.X(), dird.Y(), dird.Z());
 	  if(u == 2) dir.SetXYZ( dird.X(), -dird.Y(), dird.Z()); //no need when no divergence in vertical plane
@@ -506,26 +521,26 @@ void PrtLutReco::Run(int start, int end){
 	  if(samepath) fHist0i->Fill(tdiff);
 	  
 	  tangle = momInBar.Angle(dir)+fCorr[mcpid];
-	  if(fabs(prtangle-90)<13){
-	    if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.007*tdiff; // chromatic correction
-	    if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.005*tdiff; // chromatic correction	  
+	  if(fabs(prtangle-90)<16){
+	    if(reflected) if(fabs(tdiff)<1.5)  tangle -= 0.0075*tdiff; // chromatic correction
+	    if(!reflected) if(fabs(tdiff)<1.5) tangle -= 0.006*tdiff; // chromatic correction	  
 	  }else{
 	    if(fabs(tdiff/hitTime)<0.15) tangle -= 0.035*tdiff/hitTime;
 	  }
-	  	  
+
+	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
+	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
+	  
 	  if(fabs(tdiff)<1.5+luttime*0.04 && fabs(tangle-0.815)<0.05) isGoodHit_ti = true;
 	  if(fabs(tdiff)>timeRes+luttime*0.04) continue;
 
 	  fDiff->Fill(hitTime,tdiff);
-	  fHist3->Fill(fabs(luttime),hitTime);	  
-	  
-	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
-	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
+	  fHist3->Fill(fabs(luttime),hitTime);	  	  
 	   
 	  double w = 1; //2000/len; //w=0.5*(2-fabs(tdiff));
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
-	    else fHist->Fill(tangle ,weight);
+	    else fHist->Fill(tangle, weight);
 
 	    fHistMcp[mcpid]->Fill(tangle-fAngle[pid] ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
