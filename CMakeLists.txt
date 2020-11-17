@@ -39,11 +39,8 @@ add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtLutNode.cxx G__Prt
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
-#set(CMAKE_CXX_FLAGS "-std=gnu++11")
 
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fno-trapping-math -ftree-vectorize -fno-math-errno")
-
-message(STATUS "----------------  ${CMAKE_CXX_FLAGS_RELEASE}")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fno-trapping-math -ftree-vectorize -fno-math-errno -std=gnu++11")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
 
