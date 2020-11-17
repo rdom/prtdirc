@@ -133,7 +133,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     ch.SetBranchAddress("corr",&corr);
     for(int i=0; i<ch.GetEntries(); i++){
       ch.GetEvent(i);
-      fCorr[pmt] = (fabs(corr)<0.041)? corr: 0.00001;
+      fCorr[pmt] = (fabs(corr)<0.011)? corr: 0.00001;
       std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
     }
   }else{
@@ -146,7 +146,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     if(!gSystem->AccessPathName(fPdfPath)){
       std::cout<<"------- reading  "<<fPdfPath <<std::endl;
       TFile pdfFile(fPdfPath);
-      double sigma = 400; // ps
+      double sigma = 250; // ps
       int binfactor=(int)(sigma/50.+0.1);
       for(int i=0; i<prt_maxdircch; i++){  
 	auto hpdf2 = (TH1F*)pdfFile.Get(Form("hs_%d",i));
@@ -256,7 +256,7 @@ void PrtLutReco::Run(int start, int end){
   if(end==0) end = nEvents;
   
   int pdfend = 50000;
-  if(fPdfPath.Contains("S.pdf1.root")) pdfend = 4000;
+  if(fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
   
   if(fMethod == 4) {
     start = pdfend;
@@ -281,7 +281,7 @@ void PrtLutReco::Run(int start, int end){
     if(ievent%1000==0) std::cout<<"Event # "<< ievent << " has "<< nHits <<" hits "<< events[2]<<" "<<events[4]<<std::endl;	
 
     if(bsim) {
-      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(-5,5); 
+      posz = 0.5*radiatorL-fEvent->GetPosition().Z() + fRand.Uniform(-5,5);
     }
     else posz = fEvent->GetPosition().Z();
 
@@ -315,14 +315,8 @@ void PrtLutReco::Run(int start, int end){
       std::cout<<fStudyId<<"  prtangle++  "<<prtangle<< " phi "<<phi<<" t1 "<<test1<<" t2 "<<test2<<std::endl;
 
       momInBar = TVector3(0,0,1);
-      if(bsim){
-	speed = 197;      
-	momInBar.RotateY(TMath::Pi() - prtangle*TMath::DegToRad());
-	momInBar.RotateZ(phi*TMath::DegToRad());
-      }else{
-	momInBar.RotateY(TMath::Pi() - prtangle*TMath::DegToRad());
-	momInBar.RotateZ(phi*TMath::DegToRad());
-      }
+      momInBar.RotateY(TMath::Pi() - prtangle*TMath::DegToRad());
+      momInBar.RotateZ(phi*TMath::DegToRad());
       momInBar0 = momInBar;
     }
 
@@ -387,8 +381,7 @@ void PrtLutReco::Run(int start, int end){
     //event t0 smearing
     double t0smear = fRand.Gaus(0,0.15);
 
-    if(!bsim && fStudyId==403){
-      
+    if(!bsim && fStudyId==403){      
       posz -= 15;
     }
     
@@ -431,10 +424,9 @@ void PrtLutReco::Run(int start, int end){
       
       //======================================== dynamic cuts
       {
-	double cut1(7);
 	{ //time cuts
 	  if(prtangle<=75){
-	    if(hitTime<cut1 || hitTime>45) continue;
+	    if(hitTime<7 || hitTime>45) continue;
 	    reflected = kTRUE;
 	  }else if(prtangle>105){
 	    if(hitTime<3 || hitTime>40) continue;
@@ -528,6 +520,8 @@ void PrtLutReco::Run(int start, int end){
 	    if(fabs(tdiff/hitTime)<0.15) tangle -= 0.035*tdiff/hitTime;
 	  }
 
+	  if(fabs(tdiff)<1.5)  tangle -= 0.002*tdiff; // chromatic correction
+
 	  hChrom->Fill(tdiff,(tangle-fAngle[pid])*1000);
 	  hChromL->Fill(tdiff/hitTime,(tangle-fAngle[pid])*1000);
 	  
@@ -545,7 +539,6 @@ void PrtLutReco::Run(int start, int end){
 	    fHistMcp[mcpid]->Fill(tangle-fAngle[pid] ,weight);
 	    fHistCh[ch]->Fill(tangle ,weight);
 
-	    // if(true && tangle>0.4 && tangle<0.9){
 	    if(fabs(tangle-0.815)<0.05){
 	      isGoodHit_gr = true;
 
@@ -612,7 +605,7 @@ void PrtLutReco::Run(int start, int end){
 	fHist1->Fill(hitTime);
 	nhhits++;
 	nsHits++;
-	prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);	
+	if(tofPid == 211) prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);	
       }
     }
 
@@ -694,16 +687,14 @@ void PrtLutReco::Run(int start, int end){
     TF1 *ff;
     gROOT->SetBatch(1);
     if(fhNph_p->GetEntries()>20){
-      fhNph_p->Fit("gaus","","MQN",0,120);
-      ff = fhNph_p->GetFunction("gaus");
-      nph=ff->GetParameter(1);
-      nph_err=ff->GetParError(1);
+      TFitResultPtr r = fhNph_p->Fit("gaus","SQN","",0,120);
+      nph = r->Parameter(1);
+      nph_err = r->ParError(1);
     }
     if(fhNph_pi->GetEntries()>20){
-      fhNph_pi->Fit("gaus","","MQN",0,120);
-      ff = fhNph_pi->GetFunction("gaus");
-      nph_pi = ff->GetParameter(1);
-      nph_pi_err = ff->GetParError(1);
+      TFitResultPtr r = fhNph_pi->Fit("gaus","SQN","",0,120);
+      nph_pi = r->Parameter(1);
+      nph_pi_err = r->ParError(1);
     }
     //nph = prt_fit(fhNph_pi,40,10,50,1).X();
     gROOT->SetBatch(0);
@@ -718,7 +709,7 @@ void PrtLutReco::Run(int start, int end){
 
     double m1,m2,s1,s2,dm1,dm2,ds1,ds2;; 
     if(hLnDiffGr4->GetEntries()>10){
-      hLnDiffGr4->Fit("gaus","S");
+      hLnDiffGr4->Fit("gaus","Q");
       ff = hLnDiffGr4->GetFunction("gaus");
       m1=ff->GetParameter(1);
       s1=ff->GetParameter(2);
@@ -726,7 +717,7 @@ void PrtLutReco::Run(int start, int end){
       ds1=ff->GetParError(2);
     }
     if(hLnDiffGr2->GetEntries()>10){
-      hLnDiffGr2->Fit("gaus","S");
+      hLnDiffGr2->Fit("gaus","Q");
       ff = hLnDiffGr2->GetFunction("gaus");
       m2=ff->GetParameter(1);
       s2=ff->GetParameter(2);
@@ -744,7 +735,7 @@ void PrtLutReco::Run(int start, int end){
 
     if(fTimeImaging){
       if(hLnDiffTi4->GetEntries()>10){
-	hLnDiffTi4->Fit("gaus","S");
+	hLnDiffTi4->Fit("gaus","Q");
 	ff = hLnDiffTi4->GetFunction("gaus");
 	m1=ff->GetParameter(1);
 	s1=ff->GetParameter(2);
@@ -752,7 +743,7 @@ void PrtLutReco::Run(int start, int end){
 	ds1=ff->GetParError(2);
       }
       if(hLnDiffTi2->GetEntries()>10){
-	hLnDiffTi2->Fit("gaus","S");
+	hLnDiffTi2->Fit("gaus","Q");
 	ff = hLnDiffTi2->GetFunction("gaus");
 	m2=ff->GetParameter(1);
 	s2=ff->GetParameter(2);
@@ -998,7 +989,7 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
       fFit->SetParameter(2,0.007);
       fFit->SetParLimits(2,0.005,0.008);
       gROOT->SetBatch(1);
-      fHist->Fit("fgaus","Mlq","",0.6,1);
+      fHist->Fit("fgaus","MQ","",0.6,1);
       cangle = fFit->GetParameter(1);
       spr = fFit->GetParameter(2);
       gROOT->SetBatch(!fVerbose);
@@ -1017,12 +1008,12 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
     if(fMethod==2){
       gROOT->SetBatch(1);
         
-      fHist->Fit("fgaus","M","",cangle-0.06,cangle+0.06);
+      fHist->Fit("fgaus","MQ","",cangle-0.06,cangle+0.06);
       if(fVerbose>1) gROOT->SetBatch(0);
       cangle = fFit->GetParameter(1);
       spr = fFit->GetParameter(2);
       
-      fHistPi->Fit("fgaus","M","",cangle-0.06,cangle+0.06);        
+      fHistPi->Fit("fgaus","MQ","",cangle-0.06,cangle+0.06);        
       cangle_pi = fFit->GetParameter(1);
       spr_pi = fFit->GetParameter(2);      
       	
@@ -1045,7 +1036,7 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	  tc->Branch("corr",&corr,"corr/D");
 	
 	  fFit->SetParameter(1,0);    // mean
-	  fFit->SetParLimits(1,-0.042,0.042);
+	  fFit->SetParLimits(1,-0.012,0.012);
 	  fFit->SetParLimits(2,0.006,0.010); // width		
 	  for(int i=0; i<prt_nmcp; i++){
 	    if(fHistMcp[i]->GetEntries()<10000) continue;
@@ -1123,7 +1114,7 @@ double PrtLutReco::fillLnDiffPPi(double cangle, int tofPid, double mom){
     lFit->FixParameter(4,0.5);
  
 
-    fHist->Fit("lgaus","lq","",fAngle[4]-range,fAngle[2]+range);
+    fHist->Fit("lgaus","Q","",fAngle[4]-range,fAngle[2]+range);
     double amin,amin2,edm,errdef;
     int nvpar,nparx;
     TVirtualFitter *fitter = TVirtualFitter::Fitter(fHist);
@@ -1145,7 +1136,7 @@ double PrtLutReco::fillLnDiffPPi(double cangle, int tofPid, double mom){
     lFitPi->FixParameter(3,0);
     lFitPi->FixParameter(4,0.5);
 
-    fHist->Fit("lgausPi","lq","",fAngle[4]-range,fAngle[2]+range);
+    fHist->Fit("lgausPi","Q","",fAngle[4]-range,fAngle[2]+range);
     fitter = TVirtualFitter::Fitter(fHist);
     fitter->GetStats(amin2,edm,errdef,nvpar,nparx);
   

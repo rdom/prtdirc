@@ -285,7 +285,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
  
   Long_t pathId = 0;
   Int_t refl=0;
-  for (G4int i=0;i<prizmCol->entries();i++){    
+  for (uint i=0;i<prizmCol->entries();i++){    
     PrtPrizmHit* phit = (*prizmCol)[i];
     if(phit->GetTrackID()==track->GetTrackID()) {
       if(phit->GetNormalId()>0) pathId = pathId*10+phit->GetNormalId();

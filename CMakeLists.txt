@@ -24,7 +24,7 @@ find_package(ROOT REQUIRED)
 # Locate sources and headers for this project
 include_directories(SYSTEM ${Geant4_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/src)
-
+ 
 include(${ROOT_USE_FILE})
 include(${Geant4_USE_FILE})
 
@@ -40,7 +40,13 @@ add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtLutNode.cxx G__Prt
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
 #set(CMAKE_CXX_FLAGS "-std=gnu++11")
+
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fno-trapping-math -ftree-vectorize -fno-math-errno")
+
+message(STATUS "----------------  ${CMAKE_CXX_FLAGS_RELEASE}")
+
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
+
 add_executable(prtdirc PrtDirc.cxx ${sources})
 target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Prt -lSpectrum -lHistPainter)
 
