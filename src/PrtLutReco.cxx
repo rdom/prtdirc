@@ -380,7 +380,7 @@ void PrtLutReco::Run(int start, int end){
     // SearchClusters();
     
     //event t0 smearing
-    double t0smear = fRand.Gaus(0,0.15);
+    double t0smear = fRand.Gaus(0,0.05);
 
     if(!bsim && fStudyId==403){      
       posz -= 15;
@@ -389,7 +389,7 @@ void PrtLutReco::Run(int start, int end){
     for(int h=0; h<nHits; h++) {
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
-      if(bsim) hitTime += fRand.Gaus(0,0.25) + t0smear; // time resol. in case it was not simulated
+      if(bsim) hitTime += fRand.Gaus(0,0.2) + t0smear; // time resol. in case it was not simulated
       else{
 	if(fStudyId == 420) hitTime += 0.62;
 	if(fStudyId == 403){
@@ -571,7 +571,7 @@ void PrtLutReco::Run(int start, int end){
 
 	if(fMethod == 2){
 	  double t = hitTime;
-	  if(fabs(besttdiff) < 0.3) t -= besttdiff;
+	  // if(fabs(besttdiff) < 0.3) t -= besttdiff;
 	  double noiseti = 1e-5;
 	  double aminti4 = fPdf4[ch]->Eval(t);
 	  double aminti2 = fPdf2[ch]->Eval(t);
@@ -581,7 +581,7 @@ void PrtLutReco::Run(int start, int end){
 
 	if(fMethod == 4){ // create pdf 		  
 	  double t = hitTime;
-	  if(fabs(besttdiff) < 0.3) t -= besttdiff;
+	  // if(fabs(besttdiff) < 0.3) t -= besttdiff;
 	  if(pid == 4){
 	    total4++;
 	    fTime4[ch]->Fill(t);
