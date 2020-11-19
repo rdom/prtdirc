@@ -133,7 +133,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     ch.SetBranchAddress("corr",&corr);
     for(int i=0; i<ch.GetEntries(); i++){
       ch.GetEvent(i);
-      fCorr[pmt] = (fabs(corr)<0.011)? corr: 0.00001;
+      // fCorr[pmt] = (fabs(corr)<0.011)? corr: 0.00001;
+      fCorr[pmt] = (fabs(corr)<0.006)? corr: corr/fabs(corr)*0.006;
       std::cout<<"pmt "<<pmt<<"  "<<corr<<std::endl;    
     }
   }else{
@@ -304,7 +305,8 @@ void PrtLutReco::Run(int start, int end){
       beamz = fEvent->GetPosition().Z();
       if(bsim) beamz = 0.5*radiatorL-beamz;
       if(bsim) speed = 196.5;
-      
+      if(prtangle>115) timeRes = 0.8;
+	
       for(int i: {2,4}){
 	fAngle[i] = acos(sqrt(momentum*momentum+ prt_mass[i]*prt_mass[i])/momentum/1.4725); //1.4738 = 370 = 3.35 // 1.4725 = 380 = 3.26
 	fFunc[i] = new TF1(Form("gaus_%d",i),"[0]*exp(-0.5*((x-[1])/[2])*(x-[1])/[2])",0.7,0.9);
@@ -414,8 +416,8 @@ void PrtLutReco::Run(int start, int end){
 	  if(fabs(prtangle-105)<1) o = -0.35;
 	  if(fabs(prtangle-110)<1) o = -0.2;
 	  if(fabs(prtangle-115)<1) o = -0.1;
-	  if(fabs(prtangle-120)<1) o =  0.0;
-	  if(fabs(prtangle-120)<1) o =  0.0;
+	  if(fabs(prtangle-120)<1) o = 0.1;
+	  if(fabs(prtangle-125)<1) o =  0.1;
 	  if(fabs(prtangle-130)<1) o = +0.1;
 	  if(fabs(prtangle-135)<1) o = +0.3;
 	  if(fabs(prtangle-140)<1) o = +0.4;
