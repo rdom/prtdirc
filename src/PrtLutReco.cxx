@@ -146,7 +146,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     if(!gSystem->AccessPathName(fPdfPath)){
       std::cout<<"------- reading  "<<fPdfPath <<std::endl;
       TFile pdfFile(fPdfPath);
-      double sigma = 400; // ps
+      double sigma = 250; // ps
       int binfactor=(int)(sigma/50.+0.1);
       for(int i=0; i<prt_maxdircch; i++){  
 	auto hpdf2 = (TH1F*)pdfFile.Get(Form("hs_%d",i));
@@ -1030,11 +1030,11 @@ bool PrtLutReco::FindPeak(double& cangle, double& spr,double& cangle_pi, double&
 	
 	  fFit->SetParameters(100,0,0.007);
 	  fFit->SetParLimits(1,-0.012,0.012);// mean
-	  fFit->SetParLimits(2,0.006,0.008); // width		
+	  fFit->SetParLimits(2,0.006,0.009); // width		
 	  for(int i=0; i<prt_nmcp; i++){
 	    if(fHistMcp[i]->GetEntries()<10000) continue;
 	    if(fVerbose>2) prt_canvasAdd(Form("r_tangle_%d",i),800,400);
-	    fHistMcp[i]->Fit("fgaus","Q","",-0.03,0.03);
+	    fHistMcp[i]->Fit("fgaus","MQ","",-0.03,0.03);
 	    pmt = i;
 	    corr = -fFit->GetParameter(1);
 	    tc->Fill();
