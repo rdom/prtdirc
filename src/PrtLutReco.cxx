@@ -305,7 +305,6 @@ void PrtLutReco::Run(int start, int end){
       beamz = fEvent->GetPosition().Z();
       if(bsim) beamz = 0.5*radiatorL-beamz;
       if(bsim) speed = 196.5;
-      if(prtangle>115) timeRes = 0.8;
 	
       for(int i: {2,4}){
 	fAngle[i] = acos(sqrt(momentum*momentum+ prt_mass[i]*prt_mass[i])/momentum/1.4725); //1.4738 = 370 = 3.35 // 1.4725 = 380 = 3.26
@@ -460,6 +459,9 @@ void PrtLutReco::Run(int start, int end){
       // if(reflected) continue;
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
+
+      if(reflected) timeRes = 0.5;
+      else timeRes = 0.8;
       
       if(prt_isBadChannel(ch)) continue;
       int nedge=GetEdge(mcpid, pixid);
