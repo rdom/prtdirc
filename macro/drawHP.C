@@ -18,7 +18,7 @@ void drawHP(TString infile="../build/hits.root"){
       int ch = map_mpc[mcp][pix];
       if(prt_isBadChannel(ch)) continue;
       if(mcp>7) continue;
-      if(prt_pid == 4 && time<30) prt_hdigi[mcp]->Fill(pix%8, pix/8);
+      if(prt_pid == 4) prt_hdigi[mcp]->Fill(pix%8, pix/8);
     }
   }
   

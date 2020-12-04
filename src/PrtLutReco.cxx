@@ -22,6 +22,9 @@ TH1F*  fHist0r = new TH1F("timediffr",";t_{measured}-t_{calculated} [ns];entries
 TH1F*  fHist0s = new TH1F("timediffs",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0i = new TH1F("timediffi",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 
+TH1F*  fTof_p = new TH1F("tof_p",";TOF [ns];entries [#]", 500,31,35);
+TH1F*  fTof_pi = new TH1F("tof_pi",";TOF [ns];entries [#]", 500,31,35);
+
 TH1F*  fhNph_pi = new TH1F("fhNph_pi",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fhNph_p = new TH1F("fhNph_p",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,50);
@@ -147,7 +150,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     if(!gSystem->AccessPathName(fPdfPath)){
       std::cout<<"------- reading  "<<fPdfPath <<std::endl;
       TFile pdfFile(fPdfPath);
-      double sigma = 250; // ps
+      double sigma = 250;//250; // ps
       int binfactor=(int)(sigma/50.+0.1);
       for(int i=0; i<prt_maxdircch; i++){  
 	auto hpdf2 = (TH1F*)pdfFile.Get(Form("hs_%d",i));
@@ -341,6 +344,10 @@ void PrtLutReco::Run(int start, int end){
       int hodo1(0), hodo2(0);
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
 	double tof = fEvent->GetTest1();
+	// if(fStudyId==401 && (fabs(prtangle-20)<1 || fabs(prtangle-90)<1)){
+	//   if( pid == 4 && tof < 32.9 ) continue;
+	//   if( pid == 2 && tof > 31.8 ) continue;
+	// }
         if(fStudyId==403 && fMethod != 4){
 	  if( pid == 4 && tof < 34.2 ) continue;
 	  if( pid == 2 && tof > 33.3 ) continue;
@@ -353,7 +360,9 @@ void PrtLutReco::Run(int start, int end){
 	  if( pid == 4 && tof < 36.6 ) continue;
 	  if( pid == 2 && tof > 36.0 ) continue;
 	}
-      }
+	if( pid == 2 ) fTof_pi->Fill(tof);
+	if( pid == 4 ) fTof_p->Fill(tof);
+      }      
       for(int h=0; h<nHits; h++) {
       	gch = fEvent->GetHit(h).GetChannel();
 	if(gch<prt_maxdircch) ndirc++;
@@ -392,6 +401,15 @@ void PrtLutReco::Run(int start, int end){
       hitTime = fHit.GetLeadTime();
       if(bsim) hitTime += fRand.Gaus(0,0.2) + t0smear; // time resol. in case it was not simulated
       else{
+	if(fStudyId == 401){
+	  double o = 0.1;
+	  if(fabs(prtangle-25)<1) o = 0.3;
+	  if(fabs(prtangle-30)<1) o = 0.4;
+	  if(fabs(prtangle-60)<1) o = -0.1;
+	  if(fabs(prtangle-90)<1) o = 0.5;
+	  if(fabs(prtangle-140)<1) o = 0.5;
+	  hitTime += o;
+	}
 	if(fStudyId == 420) hitTime += 0.62;
 	if(fStudyId == 403){
 	  double o = 0.1;
@@ -460,8 +478,8 @@ void PrtLutReco::Run(int start, int end){
       if(reflected) lenz = 2*radiatorL - posz;
       else lenz = posz;
 
-      if(reflected) timeRes = 0.5;
-      else timeRes = 0.8;
+      // if(reflected) timeRes = 0.5;
+      // else timeRes = 0.8;
       
       if(prt_isBadChannel(ch)) continue;
       int nedge=GetEdge(mcpid, pixid);
@@ -528,7 +546,7 @@ void PrtLutReco::Run(int start, int end){
 	  fDiff->Fill(hitTime,tdiff);
 	  fHist3->Fill(fabs(luttime),hitTime);	  	  
 	   
-	  double w = 1; //2000/len; //w=0.5*(2-fabs(tdiff));
+	  double w = 1;
 	  if(tangle > minChangle && tangle < maxChangle && tangle < 1.85){
 	    if(tofPid==211 && fMethod==2) fHistPi->Fill(tangle ,weight);
 	    else fHist->Fill(tangle, weight);
@@ -831,6 +849,14 @@ void PrtLutReco::Run(int start, int end){
 	// prt_canvasAdd("cm"+nid,800,400);
 	// fHist3->SetTitle(Form("theta %3.1f", a));
 	// fHist3->Draw("colz");
+      }
+
+      { // tof
+	prt_canvasAdd("tof",800,400);
+	fTof_pi->SetLineColor(kBlue+1);
+	fTof_p->SetLineColor(kRed+1);
+	fTof_pi->Draw();
+	fTof_p->Draw("same");
       }
 
       { // likelihood
