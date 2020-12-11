@@ -13,8 +13,8 @@ void drawHP(TString infile="../build/hits.root"){
     for(auto hit : prt_event->GetHits()){
       int mcp = hit.GetMcpId();
       int pix = hit.GetPixelId()-1;
-      double time = hit.GetLeadTime();      
-
+      double time = hit.GetLeadTime();
+      
       int ch = map_mpc[mcp][pix];
       if(prt_isBadChannel(ch)) continue;
       if(mcp>7) continue;
