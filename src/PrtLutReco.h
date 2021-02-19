@@ -48,12 +48,12 @@ private:
   void ResetHists();
   int fDetectorID;  
   double fBboxNum,fPipehAngle,fDphi,fBarPhi;
-  TRandom fRand;
   int fMethod;
   int fRadiator;
   int fStudyId;
   bool fTimeImaging;
-
+  bool fCreateCorr;
+  
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
 

@@ -79,16 +79,7 @@ shift $((OPTIND-1))
 tseed=$(($(date +%s%N)/1000000-1393400000000))
 printf "====== Run PRTDIRC with $tseed seed base ======\n"
 
-#simopt="-w 0 -g 3 -h 2 -c 2015 -l 0 -b 1"
-#simopt="-p 7 -x pi+ -l 3 -gz 378 -gx 0 -gs 15.5 -g 2015 -c 2015 -e 100 -b 1 "
-#simopt="-p 7 -h 1 -l 3 -a 30 -gz 380 -gx 85 -gsx 67 -gsy 17 -z 10  -g 2015 -c 2015"
-
-# cern 2017 plate L6
-#simopt="-p 7 -h 2 -x pi+ -l 6 -gz 380 -gx 85 -gsx 0 -gsy 0 -g 2017 -c 2017 -e 100 -b 1 "
-
-# cern 2017 bar L3
-simopt="-p 7 -h 1 -x pi+ -l 3 -gz 380 -gx 85 -gsx 67 -gsy 0 -g 2017 -c 2017 -e 100 -b 1 "
-
+simopt="-h 1 -l 3 -p 7.00 -a 19.66 -phi -0.05 -gz 409.00 -gx 85.00 -gsx 65.00 -gsy 16.30 -z 10.00 -g 2018 -c 2018 -study 401 -x mix_pip -b 1"
 
 if [ ${run} == "0" ]; then
     ../build/prtdirc  $simopt -s 1 -z 0 -a 180 -x "opticalphoton" -p "3.18 eV" -g 0 -e 1000000  
@@ -111,7 +102,7 @@ if [ ${run} == "1" ] || [ ${run} == "3" ] ||  [ ${run} == "4" ]; then
     mkdir -p hdata
     start_time=$(date +%s)
     statusline="GSim"
-    for i in $(eval echo {20..150..${astep}}); do 
+    for i in $(eval echo {15..145..${astep}}); do 
 	../build/prtdirc -r $tseed$i -o hdata/h_b$i.root -s 0 $simopt -a $i -e $nevents -v $verbose   > /dev/null  &
 	waitForMe $threads
     done
@@ -122,16 +113,16 @@ fi
 if [ ${run} == "2" ] || [ ${run} == "3" ] || [ ${run} == "4" ]; then
     start_time=$(date +%s)
     statusline="Reco"
-    for i in $(eval echo {20..150..$astep}); do 
-	../build/prtdirc -i hdata/h_b$i.root -u ../data/lut_cs_avr.root -o r_b${tseed}_$i.root -s 2 -f 0 -e 0 -tr $test1 -v $verbose -h 2 > /dev/null 2> /dev/null &
+    for i in $(eval echo {15..145..$astep}); do 
+	../build/prtdirc -i hdata/h_b$i.root -u ~/data/jul18/401/lut_beam_401_140S_cs_avr.root -o  hdata/r_b$i.root -s 2 -f 0 -e 0 -tr $test1 -v 1 -h 2 > /dev/null 2> /dev/null &
 	waitForMe $threads
     done
     waitForMe "1"
     printf "\r$statusline [-] done [$(($(date +%s) - start_time)) s]         \n"
 
     sleep 2
-    hadd r_spr${tseed}.root r_b${tseed}_*_spr.root
-    rm r_b${tseed}_*.root 
+    # hadd r_spr${tseed}.root r_b${tseed}_*_spr.root
+    # rm r_b${tseed}_*.root 
 fi
 
 

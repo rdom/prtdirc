@@ -28,7 +28,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
   
   memset(fMultHit, 0, sizeof(fMultHit[0][0])*960);
   
-  Double_t qe_m2015[15][64]={{0.63,0.78,0.73,0.69,0.67,0.67,0.69,0.60,0.73,0.82,0.78,0.76,0.75,0.77,0.82,0.78,0.79,0.85,0.78,0.76,0.75,0.77,0.82,0.79,0.81,0.85,0.78,0.76,0.75,0.77,0.83,0.80,0.81,0.84,0.77,0.74,0.74,0.77,0.83,0.79,0.80,0.81,0.76,0.73,0.74,0.76,0.82,0.78,0.80,0.79,0.75,0.74,0.76,0.78,0.83,0.79,0.60,0.76,0.73,0.72,0.73,0.76,0.79,0.70}, //765
+  double qe_m2015[15][64]={{0.63,0.78,0.73,0.69,0.67,0.67,0.69,0.60,0.73,0.82,0.78,0.76,0.75,0.77,0.82,0.78,0.79,0.85,0.78,0.76,0.75,0.77,0.82,0.79,0.81,0.85,0.78,0.76,0.75,0.77,0.83,0.80,0.81,0.84,0.77,0.74,0.74,0.77,0.83,0.79,0.80,0.81,0.76,0.73,0.74,0.76,0.82,0.78,0.80,0.79,0.75,0.74,0.76,0.78,0.83,0.79,0.60,0.76,0.73,0.72,0.73,0.76,0.79,0.70}, //765
 			     {0.61,0.69,0.70,0.70,0.70,0.69,0.69,0.61,0.77,0.82,0.83,0.83,0.83,0.82,0.81,0.76,0.77,0.83,0.84,0.84,0.84,0.84,0.82,0.77,0.78,0.84,0.85,0.85,0.85,0.84,0.83,0.78,0.78,0.84,0.85,0.85,0.85,0.84,0.83,0.79,0.77,0.83,0.85,0.85,0.85,0.85,0.83,0.80,0.76,0.83,0.84,0.85,0.85,0.84,0.83,0.81,0.71,0.82,0.84,0.84,0.84,0.84,0.83,0.80}, //1352
 			     {0.66,0.66,0.66,0.67,0.66,0.66,0.67,0.62,0.72,0.71,0.72,0.77,0.77,0.77,0.79,0.77,0.72,0.71,0.71,0.74,0.77,0.77,0.79,0.76,0.71,0.71,0.70,0.70,0.75,0.76,0.79,0.75,0.71,0.70,0.70,0.69,0.70,0.73,0.77,0.74,0.71,0.70,0.70,0.69,0.69,0.69,0.72,0.72,0.71,0.71,0.70,0.69,0.69,0.68,0.69,0.68,0.68,0.71,0.70,0.69,0.68,0.68,0.69,0.65}, //1358
 			     {0.79,0.86,0.85,0.84,0.84,0.83,0.82,0.77,0.85,0.90,0.90,0.89,0.89,0.89,0.88,0.84,0.85,0.90,0.90,0.90,0.90,0.89,0.88,0.84,0.85,0.90,0.90,0.90,0.89,0.89,0.88,0.84,0.86,0.91,0.91,0.90,0.89,0.89,0.88,0.83,0.86,0.91,0.90,0.90,0.89,0.89,0.87,0.84,0.86,0.90,0.90,0.89,0.89,0.88,0.87,0.83,0.83,0.86,0.86,0.86,0.86,0.85,0.85,0.82}, //1392
@@ -45,7 +45,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
 			     {0.66,0.80,0.80,0.80,0.80,0.79,0.79,0.66,0.76,0.88,0.87,0.88,0.89,0.89,0.90,0.79,0.76,0.88,0.87,0.88,0.89,0.90,0.90,0.79,0.76,0.87,0.87,0.87,0.89,0.90,0.90,0.79,0.77,0.86,0.86,0.87,0.88,0.89,0.90,0.79,0.75,0.86,0.85,0.86,0.87,0.88,0.90,0.79,0.76,0.85,0.84,0.84,0.86,0.87,0.89,0.78,0.54,0.64,0.64,0.70,0.74,0.76,0.78,0.63}  //766
   };
   
-  Double_t qe_m2016[9][64]={{0.75,0.91,0.90,0.90,0.89,0.87,0.86,0.75,0.87,0.98,0.99,0.99,0.99,0.99,0.98,0.90,0.89,0.99,1.00,1.00,1.00,1.00,0.99,0.92,0.91,0.99,1.00,1.01,1.01,1.01,1.00,0.92,0.92,0.99,1.00,1.01,1.01,1.01,0.99,0.92,0.91,0.98,1.00,1.00,1.00,1.00,0.99,0.91,0.91,0.97,0.98,0.99,0.99,0.99,0.98,0.89,0.65,0.85,0.88,0.91,0.92,0.94,0.94,0.82}, //1338
+  double qe_m2016[9][64]={{0.75,0.91,0.90,0.90,0.89,0.87,0.86,0.75,0.87,0.98,0.99,0.99,0.99,0.99,0.98,0.90,0.89,0.99,1.00,1.00,1.00,1.00,0.99,0.92,0.91,0.99,1.00,1.01,1.01,1.01,1.00,0.92,0.92,0.99,1.00,1.01,1.01,1.01,0.99,0.92,0.91,0.98,1.00,1.00,1.00,1.00,0.99,0.91,0.91,0.97,0.98,0.99,0.99,0.99,0.98,0.89,0.65,0.85,0.88,0.91,0.92,0.94,0.94,0.82}, //1338
 			    {0.74,0.77,0.79,0.82,0.78,0.65,0.78,0.74,0.79,0.81,0.80,0.86,0.82,0.75,0.82,0.70,0.80,0.82,0.81,0.83,0.83,0.69,0.82,0.80,0.81,0.82,0.81,0.81,0.79,0.78,0.87,0.84,0.79,0.82,0.81,0.80,0.80,0.79,0.90,0.73,0.79,0.80,0.81,0.80,0.78,0.82,0.97,0.80,0.82,0.81,0.81,0.80,0.80,0.80,0.93,0.83,0.81,0.83,0.83,0.81,0.79,0.80,0.93,0.81}, //1353
 			    {0.50,0.63,0.64,0.64,0.64,0.65,0.65,0.56,0.72,0.90,0.92,0.91,0.89,0.90,0.89,0.74,0.72,0.92,0.93,0.93,0.93,0.93,0.91,0.76,0.71,0.92,0.94,0.94,0.94,0.93,0.92,0.77,0.70,0.92,0.94,0.94,0.94,0.93,0.92,0.77,0.69,0.92,0.94,0.94,0.93,0.93,0.91,0.77,0.66,0.89,0.92,0.92,0.92,0.91,0.89,0.76,0.46,0.74,0.75,0.76,0.77,0.77,0.75,0.63}, //1357
 			    {0.61,0.69,0.70,0.70,0.70,0.69,0.69,0.61,0.77,0.82,0.83,0.83,0.83,0.82,0.81,0.76,0.77,0.83,0.84,0.84,0.84,0.84,0.82,0.77,0.78,0.84,0.85,0.85,0.85,0.84,0.83,0.78,0.78,0.84,0.85,0.85,0.85,0.84,0.83,0.79,0.77,0.83,0.85,0.85,0.85,0.85,0.83,0.80,0.76,0.83,0.84,0.85,0.85,0.84,0.83,0.81,0.71,0.82,0.84,0.84,0.84,0.84,0.83,0.80}, //1352
@@ -84,7 +84,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
   //   {0.57,0.70,0.74,0.75,0.75,0.75,0.75,0.63,0.68,0.82,0.83,0.83,0.83,0.83,0.82,0.71,0.68,0.83,0.84,0.84,0.84,0.84,0.83,0.73,0.69,0.83,0.84,0.85,0.85,0.84,0.84,0.76,0.70,0.83,0.84,0.85,0.85,0.84,0.83,0.74,0.69,0.83,0.84,0.84,0.84,0.84,0.83,0.74,0.68,0.82,0.83,0.83,0.83,0.83,0.82,0.74,0.55,0.69,0.69,0.69,0.69,0.72,0.73,0.63}
   // };
 
-  Double_t qe_m2018[8][64]={ 
+  double qe_m2018[8][64]={ 
     // Photonis XP85012  9001352
     {0.65,0.72,0.75,0.77,0.78,0.76,0.77,0.63,0.77,0.83,0.84,0.85,0.85,0.85,0.84,0.75,0.78,0.84,0.85,0.86,0.86,0.86,0.85,0.80,0.79,0.84,0.86,0.87,0.87,0.87,0.85,0.81,0.79,0.84,0.86,0.87,0.87,0.86,0.85,0.82,0.78,0.83,0.85,0.86,0.86,0.86,0.85,0.82,0.76,0.82,0.84,0.85,0.85,0.84,0.83,0.81,0.67,0.77,0.79,0.81,0.80,0.78,0.77,0.71},
     // Photonis XP85012  9001358
@@ -99,11 +99,11 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
     {0.57,0.68,0.68,0.69,0.70,0.69,0.68,0.55,0.70,0.82,0.83,0.83,0.83,0.83,0.82,0.69,0.74,0.83,0.84,0.84,0.84,0.84,0.83,0.69,0.75,0.83,0.84,0.85,0.85,0.84,0.83,0.69,0.75,0.83,0.84,0.85,0.85,0.84,0.83,0.69,0.75,0.83,0.84,0.84,0.84,0.84,0.83,0.72,0.75,0.82,0.83,0.84,0.83,0.83,0.82,0.73,0.63,0.71,0.73,0.76,0.74,0.74,0.74,0.63},
     // Photonis XP85012  9001360
     {0.50,0.64,0.66,0.67,0.66,0.66,0.64,0.56,0.62,0.76,0.76,0.77,0.76,0.76,0.76,0.68,0.63,0.77,0.77,0.77,0.77,0.77,0.76,0.69,0.68,0.82,0.83,0.83,0.80,0.77,0.76,0.70,0.69,0.83,0.84,0.85,0.85,0.83,0.78,0.71,0.67,0.83,0.85,0.85,0.85,0.85,0.83,0.71,0.65,0.82,0.83,0.84,0.83,0.83,0.82,0.72,0.47,0.68,0.71,0.72,0.72,0.72,0.72,0.62},
-   // Photonis XP85012  9001336 // placeholder for 1306
-    {0.58,0.71,0.72,0.74,0.76,0.77,0.77,0.69,0.65,0.81,0.82,0.82,0.82,0.81,0.80,0.75,0.65,0.82,0.83,0.83,0.83,0.82,0.81,0.76,0.64,0.82,0.83,0.83,0.83,0.83,0.82,0.77,0.65,0.82,0.83,0.83,0.83,0.83,0.82,0.77,0.66,0.81,0.83,0.83,0.83,0.83,0.82,0.76,0.65,0.80,0.82,0.82,0.82,0.82,0.81,0.76,0.57,0.71,0.70,0.71,0.72,0.73,0.72,0.66}
+    // Photonis XP85012  9001358 // placeholder for 1306
+    {0.63,0.71,0.71,0.71,0.71,0.71,0.70,0.66,0.67,0.74,0.73,0.73,0.72,0.72,0.72,0.71,0.69,0.75,0.75,0.74,0.74,0.74,0.74,0.72,0.72,0.82,0.76,0.76,0.74,0.74,0.74,0.72,0.73,0.82,0.81,0.80,0.75,0.73,0.73,0.71,0.74,0.81,0.81,0.80,0.77,0.73,0.72,0.70,0.73,0.84,0.84,0.84,0.81,0.76,0.73,0.71,0.62,0.75,0.75,0.77,0.77,0.72,0.67,0.63}
   };
-
-  Double_t qe_m2017[14][64]={ 
+  
+  double qe_m2017[14][64]={ 
     // Photonis XP85012  9001357
     {0.42,0.66,0.65,0.62,0.60,0.59,0.58,0.37,0.55,0.83,0.85,0.85,0.85,0.85,0.81,0.63,0.56,0.85,0.87,0.87,0.87,0.86,0.84,0.65,0.56,0.84,0.87,0.88,0.87,0.86,0.84,0.65,0.55,0.83,0.87,0.87,0.87,0.86,0.84,0.66,0.57,0.84,0.87,0.87,0.86,0.86,0.83,0.66,0.56,0.82,0.85,0.85,0.85,0.84,0.81,0.63,0.42,0.63,0.65,0.66,0.62,0.61,0.61,0.46},
     // Photonis XP85012  9001352
@@ -152,28 +152,29 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
 		
 
   
-  Int_t layout = PrtManager::Instance()->GetMcpLayout();   
+  int layout = PrtManager::Instance()->GetMcpLayout();   
   if(layout==2015){
-    for(auto m=0; m<15; m++){
-      for(auto i=0; i<64; i++){
+    for(int m=0; m<15; m++){
+      for(int i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2015[m][i];
       }
     }
   }else if(layout==2016){
-    for(auto m=0; m<9; m++){
-      for(auto i=0; i<64; i++){
+    for(int m=0; m<9; m++){
+      for(int i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2016[m][i];
       }
     }
   }else if(layout==2018){
-    for(auto m=0; m<8; m++){
-      for(auto i=0; i<64; i++){
+    for(int m=0; m<8; m++){
+      for(int i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2018[m][i];
+	if(m == 7) fQe_space[m][i] = 0.9*qe_m2018[m][i];
       }
     } 
   }else{
-    for(auto m=0; m<14; m++){
-      for(auto i=0; i<64; i++){
+    for(int m=0; m<14; m++){
+      for(int i=0; i<64; i++){
 	fQe_space[m][i]=qe_m2017[m][i];
       }
     }
@@ -284,7 +285,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   PrtPrizmHitsCollection* prizmCol = (PrtPrizmHitsCollection*)(HCofEvent->GetHC(collectionID));
  
   Long_t pathId = 0;
-  Int_t refl=0;
+  int refl=0;
   for (uint i=0;i<prizmCol->entries();i++){    
     PrtPrizmHit* phit = (*prizmCol)[i];
     if(phit->GetTrackID()==track->GetTrackID()) {
@@ -294,9 +295,9 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   }  
     
   PrtHit hit;
-  Int_t mcpid=touchable->GetReplicaNumber(1);
-  Int_t pixid = touchable->GetReplicaNumber(0);
-  Int_t ch = fMap_Mpc[mcpid][pixid-1];
+  int mcpid=touchable->GetReplicaNumber(1);
+  int pixid = touchable->GetReplicaNumber(0);
+  int ch = fMap_Mpc[mcpid][pixid-1];
   
   hit.SetMcpId(mcpid);
   hit.SetPixelId(pixid);
@@ -321,7 +322,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   // G4Navigator* theNavigator 
   //   = G4TransportationManager::GetTransportationManager()
   //   ->GetNavigatorForTracking();
-  // Double_t normalId = 0;
+  // double normalId = 0;
   // G4bool valid;
   // G4ThreeVector theLocalNormal = theNavigator->GetLocalExitNormal(&valid);
   // if (valid ){
@@ -336,7 +337,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   G4double time = step->GetPreStepPoint()->GetLocalTime();
   if(PrtManager::Instance()->GetRunType()==0) time = G4RandGauss::shoot(time,PrtManager::Instance()->GetTimeRes()); //resolution [ns]
   hit.SetLeadTime(time);
-  Double_t wavelength = 1.2398/(track->GetMomentum().mag()*1E6)*1000;
+  double wavelength = 1.2398/(track->GetMomentum().mag()*1E6)*1000;
   hit.SetTotTime(wavelength); //set photon wavelength
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
@@ -346,11 +347,11 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     return true;
   }
   
-  Bool_t quantum_efficiency(true);
-  Bool_t charge_sharing(true);
-  Bool_t dead_time(true);
-  Bool_t dark_counts(true);
-  Bool_t transport_efficiency(true);
+  bool quantum_efficiency(true);
+  bool charge_sharing(true);
+  bool dead_time(true);
+  bool dark_counts(true);
+  bool transport_efficiency(true);
   
   if(PrtManager::Instance()->GetGeometry()==2021) charge_sharing=false; //no cs in mfield
   if(PrtManager::Instance()->GetMcpLayout()==2030){
@@ -359,35 +360,33 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   }
 
   if(transport_efficiency){
-    Double_t pi(4*atan(1));
-    Double_t roughness(1); //nm
-    //std::cout<<"vec  "<<localvec.x()<<" "<<localvec.y() << " " <<localvec.z() <<std::endl;
-    
-    Double_t angleX = localvec.angle(G4ThreeVector(1,0,0));
-    Double_t angleY = localvec.angle(G4ThreeVector(0,1,0));
-    Double_t length = track->GetTrackLength()-400;
-    Double_t lengthx = fabs(length*localvec.x());
-    Double_t lengthy = fabs(length*localvec.y());
+    double pi(4*atan(1));
+    double roughness(0.5); //nm
+    double angleX = localvec.angle(G4ThreeVector(1,0,0));
+    double angleY = localvec.angle(G4ThreeVector(0,1,0));
+    if(angleX>0.5*pi) angleX = pi-angleX;
+    if(angleY>0.5*pi) angleY = pi-angleY; 
+    double length = track->GetTrackLength()-400; // 400 - average path in EV
+    double lengthx = fabs(length*localvec.x());  // along the bar
+    double lengthy = fabs(length*localvec.y());
       
-    Int_t nBouncesX=(Int_t)(lengthx)/17.1; // 17 bar height
-    Int_t nBouncesY=(Int_t)(lengthy)/35.9; // 36 bar width
+    int nBouncesX = (int)(lengthx)/17.1; // 17 bar height
+    int nBouncesY = (int)(lengthy)/35.9; // 36 bar width
   
-    //std::cout<<" angleX  "<< angleX <<"   angleY "<< angleY << " nBouncesX " << nBouncesX << " nBouncesY " << nBouncesY  << "  length "<< length<<std::endl;
+    double ll = wavelength*wavelength;
+    double n_quartz = sqrt(1. + (0.696*ll/(ll-pow(0.068,2))) + (0.407*ll/(ll-pow(0.116,2))) + 0.897*ll/(ll-pow(9.896,2)));
+    double bounce_probX = 1 - pow(4*pi*cos(angleX)*roughness*n_quartz/wavelength,2);
+    double bounce_probY = 1 - pow(4*pi*cos(angleY)*roughness*n_quartz/wavelength,2);
     
+    double totalProb = pow(bounce_probX, nBouncesX)*pow(bounce_probY, nBouncesY);
     
-    Double_t ll = wavelength*wavelength;
-    Double_t n_quartz = sqrt(1. + (0.696*ll/(ll-pow(0.068,2))) + (0.407*ll/(ll-pow(0.116,2))) + 0.897*ll/(ll-pow(9.896,2)));
-    Double_t bounce_probX = 1 - pow(4*pi*cos(angleX)*roughness*n_quartz/wavelength,2);
-    Double_t bounce_probY = 1 - pow(4*pi*cos(angleY)*roughness*n_quartz/wavelength,2);
-
-    Double_t totalProb = pow(bounce_probX, nBouncesX)*pow(bounce_probY, nBouncesY);	
     if(G4UniformRand() > totalProb) {
       // std::cout<<"photon lost in the radiator. n_bounces = ["<<nBouncesX<<" "<<nBouncesY<<"] with prob= "<<totalProb<<std::endl;      
       return true;
     }
   }
 
-  Bool_t is_hit(true);
+  bool is_hit(true);
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) {
       if(fMultHit[mcpid][pixid]==0 || !dead_time) PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
@@ -402,9 +401,10 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 
   if(is_hit && charge_sharing){
     //charge sharing for 8x8 MCP
-    Double_t pixdim(53/16.);
-    //Double_t chargesig(1),threshold(0.5);
-    Double_t chargesig(1.7),threshold(0.7); //high cs / ct  // 1.5/0.9 for 0.5mV // 1.5/0.7 for 1mV
+    double pixdim(53/16.);
+    // double chargesig(1),threshold(0.3);
+    // double chargesig(1.7),threshold(0.7); //high cs / ct  // 1.5/0.9 for 0.5mV // 1.5/0.7 for 1mV
+    double chargesig(1.5),threshold(0.8); //high cs / ct  // 1.5/0.9 for 0.5mV // 1.5/0.7 for 1mV
     // if(mcpid==3){
     //   chargesig=3.2;
     //   threshold=1;
@@ -413,10 +413,10 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
     //   chargesig=1.7;
     //   threshold=1;
     // }
-    Double_t x(localPos.x()), y(localPos.y());
-    Int_t p(pixid);
-    Bool_t ok(false);
-    Double_t expd = exp(-(pixdim-fabs(x))/chargesig);
+    double x(localPos.x()), y(localPos.y());
+    int p(pixid);
+    bool ok(false);
+    double expd = exp(-(pixdim-fabs(x))/chargesig);
     
     if(x<0 && pixid%8!=1 && expd>G4UniformRand() && expd<threshold){ok=true; p-=1;}
     if(x>0 && pixid%8!=0 && expd>G4UniformRand() && expd<threshold){ok=true; p+=1;}

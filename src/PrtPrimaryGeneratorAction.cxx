@@ -97,7 +97,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent){
     PrtManager::Instance()->Event()->SetPosition(TVector3(x,y,z));
     G4double angle = -G4UniformRand()*M_PI;
     G4ThreeVector vec(0,0,1);
-    vec.setTheta(G4RandGauss::shoot(0,0.002)); //beam divergence  
+    vec.setTheta(G4RandGauss::shoot(0,0.0015)); //beam divergence  
     vec.setPhi(2*M_PI*G4UniformRand());
 
     fParticleGun->SetParticleMomentumDirection(vec);    
