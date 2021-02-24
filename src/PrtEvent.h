@@ -48,6 +48,9 @@ public:
   Double_t GetBeamX(){ return fBeamX; }
   Double_t GetBeamZ(){ return fBeamZ; }
   Double_t GetTimeRes(){ return fTimeRes; }
+  Double_t GetTof(){ return fTof; }
+  Double_t GetTofPi(){ return fTofPi; }
+  Double_t GetTofP(){ return fTofP; }  
   TString  GetInfo() { return fInfo; }
   
   // Mutators
@@ -72,6 +75,9 @@ public:
   void SetBeamX(Double_t val){ fBeamX = val; }
   void SetBeamZ(Double_t val){ fBeamZ = val; }
   void SetTimeRes(Double_t val){ fTimeRes = val; }
+  void SetTof(Double_t val){ fTof = val; }
+  void SetTofPi(Double_t val){ fTofPi = val; }
+  void SetTofP(Double_t val){ fTofP = val; }
   void SetInfo(TString val){ fInfo = val; }
 
 private: 
@@ -99,8 +105,11 @@ private:
   Double_t fBeamX;
   Double_t fBeamZ;
   Double_t fTimeRes;
+  Double_t fTof;
+  Double_t fTofPi;
+  Double_t fTofP;
   TString  fInfo;
   
-  ClassDef(PrtEvent, 5);
+  ClassDef(PrtEvent, 6);
 };
 #endif

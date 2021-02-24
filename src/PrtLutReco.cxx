@@ -22,8 +22,8 @@ TH1F*  fHist0r = new TH1F("timediffr",";t_{measured}-t_{calculated} [ns];entries
 TH1F*  fHist0s = new TH1F("timediffs",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0i = new TH1F("timediffi",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 
-TH1F*  fTof_p = new TH1F("tof_p",";TOF [ns];entries [#]", 500,31,35);
-TH1F*  fTof_pi = new TH1F("tof_pi",";TOF [ns];entries [#]", 500,31,35);
+TH1F*  fTof_p = new TH1F("tof_p",";TOF [ns];entries [#]", 500,34,38);
+TH1F*  fTof_pi = new TH1F("tof_pi",";TOF [ns];entries [#]", 500,34,38); //31 35
 
 TH1F*  fhNph_pi = new TH1F("fhNph_pi",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fhNph_p = new TH1F("fhNph_p",";detected photons [#];entries [#]", 150,0,150);
@@ -350,6 +350,33 @@ void PrtLutReco::Run(int start, int end){
       int gch, ndirc(0), t2(0), t3h(0), t3v(0),
 	str1(0),stl1(0),str2(0),stl2(0);
       int hodo1(0), hodo2(0);
+
+      for(int h=0; h<nHits; h++) {
+      	gch = fEvent->GetHit(h).GetChannel();
+	if(gch<prt_maxdircch) ndirc++;
+
+	if(gch==513) t2++;
+	if(gch==514) t3h++;
+	if(gch==515) t3v++;
+
+	if(fMethod == 3) {if(gch>=1094 && gch<=1101) hodo1++;}
+	else {if(gch>=1089 && gch<=1106) hodo1++;}
+
+	// if(gch>=1097 && gch<=1098) hodo1++;
+	if(gch==1140) str1++;
+	if(gch==1142) stl1++;
+	if(gch==1144) str2++;
+	if(gch==1146) stl2++;
+	
+	//if(gch>=1115 && gch<=1120)
+	hodo2++;      
+      }
+      // if(ndirc<5) continue;
+      // if(!(hodo1 && hodo2)) continue;
+      // if(!(t3h && t3v)) continue;
+      // if(!t2) continue;
+      // if(!(str1 && stl1 && str2 && stl2)) continue;
+
       if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
 	double tof = fEvent->GetTest1();
 
@@ -383,32 +410,15 @@ void PrtLutReco::Run(int start, int end){
 	  if( pid == 4 && tof < 36.6 ) continue;
 	  if( pid == 2 && tof > 36.0 ) continue;
 	}
+
+	if(fStudyId == 415 && fMethod != 4){
+	}
+
+
 	if( pid == 2 ) fTof_pi->Fill(tof);
 	if( pid == 4 ) fTof_p->Fill(tof);
-      }      
-      for(int h=0; h<nHits; h++) {
-      	gch = fEvent->GetHit(h).GetChannel();
-	if(gch<prt_maxdircch) ndirc++;
-
-	if(gch==513) t2++;
-	if(gch==514) t3h++;
-	if(gch==515) t3v++;
-	//if(gch>=1089 && gch<=1106) hodo1++;
-	if(gch>=1094 && gch<=1101) hodo1++;
-	// if(gch>=1097 && gch<=1098) hodo1++;
-	if(gch==1140) str1++;
-	if(gch==1142) stl1++;
-	if(gch==1144) str2++;
-	if(gch==1146) stl2++;
-	
-	//if(gch>=1115 && gch<=1120)
-	hodo2++;      
       }
-      if(ndirc<5) continue;
-      if(!(hodo1 && hodo2)) continue;
-      if(!(t3h && t3v)) continue;
-      if(!t2) continue;
-      if(!(str1 && stl1 && str2 && stl2)) continue;
+      
     }
     
     // SearchClusters();
