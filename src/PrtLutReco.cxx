@@ -22,8 +22,8 @@ TH1F*  fHist0r = new TH1F("timediffr",";t_{measured}-t_{calculated} [ns];entries
 TH1F*  fHist0s = new TH1F("timediffs",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0i = new TH1F("timediffi",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 
-TH1F*  fTof_p = new TH1F("tof_p",";TOF [ns];entries [#]", 500,34,38);
-TH1F*  fTof_pi = new TH1F("tof_pi",";TOF [ns];entries [#]", 500,34,38); //31 35
+TH1F*  fTof_p = new TH1F("tof_p",";TOF [ns];entries [#]", 500,34,40);
+TH1F*  fTof_pi = new TH1F("tof_pi",";TOF [ns];entries [#]", 500,34,40); //31 35
 
 TH1F*  fhNph_pi = new TH1F("fhNph_pi",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fhNph_p = new TH1F("fhNph_p",";detected photons [#];entries [#]", 150,0,150);
@@ -38,10 +38,10 @@ TH2F*  fHist3 = new TH2F("time3",";calculated time [ns];measured time [ns]", 500
 TH2F*  fHist4 = new TH2F("time4",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 400,-1,1, 400,-1,1);
 TH2F*  fHist5 = new TH2F("time5",";#theta_{c}sin(#varphi_{c});#theta_{c}cos(#varphi_{c})", 400,-1,1, 400,-1,1);
 
-TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-70,70);
-TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-70,70);
-TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-70,70);
-TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-70,70);
+TH1F *hLnDiffGr4 = new TH1F("hLnDiffGr4",";ln L(p) - ln L(#pi);entries [#]",120,-170,170);
+TH1F *hLnDiffGr2 = new TH1F("hLnDiffGr2",";ln L(p) - ln L(#pi);entries [#]",120,-170,170);
+TH1F *hLnDiffTi4 = new TH1F("hLnDiffTi4",";ln L(p) - ln L(#pi);entries [#]",120,-170,170);
+TH1F *hLnDiffTi2 = new TH1F("hLnDiffTi2",";ln L(p) - ln L(#pi);entries [#]",120,-170,170);
 TH2F *hLnMap = new TH2F("hLnMap",";GR     ln L(p) - ln L(#pi);TI     ln L(p) - ln L(#pi); ",120,-60,60,120,-60,60);
 
 TH2F *hChrom = new TH2F("chrom",";t_{measured}-t_{calculated} [ns];#Delta#theta_{C} [mrad]", 100,-1.0,1.0, 100,-30,30);
@@ -309,7 +309,7 @@ void PrtLutReco::Run(int start, int end){
     
     if(ievent-start == 0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = fEvent->GetAngle(); // + test1*TMath::RadToDeg(); // prt_data_info.getAngle();
+      prtangle = fEvent->GetAngle() + test1*TMath::RadToDeg(); // prt_data_info.getAngle();
       phi = fEvent->GetPhi(); // + test2*TMath::RadToDeg(); //prt_data_info.getPhi();
       mom = fEvent->GetMomentum().Mag();
       beamx = fEvent->GetPosition().X();
@@ -371,54 +371,57 @@ void PrtLutReco::Run(int start, int end){
 	//if(gch>=1115 && gch<=1120)
 	hodo2++;      
       }
-      // if(ndirc<5) continue;
-      // if(!(hodo1 && hodo2)) continue;
-      // if(!(t3h && t3v)) continue;
-      // if(!t2) continue;
-      // if(!(str1 && stl1 && str2 && stl2)) continue;
+      if(ndirc<5) continue;
+      if(!(hodo1 && hodo2)) continue;
+      if(!(t3h && t3v)) continue;
+      if(!t2) continue;
+      if(!(str1 && stl1 && str2 && stl2)) continue;
 
-      if(fabs(fEvent->GetMomentum().Mag()-7)<0.1){
-	double tof = fEvent->GetTest1();
-
-        if(fStudyId==403 && fMethod != 4){
-	  if( pid == 4 && tof < 34.45 ) continue;
-	  if( pid == 2 && tof > 33.25 ) continue;	  
-	}
-	if(fStudyId==401 && fMethod != 4){
-	  if(fabs(prtangle-90)<2){
-	    if( pid == 4 && tof < 32.7 ) continue;
-	    if( pid == 2 && tof > 31.6 ) continue;	  
-	  }else if(fabs(prtangle-60)<2){
-	    if( pid == 4 && tof < 34.2 ) continue;
-	    if( pid == 2 && tof > 33.3 ) continue;	  
+      double tof = fEvent->GetTest1();
+      
+      if(fStudyId==403 && fMethod != 4){
+	if( pid == 4 && tof < 34.45 ) continue;
+	if( pid == 2 && tof > 33.25 ) continue;	  
+      }
+      if(fStudyId==401 && fMethod != 4){
+	if(fabs(prtangle-90)<2){
+	  if( pid == 4 && tof < 32.7 ) continue;
+	  if( pid == 2 && tof > 31.6 ) continue;	  
+	}else if(fabs(prtangle-60)<2){
+	  if( pid == 4 && tof < 34.2 ) continue;
+	  if( pid == 2 && tof > 33.3 ) continue;	  
+	}else{
+	  if(fMethod == 3){ // more stat for 3
+	    if( pid == 4 ) continue;
+	    if( pid == 2 && tof > 31.7 ) continue;	  
 	  }else{
-	    if(fMethod == 3){ // more stat for 3
-	      if( pid == 4 ) continue;
-	      if( pid == 2 && tof > 31.7 ) continue;	  
-	    }else{
-	      if( pid == 4 && tof < 32.85 ) continue;
-	      if( pid == 2 && tof > 31.65 ) continue;	  
-	    }
+	    if( pid == 4 && tof < 32.85 ) continue;
+	    if( pid == 2 && tof > 31.65 ) continue;	  
 	  }
 	}
+      }
 
-	if(fStudyId == 420 && fMethod != 4){
-	  if( pid == 4 && tof < 36.9 ) continue;
-	  if( pid == 2 && tof > 35.7 ) continue;
-	}
-	if(fStudyId == 420 && fMethod == 4){
-	  if( pid == 4 && tof < 36.6 ) continue;
-	  if( pid == 2 && tof > 36.0 ) continue;
-	}
-
-	if(fStudyId == 415 && fMethod != 4){
-	}
-
-
-	if( pid == 2 ) fTof_pi->Fill(tof);
-	if( pid == 4 ) fTof_p->Fill(tof);
+      if(fStudyId == 420 && fMethod != 4){
+	if( pid == 4 && tof < 36.9 ) continue;
+	if( pid == 2 && tof > 35.7 ) continue;
+      }
+      if(fStudyId == 420 && fMethod == 4){
+	if( pid == 4 && tof < 36.6 ) continue;
+	if( pid == 2 && tof > 36.0 ) continue;
       }
       
+      if(fStudyId == 415 && fMethod != 4){
+	tof = fEvent->GetTof();
+	double  tofPi = fEvent->GetTofPi();
+	double  tofP = fEvent->GetTofP();
+	double c = 3*0.18; //3 sigma cut
+	if(fabs(mom-7)<0.1) c = -1.5*0.18;
+	if( pid == 4 && tof < tofP - c) continue; //1 sigma cut
+	if( pid == 2 && tof > tofPi + c) continue;	  
+      }
+	
+      if( pid == 2 ) fTof_pi->Fill(tof);
+      if( pid == 4 ) fTof_p->Fill(tof);      
     }
     
     // SearchClusters();
@@ -426,7 +429,7 @@ void PrtLutReco::Run(int start, int end){
     double t0smear = gRandom->Gaus(0,0.05); //event t0 smearing
     
     for(int h=0; h<nHits; h++) {
-      if(test3 < gRandom->Uniform(0,1)) continue;
+      // if(test3 < gRandom->Uniform(0,1)) continue;
       fHit = fEvent->GetHit(h);
       hitTime = fHit.GetLeadTime();
       if(bsim) hitTime += gRandom->Gaus(0,0.2) + t0smear; // time resol. in case it was not simulated
@@ -463,6 +466,12 @@ void PrtLutReco::Run(int start, int end){
 	  if(fabs(prtangle-140)<1) o = -0.15;
 	  hitTime += o;
 	}
+	if(fStudyId == 415){
+	  double o = 0;
+	  if(fabs(mom-7)<0.1) o = -0.03;
+	  hitTime += o;
+	}
+
       }
       
       //======================================== dynamic cuts
