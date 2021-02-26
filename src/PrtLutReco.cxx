@@ -269,8 +269,8 @@ void PrtLutReco::Run(int start, int end){
   int nEvents = fChain->GetEntries();
   if(end==0) end = nEvents;
   
-  int pdfend = 200000;
-  if(fPdfPath.Contains("S.pdf1.root")) pdfend = 45000;
+  int pdfend = 50000;
+  if(fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
   
   if(fMethod == 4) {
     start = pdfend;
@@ -415,7 +415,21 @@ void PrtLutReco::Run(int start, int end){
 	double  tofPi = fEvent->GetTofPi();
 	double  tofP = fEvent->GetTofP();
 	double c = 3*0.18; //3 sigma cut
-	if(fabs(mom-7)<0.1) c = -1.5*0.18;
+	double tofres = -0.2;
+
+	if(fMethod == 4){	
+	  if(fabs(mom-7)<0.1) c = 0.3;
+	  if(fabs(mom-8)<0.1) c = -0.5;
+	  if(fabs(mom-9)<0.1) c = 0.15;
+	  if(fabs(mom-10)<0.1) c = -0.1;
+	}else{
+	  if(fabs(mom-6)<0.1) c = 0.2;
+	  if(fabs(mom-7)<0.1) c = -0.2;
+	  if(fabs(mom-8)<0.1) c = -0.18;
+	  if(fabs(mom-9)<0.1) c = -0.15;
+	  if(fabs(mom-10)<0.1) c = -0.35;
+	}
+	
 	if( pid == 4 && tof < tofP - c) continue; //1 sigma cut
 	if( pid == 2 && tof > tofPi + c) continue;	  
       }
@@ -469,6 +483,9 @@ void PrtLutReco::Run(int start, int end){
 	if(fStudyId == 415){
 	  double o = 0;
 	  if(fabs(mom-7)<0.1) o = -0.03;
+	  if(fabs(mom-8)<0.1) o = -0.1;
+	  if(fabs(mom-9)<0.1) o = -0.05;
+	  if(fabs(mom-10)<0.1) o = -0.05;
 	  hitTime += o;
 	}
 
