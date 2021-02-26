@@ -309,7 +309,7 @@ void PrtLutReco::Run(int start, int end){
     
     if(ievent-start == 0){
       tree.SetTitle(fEvent->PrintInfo());
-      prtangle = fEvent->GetAngle() + test1*TMath::RadToDeg(); // prt_data_info.getAngle();
+      prtangle = fEvent->GetAngle(); // + test1*TMath::RadToDeg(); // prt_data_info.getAngle();
       phi = fEvent->GetPhi(); // + test2*TMath::RadToDeg(); //prt_data_info.getPhi();
       mom = fEvent->GetMomentum().Mag();
       beamx = fEvent->GetPosition().X();
