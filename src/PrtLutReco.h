@@ -82,6 +82,7 @@ private:
   TGraph *fPdf2[512],*fPdf4[512];
   TH1F *fTime2[512], *fTime4[512];
   
+  TH1F *hLnDiffGr2,*hLnDiffGr4,*hLnDiffTi2,*hLnDiffTi4;
 };
 
 #endif

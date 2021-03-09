@@ -203,7 +203,7 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   }
   if(fGeomId == 0 || PrtManager::Instance()->GetRunType() == 1) zshift=0;
   //tilt scan
-  fPrtRot->rotateY((180-PrtManager::Instance()->GetAngle())*deg);
+  fPrtRot->rotateY((90-PrtManager::Instance()->GetAngle())*deg);
   fPrtRot->rotateX(PrtManager::Instance()->GetPhi()*deg);
   std::cout<<"PrtManager::Instance()->GetAngle() "<<PrtManager::Instance()->GetAngle()<<std::endl;
 
