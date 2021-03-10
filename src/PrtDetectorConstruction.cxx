@@ -205,8 +205,6 @@ G4VPhysicalVolume* PrtDetectorConstruction::Construct(){
   //tilt scan
   fPrtRot->rotateY((90-PrtManager::Instance()->GetAngle())*deg);
   fPrtRot->rotateX(PrtManager::Instance()->GetPhi()*deg);
-  std::cout<<"PrtManager::Instance()->GetAngle() "<<PrtManager::Instance()->GetAngle()<<std::endl;
-
   wDirc  = new G4PVPlacement(fPrtRot,dircpos+G4ThreeVector(-zshift,0,0),lDirc,"wDirc",lExpHall,false,0);
 
   // The DIRC cover box

@@ -22,11 +22,6 @@ TH1F*  fHist0r = new TH1F("timediffr",";t_{measured}-t_{calculated} [ns];entries
 TH1F*  fHist0s = new TH1F("timediffs",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 TH1F*  fHist0i = new TH1F("timediffi",";t_{measured}-t_{calculated} [ns];entries [#]", 500,-10,10);
 
-TH1F*  fTof_p = new TH1F("tof_p",";TOF [ns];entries [#]", 500,34,40);
-TH1F*  fTof_pi = new TH1F("tof_pi",";TOF [ns];entries [#]", 500,34,40); //31 35
-
-TH1F*  fhNph_pi = new TH1F("fhNph_pi",";detected photons [#];entries [#]", 150,0,150);
-TH1F*  fhNph_p = new TH1F("fhNph_p",";detected photons [#];entries [#]", 150,0,150);
 TH1F*  fHist1 = new TH1F("time1",";measured time [ns];entries [#]",   1000,0,50);
 TH1F*  fHist2 = new TH1F("time2",";calculated time [ns];entries [#]", 1000,0,50);
 TH1F*  fHist6 = new TH1F("time6",";measured time [ns];entries [#]", 1000,0,50);
@@ -174,7 +169,13 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
     fTime2[i] = new TH1F(Form("hs_%d",i),"pdf;LE time [ns]; entries [#]",1000,0,50);
     fTime4[i] = new TH1F(Form("hf_%d",i),"pdf;LE time [ns]; entries [#]",1000,0,50);
   }
-
+  
+  for(int i : {2,4}){
+    hTof[i] = new TH1F("tof_"  +prt_name[i],";TOF [ns];entries [#]", 500,34,40);
+    hTofc[i] = new TH1F("tofc_"+prt_name[i],";TOF [ns];entries [#]", 500,34,40);
+    hNph[i] = new TH1F("nph_"+prt_name[i],";detected photons [#];entries [#]", 150,0,150);
+  }
+  
   int range = 70;
   if(infile.Contains("415_2")) range = 280;
   if(infile.Contains("_3")) range = 280;
@@ -396,13 +397,19 @@ void PrtLutReco::Run(int start, int end){
       if(!t2) continue;
       if(!(str1 && stl1 && str2 && stl2)) continue;
 
-      double tof = fEvent->GetTest1();
+      double tof = fEvent->GetTof();
+      double tofPi = fEvent->GetTofPi();
+      double tofP = fEvent->GetTofP();
+      double c = 3*0.18; //3 sigma cut
+      hTof[pid]->Fill(tof);
       
       if(fStudyId==403 && fMethod != 4){
+	tof = fEvent->GetTest1();
 	if( pid == 4 && tof < 34.45 ) continue;
 	if( pid == 2 && tof > 33.25 ) continue;	  
       }
       if(fStudyId==401 && fMethod != 4){
+	tof = fEvent->GetTest1();
 	if(fabs(prtangle-90)<2){
 	  if( pid == 4 && tof < 32.7 ) continue;
 	  if( pid == 2 && tof > 31.6 ) continue;	  
@@ -418,22 +425,18 @@ void PrtLutReco::Run(int start, int end){
 	    if( pid == 2 && tof > 31.65 ) continue;	  
 	  }
 	}
-      }
-
-      if(fStudyId == 420 && fMethod != 4){
-	if( pid == 4 && tof < 36.9 ) continue;
-	if( pid == 2 && tof > 35.7 ) continue;
-      }
-      if(fStudyId == 420 && fMethod == 4){
-	if( pid == 4 && tof < 36.6 ) continue;
-	if( pid == 2 && tof > 36.0 ) continue;
+      }      
+      if(fStudyId == 420){
+	tof = fEvent->GetTest1();
+	if(fMethod == 4){
+	  if( pid == 4 && tof < 36.6 ) continue;
+	  if( pid == 2 && tof > 36.0 ) continue;
+	}else{
+	  if( pid == 4 && tof < 36.9 ) continue;
+	  if( pid == 2 && tof > 35.7 ) continue;
+	}
       }
       if(fStudyId == 415){
-	tof = fEvent->GetTof();
-	double tofPi = fEvent->GetTofPi();
-	double tofP = fEvent->GetTofP();
-	double c = 3*0.18; //3 sigma cut
-	
 	if(fMethod == 4){
 	  if(fabs(mom-5)<0.1) c = 0.2;
 	  if(fabs(mom-6)<0.1) c = 0.2;
@@ -460,29 +463,24 @@ void PrtLutReco::Run(int start, int end){
 	if( pid == 2 && fabs(tofPi-tof)>0.15+fabs(c)) continue;
 	if( pid == 4 && fabs(tofP-tof)>0.15+fabs(c)) continue;
       }
-
-      if(fStudyId == 436){
-	tof = fEvent->GetTof();
-	double tofPi = fEvent->GetTofPi();
-	double tofP = fEvent->GetTofP();
-	double c = 3*0.18; //3 sigma cut
-	
+      if(fStudyId == 436){	
 	if(fMethod == 4){
 	  if(fabs(mom-4)<0.1) c = 0.2;
 	  if(fabs(mom-5)<0.1) c = 0.2;
 	  if(fabs(mom-6)<0.1) c = 0.2;
-	  if(fabs(mom-7)<0.1) c = 0.15;
+	  if(fabs(mom-7)<0.1) c = 0.1;
 	  if(fabs(mom-8)<0.1) c = 0.1;
 	  if(fabs(mom-9)<0.1) c = 0.1;
 	}else{
 	  if(fabs(mom-4)<0.1) c = 0.2;
 	  if(fabs(mom-5)<0.1) c = -0.15;
 	  if(fabs(mom-6)<0.1) c = -0.3;
-	  if(fabs(mom-7)<0.1) c = -0.2;
+	  if(fabs(mom-7)<0.1) c = -0.3;
 	  if(fabs(mom-8)<0.1) c = -0.3;
 	  if(fabs(mom-9)<0.1) c = -0.3;
 	}
 
+	if( pid == 4 && fabs(mom-7)<0.1) c += 0.05;
 	if( pid == 2 && fabs(mom-9)<0.1) c += 0.15;
 	if( pid == 4 && tof < tofP - c) continue;
 	if( pid == 2 && tof > tofPi + c) continue;
@@ -490,11 +488,10 @@ void PrtLutReco::Run(int start, int end){
 	if( pid == 4 && fabs(tofP-tof)>0.15+fabs(c)) continue;
       }
       
-      if( pid == 2 ) fTof_pi->Fill(tof);
-      if( pid == 4 ) fTof_p->Fill(tof);      
+      hTofc[pid]->Fill(tof);
     }
     else{
-      if(fStudyId == 415){
+      if(fStudyId == 415 || fStudyId == 436){
 	if(fabs(mom-3)<0.1) sm = 0.35;
 	if(fabs(mom-4)<0.1) sm = 0.3;
 	if(fabs(mom-5)<0.1) sm = 0.2;
@@ -823,12 +820,11 @@ void PrtLutReco::Run(int start, int end){
     
     double sumgr = sum1-sum2 + 30*sum_nph;
     if(sumgr != 0){
+      hNph[pid]->Fill(nhhits);
       if(tofPid == 2212){
-	fhNph_p->Fill(nhhits);
 	hLnDiffGr4->Fill(sumgr);
       }
       if(tofPid == 211){
-	fhNph_pi->Fill(nhhits);
 	hLnDiffGr2->Fill(sumgr);
       }
       likelihood = sumgr;
@@ -904,18 +900,18 @@ void PrtLutReco::Run(int start, int end){
   if(fMethod==2){
     TF1 *ff;
     gROOT->SetBatch(1);
-    if(fhNph_p->GetEntries()>20){
-      auto r = fhNph_p->Fit("gaus","SQ","",0,120);
+    if(hNph[4]->GetEntries()>20){
+      auto r = hNph[4]->Fit("gaus","SQ","",0,120);
       nph = r->Parameter(1);
       nph_err = r->ParError(1);
     }
-    if(fhNph_pi->GetEntries()>20){
-      auto r = fhNph_pi->Fit("gaus","SQ","",0,120);
+    if(hNph[2]->GetEntries()>20){
+      auto r = hNph[2]->Fit("gaus","SQ","",0,120);
       nph_pi = r->Parameter(1);
       nph_pi_err = r->ParError(1);
     }
     
-    //nph = prt_fit(fhNph_pi,40,10,50,1).X();
+    //nph = prt_fit(hNph[4],40,10,50,1).X();
     gROOT->SetBatch(0);
     FindPeak(cangle,spr,cangle_pi,spr_pi, prtangle);
     //nph = nsHits/(double)nsEvents;
@@ -989,11 +985,11 @@ void PrtLutReco::Run(int start, int end){
       sep_ti_err = sqrt(e1*e1+e2*e2+e3*e3+e4*e4);
     }
     
-    nnratio_pi = fhNph_pi->GetEntries()/(double)end;
-    nnratio_p = fhNph_p->GetEntries()/(double)end;
+    nnratio_pi = hNph[2]->GetEntries()/(double)end;
+    nnratio_p = hNph[4]->GetEntries()/(double)end;
     
     if(fVerbose) {
-      std::cout<<"nnratio_pi "<<nnratio_pi<<" "<<end <<"  "<< fhNph_pi->GetEntries()<<std::endl;	
+      std::cout<<"nnratio_pi "<<nnratio_pi<<" "<<end <<"  "<< hNph[2]->GetEntries()<<std::endl;	
       std::cout<<Form("p  SPR = %2.2F N = %2.2f +/- %2.2f",spr,nph,nph_err)<<std::endl;
       std::cout<<Form("pi SPR = %2.2F N = %2.2f +/- %2.2f",spr_pi,nph_pi,nph_pi_err)<<std::endl;
       std::cout<<"sep gr "<< sep_gr <<" +/- "<<sep_gr_err <<std::endl;
@@ -1093,10 +1089,10 @@ void PrtLutReco::Run(int start, int end){
 
       { // tof
 	prt_canvasAdd("tof",800,400);
-	fTof_pi->SetLineColor(kBlue+1);
-	fTof_p->SetLineColor(kRed+1);
-	fTof_pi->Draw();
-	fTof_p->Draw("same");
+	for(int i: {2,4}){
+	  hTof[i]->SetLineColor(prt_color[i]);
+	  hTof[i]->Draw((i==2)? "":"same");
+	}
       }
 
       { // likelihood
@@ -1170,28 +1166,23 @@ void PrtLutReco::Run(int start, int end){
 
       { // nph
 	prt_canvasAdd("nph"+nid,800,400);
-	fhNph_p->SetLineColor(kRed+1);
-	auto f = fhNph_p->GetFunction("gaus");
-	if(f){
-	  f->SetLineWidth(2);
-	  f->SetLineColor(kRed+1);
-	}
-	fhNph_p->Draw();
-	fhNph_pi->SetLineColor(kBlue+1);
-	f = fhNph_pi->GetFunction("gaus");
-	if(f){	  
-	  f->SetLineWidth(2);
-	  f->SetLineColor(kBlue+1);
-	}
-	fhNph_pi->Draw("same");
 
 	TLegend *leg = new TLegend(0.7,0.7,0.9,0.9);
 	leg->SetFillColor(0);
 	leg->SetFillStyle(0);
 	leg->SetBorderSize(0);
 	leg->SetFillStyle(0);
-	leg->AddEntry(fhNph_pi,"pions","lp");
-	leg->AddEntry(fhNph_p,"protons","lp");
+
+	for(int i: {2,4}){
+	  hNph[i]->SetLineColor(prt_color[i]);	
+	  auto f = hNph[i]->GetFunction("gaus");
+	  if(f){
+	    f->SetLineWidth(2);
+	    f->SetLineColor(kRed+1);
+	  }
+	  hNph[i]->Draw((i==2)? "":"same");
+	  leg->AddEntry(hNph[i],prt_name[i],"lp");
+	}       
 	leg->Draw();
       }
 	
