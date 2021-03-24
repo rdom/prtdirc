@@ -84,7 +84,6 @@ void PrtManager::AddEvent(PrtEvent event){
     fEvent = new PrtEvent(event);
     fEvent->SetType(1);
     fEvent->SetPhysList(fPhysList);
-    //    fEvent->SetAngle((180*deg-fAngle)/deg);
     fEvent->SetAngle(fAngle);
     fEvent->SetPhi(fPhi);
     

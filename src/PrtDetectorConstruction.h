@@ -27,9 +27,9 @@ public:
   virtual void ConstructSDandField();
   void DefineMaterials();
   void SetVisualization();
-  void SetRotation(G4double angle);
-  void SetLens(G4int id);
-  void SetQuantumEfficiency(G4int id);
+  void SetRotation(double angle);
+  void SetLens(int id);
+  void SetQuantumEfficiency(int id);
   
 
 private:
@@ -69,26 +69,28 @@ private:
   G4Material*        PbF2Material;  
   G4Material*        frontMaterial;
   
-  G4int fNRow;
-  G4int fNCol;
-  G4int fGeomId;
-  G4int fLensId;
-  G4int fMcpLayout;
-  G4double fHall[3];
-  G4double fBar[3];
-  G4double fMirror[3];
-  G4double fPrizm[4];
-  G4double fLens[4];
-  G4double fMcpTotal[3];
-  G4double fMcpActive[3];
+  int fNRow;
+  int fNCol;
+  int fGeomId;
+  int fLensId;
+  int fRadiatorId;
+  double fPrismStepX;
+  int fMcpLayout;
+  double fHall[3];
+  double fBar[3];
+  double fMirror[3];
+  double fPrizm[4];
+  double fLens[4];
+  double fMcpTotal[3];
+  double fMcpActive[3];
   G4ThreeVector fPrismShift;
   G4ThreeVector fCenterShift;
-  G4double fOffset;
+  double fOffset;
   
-  G4double fRotAngle;
+  double fRotAngle;
   G4RotationMatrix *fPrtRot;
   PrtDetectorConstructionMessenger* fGeomMessenger;
-  G4double *fQuantumEfficiency;
+  double *fQuantumEfficiency;
 };
 
 #endif

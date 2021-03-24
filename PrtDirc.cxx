@@ -176,20 +176,15 @@ int main(int argc,char** argv)
   if ( macro.size() ) {
     G4String command = "/control/execute ";
     UImanager->ApplyCommand(command+macro);
-  }else { 
-    UImanager->ApplyCommand("/control/execute ../prt.mac");
+  }else {
+    //  UImanager->ApplyCommand("/control/execute ../prt.mac");
+    
+    UImanager->ApplyCommand("/gun/direction 0 0 1");
+    UImanager->ApplyCommand("/gun/position 0 0 -100 cm");
+    UImanager->ApplyCommand("/Prt/geom/prtRotation 90 deg");
+    UImanager->ApplyCommand("/gun/direction 0 0 1");
   }
-  
-  if ( geomAng.size() ) {
-    G4String command = "/Prt/geom/prtRotation ";
-    //UImanager->ApplyCommand(command+geomAng);
-  }
-
-  if ( lensId.size() ) {
-    G4String command = "/Prt/geom/lensId ";
-    UImanager->ApplyCommand(command+lensId);
-  }
- 
+   
   if ( particle.size() ) {
     int pdgid = 0;
     if(particle=="mix_pip") PrtManager::Instance()->SetMix(1);
@@ -214,22 +209,16 @@ int main(int argc,char** argv)
     UImanager->ApplyCommand("/run/beamOn "+events);
   }else{  // UI session for interactive mode
 
-    //#ifdef G4UI_USE
     G4UIExecutive * ui = new G4UIExecutive(argc,argv,"Qt");
-    //#ifdef G4VIS_USE
     UImanager->ApplyCommand("/control/execute ../vis.mac");
-    //#endif
     if (ui->IsGUI()) UImanager->ApplyCommand("/control/execute gui.mac");
     UImanager->ApplyCommand("/run/beamOn "+events);
     //UImanager->ApplyCommand("/vis/ogl/printEPS");
     ui->SessionStart();
     delete ui;
-    //#endif
   }
 
-  //#ifdef G4VIS_USE
   delete visManager;
-  //#endif
   delete runManager;
 
   return 0;

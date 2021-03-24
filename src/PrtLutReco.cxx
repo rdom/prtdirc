@@ -171,8 +171,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   }
   
   for(int i : {2,4}){
-    hTof[i] = new TH1F("tof_"  +prt_name[i],";TOF [ns];entries [#]", 500,34,40);
-    hTofc[i] = new TH1F("tofc_"+prt_name[i],";TOF [ns];entries [#]", 500,34,40);
+    hTof[i] = new TH1F("tof_"  +prt_name[i],";TOF [ns];entries [#]", 500,34,42);
+    hTofc[i] = new TH1F("tofc_"+prt_name[i],";TOF [ns];entries [#]", 500,34,42);
     hNph[i] = new TH1F("nph_"+prt_name[i],";detected photons [#];entries [#]", 150,0,150);
   }
   
@@ -286,10 +286,9 @@ void PrtLutReco::Run(int start, int end){
   if(fPdfPath.Contains("beam_415_9")) pdfend = 200000;
   if(fPdfPath.Contains("beam_415_10")) pdfend = 300000;
 
+  if(fPdfPath.Contains("beam_436")) pdfend = 50000;
   if(fPdfPath.Contains("beam_436_3")) pdfend = 10000;
-  if(fPdfPath.Contains("beam_436_4")) pdfend = 50000;
-  if(fPdfPath.Contains("beam_436_9")) pdfend = 50000;
-  
+
   if(fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
   
   if(fMethod == 4) {
@@ -380,9 +379,9 @@ void PrtLutReco::Run(int start, int end){
 	if(gch==515) t3v++;
 
 	if(fMethod == 3) {if(gch>=1094 && gch<=1101) hodo1++;}
-	else {if(gch>=1089 && gch<=1106) hodo1++;}
-
-	// if(gch>=1097 && gch<=1098) hodo1++;
+	else {if(gch>=1089 && gch<=1106) hodo1++;}      
+ 
+	// if(gch>=1095 && gch<=1095) hodo1++;
 	if(gch==1140) str1++;
 	if(gch==1142) stl1++;
 	if(gch==1144) str2++;
@@ -400,7 +399,7 @@ void PrtLutReco::Run(int start, int end){
       double tof = fEvent->GetTof();
       double tofPi = fEvent->GetTofPi();
       double tofP = fEvent->GetTofP();
-      double c = 3*0.18; //3 sigma cut
+      double s1=0,s2=0,c = 3*0.18; //3 sigma cut
       hTof[pid]->Fill(tof);
       
       if(fStudyId==403 && fMethod != 4){
@@ -463,29 +462,30 @@ void PrtLutReco::Run(int start, int end){
 	if( pid == 2 && fabs(tofPi-tof)>0.15+fabs(c)) continue;
 	if( pid == 4 && fabs(tofP-tof)>0.15+fabs(c)) continue;
       }
-      if(fStudyId == 436){	
-	if(fMethod == 4){
-	  if(fabs(mom-4)<0.1) c = 0.2;
-	  if(fabs(mom-5)<0.1) c = 0.2;
-	  if(fabs(mom-6)<0.1) c = 0.2;
-	  if(fabs(mom-7)<0.1) c = 0.1;
-	  if(fabs(mom-8)<0.1) c = 0.1;
-	  if(fabs(mom-9)<0.1) c = 0.1;
-	}else{
-	  if(fabs(mom-4)<0.1) c = 0.2;
-	  if(fabs(mom-5)<0.1) c = -0.15;
-	  if(fabs(mom-6)<0.1) c = -0.3;
-	  if(fabs(mom-7)<0.1) c = -0.3;
-	  if(fabs(mom-8)<0.1) c = -0.3;
-	  if(fabs(mom-9)<0.1) c = -0.3;
-	}
 
-	if( pid == 4 && fabs(mom-7)<0.1) c += 0.05;
-	if( pid == 2 && fabs(mom-9)<0.1) c += 0.15;
-	if( pid == 4 && tof < tofP - c) continue;
-	if( pid == 2 && tof > tofPi + c) continue;
-	if( pid == 2 && fabs(tofPi-tof)>0.15+fabs(c)) continue;
-	if( pid == 4 && fabs(tofP-tof)>0.15+fabs(c)) continue;
+      if(fStudyId == 436){
+      	if(fMethod == 4){
+      	  c = 0.2; s1 = 0.1; s2 = 0.05;
+	  if(fabs(mom-3)<0.1) {c = 0.5; s1 = 0.2; s2 = 0.2;}
+      	  if(fabs(mom-4)<0.1) {c = 0.3; s1 = 0.3; s2 = 0.2;}
+	  if(fabs(mom-5)<0.1) {c = 0.4; s1 = 0.3; s2 = 0.25;}
+	  if(fabs(mom-6)<0.1) {c = 0.4; s1 = 0.3; s2 = 0.25;}
+      	  if(fabs(mom-7)<0.1) {c = 0.35; s1 = 0.2; s2 = 0.2;}
+      	  if(fabs(mom-8)<0.1) {c = 0.35; s1 = 0.25; s2 = 0.25;}
+      	  if(fabs(mom-9)<0.1) {c = 0.35; s1 = 0.25; s2 = 0.3;}
+
+      	}else{
+	  if(fabs(mom-3)<0.1) {c = 0.5; s1 = 0.2; s2 = 0.2;}
+      	  if(fabs(mom-4)<0.1) {c = 0.3; s1 = 0.3; s2 = 0.2;}
+	  if(fabs(mom-5)<0.1) {c = 0.3; s1 = 0.3; s2 = 0.25;}
+      	  if(fabs(mom-6)<0.1) {c = 0.1; s1 = 0.3; s2 = 0.25;}
+      	  if(fabs(mom-7)<0.1) {c = 0.15;s1 = 0.4; s2 = 0.3;}
+      	  if(fabs(mom-8)<0.1) {c = 0.1; s1 = 0.32; s2 = 0.35;}
+	  if(fabs(mom-9)<0.1) {c = 0.08; s1 = 0.25; s2 = 0.4;}
+      	}
+	
+      	if(pid == 2 && fabs(tof-tofPi+s1)>c) continue;
+      	if(pid == 4 && fabs(tof-tofP-s2)>c) continue;
       }
       
       hTofc[pid]->Fill(tof);
@@ -494,8 +494,7 @@ void PrtLutReco::Run(int start, int end){
       if(fStudyId == 415 || fStudyId == 436){
 	if(fabs(mom-3)<0.1) sm = 0.35;
 	if(fabs(mom-4)<0.1) sm = 0.3;
-	if(fabs(mom-5)<0.1) sm = 0.2;
-	
+	if(fabs(mom-5)<0.1) sm = 0.2;	
       }
     }
     
@@ -535,6 +534,12 @@ void PrtLutReco::Run(int start, int end){
 
 	  hitTime += o;	  
 	}
+	if(fStudyId == 409){
+	  double o = 0.4;
+	  if(fabs(prtangle-20)<1) o = -0.45;
+	  hitTime += o;	  
+	}
+
 	if(fStudyId == 420) hitTime += 0.62;
 	if(fStudyId == 403){
 	  double o = 0.05;
@@ -629,7 +634,7 @@ void PrtLutReco::Run(int start, int end){
 	
 	bool samepath(false);
 	if(bsim && lpathid == pathid) samepath = true;
-	// if(!samepath) continue;
+        // if(!samepath) continue;
  
 	double lphi = dird.Phi();
 	double ltheta = dird.Theta();
@@ -1091,7 +1096,11 @@ void PrtLutReco::Run(int start, int end){
 	prt_canvasAdd("tof",800,400);
 	for(int i: {2,4}){
 	  hTof[i]->SetLineColor(prt_color[i]);
+	  hTofc[i]->SetLineColor(prt_color[i]);
+	  hTofc[i]->SetFillColor(prt_color[i]);
+	  hTofc[i]->SetFillStyle(3005);
 	  hTof[i]->Draw((i==2)? "":"same");
+	  hTofc[i]->Draw("same");
 	}
       }
 
