@@ -14,7 +14,7 @@ PrtStackingAction::PrtStackingAction()
   : G4UserStackingAction(), fScintillationCounter(0), fCerenkovCounter(0){
 
   fRand = new TRandom();
-  fQEtype=0;
+  fQEtype=1;
   if(PrtManager::Instance()->GetMcpLayout()==2030) fQEtype=1;
 
     

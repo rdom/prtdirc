@@ -118,7 +118,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   // read corrections
   fCorrPath = PrtManager::Instance()->GetOutName()+"_corr.root";
   fCorrPath.ReplaceAll("reco_",Form("reco_%d_",prt_data_info.getFileId()));
-  for(int i=0; i<8; i++) fCorr[i] = 0;
+  for(int i=0; i<prt_nmcp; i++) fCorr[i] = 0;
   if(!gSystem->AccessPathName(fCorrPath)){
     std::cout<<"------- reading  "<<fCorrPath <<std::endl;
     int pmt;
@@ -173,10 +173,10 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose){
   for(int i : {2,4}){
     hTof[i] = new TH1F("tof_"  +prt_name[i],";TOF [ns];entries [#]", 500,34,42);
     hTofc[i] = new TH1F("tofc_"+prt_name[i],";TOF [ns];entries [#]", 500,34,42);
-    hNph[i] = new TH1F("nph_"+prt_name[i],";detected photons [#];entries [#]", 150,0,150);
+    hNph[i] = new TH1F("nph_"+prt_name[i],";detected photons [#];entries [#]", 160,0,160);
   }
   
-  int range = 70;
+  int range = 220; // 70
   if(infile.Contains("415_2")) range = 280;
   if(infile.Contains("_3")) range = 280;
   if(infile.Contains("415_4")) range = 180;
@@ -227,7 +227,7 @@ void PrtLutReco::Run(int start, int end){
 
   prt_setRootPalette(1);
   prt_createMap();
-  prt_initDigi();
+  prt_initDigi(2);
 
   outFile.ReplaceAll("reco_",Form("reco_%d_",prt_data_info.getFileId()));
   TFile file(outFile,"recreate");
@@ -500,7 +500,7 @@ void PrtLutReco::Run(int start, int end){
     
     // SearchClusters();
     
-    double t0smear = gRandom->Gaus(0,0.1+sm); //event t0 smearing
+    double t0smear = gRandom->Gaus(0,0.1+sm); // event t0 smearing 
     
     // double temp_ti[prt_maxdircch] = {0}; 
 
@@ -520,7 +520,7 @@ void PrtLutReco::Run(int start, int end){
       // if(!spathid.Contains("142")) continue;
       // std::cout<<"pathid "<<pathid<<std::endl;    
       
-      if(bsim) hitTime += gRandom->Gaus(0,0.2) + t0smear; // time resol. in case it was not simulated
+      if(bsim) hitTime += gRandom->Gaus(0,0.1);// + t0smear; // 0.2 time resol. in case it was not simulated
       else{
 	if(fStudyId == 401){
 	  double o = -0.9;
@@ -615,19 +615,20 @@ void PrtLutReco::Run(int start, int end){
       // else timeRes = 0.8;
       
       if(prt_isBadChannel(ch)) continue;
+      
       int nedge=GetEdge(mcpid, pixid);
       // if(cluster[mcpid][pixid]>4) continue;
       
       bool isGoodHit_gr(0), isGoodHit_ti(0);
       int bestbounce = 0;      
       double besttangle = 0, besttdiff = 100;
-      int size = fLutNode[ch]->Entries(); 
-      
+      int size = fLutNode[ch]->Entries();       
+	
       for(int i=0; i<size; i++){
-	weight = 12*fLutNode[ch]->GetWeight(i);
-	dird   = fLutNode[ch]->GetEntryCs(i,nedge); // nedge=0
-	// dird  = fLutNode[ch]->GetEntry(i);
-	evtime = fLutNode[ch]->GetTime(i);
+	weight = 20*fLutNode[ch]->GetWeight(i);
+	// dird   = fLutNode[ch]->GetEntryCs(i,nedge); // nedge=0
+	dird  = fLutNode[ch]->GetEntry(i);
+	evtime = fLutNode[ch]->GetTime(i);	
 
 	// double nrefl = fLutNode[ch]->GetNRefl(i);
 	int lpathid = fLutNode[ch]->GetPathId(i);
@@ -671,7 +672,7 @@ void PrtLutReco::Run(int start, int end){
 	    }else if(fabs(prtangle-60)<15){
 	      tangle -= 0.055*tdiff/hitTime;
 	    }else{
-	      tangle -= 0.035*tdiff/hitTime;
+	      tangle -= 0.045*tdiff/hitTime;
 	    }
 	  }
 	  
@@ -797,7 +798,7 @@ void PrtLutReco::Run(int start, int end){
 	fHist1->Fill(hitTime);
 	nhhits++;
 	nsHits++;
-        if(tofPid == 211) prt_hdigi[mcpid]->Fill(pixid%8, pixid/8);	
+        if(tofPid == 211) prt_hdigi[mcpid]->Fill((pixid+1)%16, (pixid+1)/16);
       }
     }
 
@@ -906,12 +907,12 @@ void PrtLutReco::Run(int start, int end){
     TF1 *ff;
     gROOT->SetBatch(1);
     if(hNph[4]->GetEntries()>20){
-      auto r = hNph[4]->Fit("gaus","SQ","",0,120);
+      auto r = hNph[4]->Fit("gaus","SQ","",0,160);
       nph = r->Parameter(1);
       nph_err = r->ParError(1);
     }
     if(hNph[2]->GetEntries()>20){
-      auto r = hNph[2]->Fit("gaus","SQ","",0,120);
+      auto r = hNph[2]->Fit("gaus","SQ","",0,160);
       nph_pi = r->Parameter(1);
       nph_pi_err = r->ParError(1);
     }
@@ -1196,7 +1197,7 @@ void PrtLutReco::Run(int start, int end){
       }
 	
       { // hp
-	auto cdigi = prt_drawDigi(2018);
+	auto cdigi = prt_drawDigi(2031); //2018
 	cdigi->SetName("hp"+nid);
 	prt_canvasAdd(cdigi);
       }

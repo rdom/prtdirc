@@ -202,14 +202,15 @@ void PrtPixelSD::Initialize(G4HCofThisEvent* hce){
  
   //PrtManager::Instance()->AddEvent(PrtEvent());
 
-
+  int prt_npix = 16*16;
   //create MPC map
-  for(int ch=0; ch<15*64; ch++){
-    int mcp = ch/64;
-    int pix = ch%64;	
+  for(int ch=0; ch<12*prt_npix; ch++){
+    int mcp = ch/prt_npix;
+    int pix = ch%prt_npix;	
     int col = pix/2 - 8*(pix/16);
     int row = pix%2 + 2*(pix/16);
-    pix = col+8*row;    
+    // pix = col+sqrt(prt_npix)*row;
+    
     fMap_Mpc[mcp][pix]=ch;
   }   
 }
@@ -354,7 +355,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   bool transport_efficiency(true);
   
   if(PrtManager::Instance()->GetGeometry()==2021) charge_sharing=false; //no cs in mfield
-  if(PrtManager::Instance()->GetMcpLayout()==2030){
+  if(PrtManager::Instance()->GetMcpLayout()==2030 || PrtManager::Instance()->GetMcpLayout()==2018){
     charge_sharing=false;
     quantum_efficiency=false;
   }
@@ -390,7 +391,6 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
   if(PrtManager::Instance()->GetRunType()==0 && PrtManager::Instance()->GetMcpLayout()>=2015 && quantum_efficiency){
     if(fQe_space[mcpid][pixid]>G4UniformRand()) {
       if(fMultHit[mcpid][pixid]==0 || !dead_time) PrtManager::Instance()->AddHit(hit,localPos,digiPos,position);
-      //else std::cout<<"fMultHit["<<mcpid<<"]["<<pixid<<"] "<<fMultHit[mcpid][pixid] <<std::endl;      
       fMultHit[mcpid][pixid]++;
     }else is_hit=false;
     
@@ -438,7 +438,7 @@ G4bool PrtPixelSD::ProcessHits(G4Step* step, G4TouchableHistory* hist){
 }
 
 void PrtPixelSD::EndOfEvent(G4HCofThisEvent*){
-  memset(fMultHit, 0, sizeof(fMultHit[0][0])*960);
+  memset(fMultHit, 0, sizeof(fMultHit[0][0])*16*16*12);
   G4int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
   if(eventNumber%1==0 && PrtManager::Instance()->GetRunType()==0) std::cout<<"Event # "<<eventNumber <<std::endl;
   if(eventNumber%1000==0 && PrtManager::Instance()->GetRunType()!=0) std::cout<<"Event # "<<eventNumber <<std::endl;

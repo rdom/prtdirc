@@ -37,9 +37,9 @@ class PrtPixelSD : public G4VSensitiveDetector
 
   private:
   G4int     fNofCells;
-  G4double fQe_space[15][64];
-  G4int fMultHit[15][64];
-  G4int fMap_Mpc[15][64];
+  G4double fQe_space[12][64];
+  G4int fMultHit[12][256];
+  G4int fMap_Mpc[12][256];
 };
 
 #endif

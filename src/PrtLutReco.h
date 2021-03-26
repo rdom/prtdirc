@@ -76,11 +76,11 @@ private:
   TSpectrum *fSpect;
   double fAngle[5];
   double fTest;
-  double fCorr[8];
+  double fCorr[12];
   TString fCorrPath;
   TString fPdfPath;
-  TGraph *fPdf2[512],*fPdf4[512];
-  TH1F *fTime2[512], *fTime4[512];
+  TGraph *fPdf2[3072],*fPdf4[3072];
+  TH1F *fTime2[3072], *fTime4[3072];
   TH1F *hTof[5], *hTofc[5];
   TH1F *hNph[5];
   

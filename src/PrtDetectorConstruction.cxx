@@ -656,8 +656,8 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
     lMcp = new G4LogicalVolume(gMcp, BarMaterial, "lMcp", 0, 0, 0); // BarMaterial
 
     // The MCP Pixel
-    int mcpDimx = 8;
-    int mcpDimy = 8;
+    int mcpDimx = 16;
+    int mcpDimy = 16;
     if (fMcpLayout == 2030) {
       mcpDimx = 16;
       mcpDimy = 16;
