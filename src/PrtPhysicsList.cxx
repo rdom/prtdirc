@@ -41,7 +41,7 @@ PrtPhysicsList::PrtPhysicsList()
 {
   fMessenger = new PrtPhysicsListMessenger(this);
   SetVerboseLevel(0);  
-  fPhysList =  PrtManager::Instance()->GetPhysList();
+  fPhysList =  PrtManager::Instance()->getRun()->getPhysList();
 }
 
 PrtPhysicsList::~PrtPhysicsList() { delete fMessenger; }

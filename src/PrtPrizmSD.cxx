@@ -41,6 +41,7 @@ void PrtPrizmSD::Initialize(G4HCofThisEvent* hce){
 }
 
 G4bool PrtPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
+
   G4StepPoint* pPostStepPoint = aStep->GetPostStepPoint(); 
   if (pPostStepPoint->GetStepStatus() == fGeomBoundary){
     PrtPrizmHit* newHit = new PrtPrizmHit();
@@ -66,7 +67,7 @@ G4bool PrtPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
     newHit->SetNormalId(nid);
     fHitsCollection->insert(newHit);
   }
-
+  
   return true;
 }
 

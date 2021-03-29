@@ -1,7 +1,7 @@
 // -----------------------------------------
 // PrtStackingAction class
 //
-// Author  : R.Dzhygadlo at gsi.de
+// author  : r.dzhygadlo at gsi.de
 // --------------------------------------
 
 #ifndef PrtStackingAction_H
@@ -13,24 +13,21 @@
 #include "TGraph.h"
 #include "TRandom.h"
 
+class PrtStackingAction : public G4UserStackingAction {
+ public:
+  PrtStackingAction();
+  virtual ~PrtStackingAction();
 
-class PrtStackingAction : public G4UserStackingAction
-{
-  public:
-    PrtStackingAction();
-    virtual ~PrtStackingAction();
+ public:
+  virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track *aTrack);
+  virtual void NewStage();
+  virtual void PrepareNewEvent();
 
-  public:
-    virtual G4ClassificationOfNewTrack ClassifyNewTrack(const G4Track* aTrack);
-    virtual void NewStage();
-    virtual void PrepareNewEvent();
-
-  private:
-    G4int fScintillationCounter;
-    G4int fCerenkovCounter; 
-    TRandom* fRand;
-    TGraph* fDetEff[2];
-    int fQEtype;
+ private:
+  int fScintillationCounter;
+  int fCerenkovCounter;
+  TGraph *fDetEff[2];
+  int fQEtype;
 };
 
 #endif

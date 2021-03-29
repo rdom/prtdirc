@@ -32,8 +32,8 @@ void PrtRunAction::EndOfRunAction(const G4Run* aRun)
 {
   if(IsMaster())
     {
-      PrtManager::Instance()->FillLut();
-      PrtManager::Instance()->Save();
+      PrtManager::Instance()->fillLut();
+      PrtManager::Instance()->save();
   
       fTimer->Stop();
       G4cout << "number of event = " << aRun->GetNumberOfEvent()

@@ -54,7 +54,7 @@ void PrtDetectorConstructionMessenger::SetNewValue(
   
   if( command == fLensIdCmd ) {
     G4int id = fLensIdCmd->GetNewIntValue(newValue);
-    PrtManager::Instance()->SetLens(id);
+    PrtManager::Instance()->getRun()->setLens(id);
     fPrtGeom->SetLens(id);
   }
 

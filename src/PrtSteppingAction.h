@@ -1,7 +1,7 @@
 // -----------------------------------------
 // PrtSteppingAction.h
 //
-// Author  : R.Dzhygadlo at gsi.de
+// author  : r.dzhygadlo at gsi.de
 // -----------------------------------------
 
 #ifndef PrtSteppingAction_h
@@ -10,21 +10,18 @@
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
 
-/// Stepping action class 
+class PrtSteppingAction : public G4UserSteppingAction {
+ public:
+  PrtSteppingAction();
+  virtual ~PrtSteppingAction();
 
-class PrtSteppingAction : public G4UserSteppingAction
-{
-  public:
-    PrtSteppingAction();
-    virtual ~PrtSteppingAction();
+  // method from the base class
+  virtual void UserSteppingAction(const G4Step *);
 
-    // method from the base class
-    virtual void UserSteppingAction(const G4Step*);
-
-  private:
-    G4int fScintillationCounter;
-    G4int fCerenkovCounter;
-    G4int fEventNumber;
+ private:
+  G4int fScintillationCounter;
+  G4int fCerenkovCounter;
+  G4int fEventNumber;
 };
 
 #endif

@@ -1,7 +1,7 @@
 // -----------------------------------------
 // PrtRun.h
 //
-// Author  : R.Dzhygadlo at gsi.de
+// author  : r.dzhygadlo at gsi.de
 // -----------------------------------------
 
 #ifndef PrtRun_h
@@ -11,92 +11,114 @@
 #include "TObject.h"
 #include "TVector3.h"
 
-class PrtRun: public TObject  {
+class PrtRun : public TObject {
 
-public:
-
-  PrtRun(); 	//the default constructor
+ public:
+  PrtRun();
   ~PrtRun(){};
-  void PrintInfo();
 
-  // Accessors 
-  Int_t runId()         const { return frunId; }
-  Int_t studyId()       const { return fstudyId; }
-  Bool_t mc()           const { return fmc; }
-  Double_t theta()      const { return ftheta; }
-  Double_t phi()        const { return fphi; }
-  Int_t physList()      const { return fphysList; }
-  Int_t pid()           const { return fpid; }
-  TVector3 momentum()   const { return fmomentum; }
-  TVector3 position()   const { return fposition; }
-  Int_t geometry()      const { return fgeometry; }
-  Int_t lens()          const { return flens; }
-  Int_t trigger()       const { return ftrigger; } 
-  Double_t prismStepX() const { return fprismStepX; }
-  Double_t prismStepY() const { return fprismStepY; }
-  Double_t beamX()      const { return fbeamX; }
-  Double_t beamZ()      const { return fbeamZ; }
-  Double_t timeSigma()  const { return ftimeSigma; }
-  Double_t tof()        const { return ftof; }
-  Double_t tofPi()      const { return ftofPi; }
-  Double_t tofP()       const { return ftofP; }  
-  Double_t test1()      const { return ftest1; }
-  Double_t test2()      const { return ftest2; }
-  
-  // Mutators
-  void runId(Int_t v)      { frunId = v; }
-  void studyId(Int_t v)    { fstudyId = v; }
-  void mc(Bool_t v)    { fmc = v; }
-  void theta(Double_t v)   { ftheta = v; }
-  void phi(Double_t v)     { fphi = v; }
-  void physList(Int_t v) { fphysList = v; }
-  void pid(Int_t v) { fpid = v; }
-  void momentum(TVector3 v) { fmomentum = v; }
-  void position(TVector3 v) { fposition = v; }
-  void geometry(Int_t v) { fgeometry = v; }
-  void lens(Int_t v) { flens = v; }
-  void trigger(Int_t v) { ftrigger = v; }
-  void prismStepX(Double_t v){ fprismStepX = v; }
-  void prismStepY(Double_t v){ fprismStepY = v; }
-  void beamX(Double_t v){ fbeamX = v; }
-  void beamZ(Double_t v){ fbeamZ = v; }
-  void timeSigma(Double_t v){ ftimeSigma = v; }
-  void tof(Double_t v){ ftof = v; }
-  void tofPi(Double_t v){ ftofPi = v; }
-  void tofP(Double_t v){ ftofP = v; }  
-  void test1(Double_t v) { ftest1 = v; }
-  void test2(Double_t v) { ftest2 = v; }
+  // accessors
+  TString getInfo();
+  TString getShortInfo() const { return fShortInfo; }
+  TString getName() const { return fName; }
+  Int_t getId() const { return fId; }
+  Int_t getRunType() const { return fRunType; }
+  Int_t getStudy() const { return fStudy; }
+  Bool_t getMc() const { return fMc; }
+  Double_t getTheta() const { return fTheta; }
+  Double_t getPhi() const { return fPhi; }
+  Int_t getPhysList() const { return fPhysList; }
+  Int_t getPid() const { return fPid; }
+  Double_t getMomentum() const { return fMomentum; }
+  Int_t getGeometry() const { return fGeometry; }
+  Int_t getRadiator() const { return fRadiator; }
+  Int_t getPmtLayout() const { return fPmtLayout; }
+  Int_t getLens() const { return fLens; }
+  Int_t getTrigger() const { return fTrigger; }
+  Int_t getNpmt() const { return fNpmt; }
+  Int_t getNpix() const { return fNpix; }
+  Double_t getPrismStepX() const { return fPrismStepX; }
+  Double_t getPrismStepY() const { return fPrismStepY; }
+  Double_t getBeamX() const { return fBeamX; }
+  Double_t getBeamZ() const { return fBeamZ; }
+  Double_t getBeamSize() const { return fBeamSize; }
+  Double_t getTimeSigma() const { return fTimeSigma; }
+  Double_t getSimOffset() const { return fSimOffset; }
+  Double_t getRadiatorL() const { return fRadiatorL; }
+  Double_t getRadiatorW() const { return fRadiatorW; }
+  Double_t getRadiatorH() const { return fRadiatorH; }
+  Double_t getTest1() const { return fTest1; }
+  Double_t getTest2() const { return fTest2; }
+  Double_t getTest3() const { return fTest3; }
 
-private: 
-  Int_t frunId;
-  Int_t fstudyId;
-  Bool_t fmc;
-  Int_t fphysList;
-  Int_t fpid;
-  Int_t fgeometry;
-  Int_t flens;
-  Int_t fradiator;
-  Int_t ftrigger;
-  
-  Double_t ftheta;
-  Double_t fphi;
-  TVector3 fmomentum;
-  TVector3 fposition;
+  // mutators
+  void setInfo(TString v) { fShortInfo = v; }
+  void setName(TString v) { fName = v; }
+  void setId(Int_t v) { fId = v; }
+  void setRunType(Int_t v) { fRunType = v; }
+  void setStudy(Int_t v) { fStudy = v; }
+  void setMc(Bool_t v) { fMc = v; }
+  void setTheta(Double_t v) { fTheta = v; }
+  void setPhi(Double_t v) { fPhi = v; }
+  void setPhysList(Int_t v) { fPhysList = v; }
+  void setPid(Int_t v) { fPid = v; }
+  void setMomentum(Double_t v) { fMomentum = v; }
+  void setGeometry(Int_t v) { fGeometry = v; }
+  void setRadiator(Int_t v) { fRadiator = v; }
+  void setPmtLayout(Int_t v) { fPmtLayout = v; }
+  void setLens(Int_t v) { fLens = v; }
+  void setTrigger(Int_t v) { fTrigger = v; }
+  void setNpmt(Int_t v) { fNpmt = v; }
+  void setNpix(Int_t v) { fNpix = v; }
+  void setPrismStepX(Double_t v) { fPrismStepX = v; }
+  void setPrismStepY(Double_t v) { fPrismStepY = v; }
+  void setBeamX(Double_t v) { fBeamX = v; }
+  void setBeamZ(Double_t v) { fBeamZ = v; }
+  void setBeamSize(Double_t v) { fBeamSize = v; }
+  void setTimeSigma(Double_t v) { fTimeSigma = v; }
+  void setSimOffset(Double_t v) { fSimOffset = v; }
+  void setRadiatorL(Double_t v) { fRadiatorL = v; }
+  void setRadiatorW(Double_t v) { fRadiatorW = v; }
+  void setRadiatorH(Double_t v) { fRadiatorH = v; }
+  void setTest1(Double_t v) { fTest1 = v; }
+  void setTest2(Double_t v) { fTest2 = v; }
+  void setTest3(Double_t v) { fTest3 = v; }
 
-  Double_t fprismStepX;
-  Double_t fprismStepY;
-  Double_t fbeamX;
-  Double_t fbeamZ;
-  Double_t fbeamSize;
-  Double_t ftimeSigma;
+ private:
+  TString fShortInfo;
+  TString fName;
+  Int_t fId;
+  Int_t fRunType;
+  Int_t fStudy;
+  Bool_t fMc;
+  Int_t fPhysList;
+  Int_t fPid;
+  Int_t fGeometry;
+  Int_t fLens;
+  Int_t fRadiator;
+  Int_t fPmtLayout;
+  Int_t fTrigger;
+  Int_t fNpmt;
+  Int_t fNpix;
 
-  Double_t ftof;
-  Double_t ftofPi;
-  Double_t ftofP;
+  Double_t fTheta;
+  Double_t fPhi;
+  Double_t fMomentum;
 
-  Double_t ftest1;
-  Double_t ftest2;
-  
-  ClassDef(PrtRun, 0);
+  Double_t fPrismStepX;
+  Double_t fPrismStepY;
+  Double_t fBeamX;
+  Double_t fBeamZ;
+  Double_t fBeamSize;
+  Double_t fTimeSigma;
+  Double_t fSimOffset;
+
+  Double_t fRadiatorL, fRadiatorW, fRadiatorH;
+
+  Double_t fTest1;
+  Double_t fTest2;
+  Double_t fTest3;
+
+  ClassDef(PrtRun, 1);
 };
 #endif

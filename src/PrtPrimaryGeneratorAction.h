@@ -1,7 +1,7 @@
 // -----------------------------------------
 // PrtPrimaryGeneratorAction class
 //
-// Author  : R.Dzhygadlo at gsi.de
+// author  : r.dzhygadlo at gsi.de
 // -----------------------------------------
 
 #ifndef PrtPrimaryGeneratorAction_h
@@ -15,25 +15,24 @@ class G4ParticleGun;
 class G4Event;
 class PrtPrimaryGeneratorMessenger;
 
-class PrtPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
-{
-public:
+class PrtPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
+ public:
   PrtPrimaryGeneratorAction();
   virtual ~PrtPrimaryGeneratorAction();
 
-public:
-  virtual void GeneratePrimaries(G4Event*);
+ public:
+  virtual void GeneratePrimaries(G4Event *);
 
   void SetOptPhotonPolar();
   void SetOptPhotonPolar(G4double);
 
-private:
+ private:
   int iter;
-  G4ParticleGun* fParticleGun;
-  G4ParticleDefinition* fParticleP;
-  G4ParticleDefinition* fParticlePi;
-  G4ParticleDefinition* fParticleKaon;
-  PrtPrimaryGeneratorMessenger* fGunMessenger;
+  G4ParticleGun *fParticleGun;
+  G4ParticleDefinition *fParticleP;
+  G4ParticleDefinition *fParticlePi;
+  G4ParticleDefinition *fParticleKaon;
+  PrtPrimaryGeneratorMessenger *fGunMessenger;
 };
 
 #endif

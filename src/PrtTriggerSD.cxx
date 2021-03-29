@@ -13,40 +13,23 @@
 #include "PrtRunAction.h"
 #include "PrtManager.h"
 
-PrtTriggerSD::PrtTriggerSD(
-                            const G4String& name, 
-                            const G4String& hitsCollectionName,
-                            G4int nofCells)
-  : G4VSensitiveDetector(name)
-{
+PrtTriggerSD::PrtTriggerSD(const G4String &name, const G4String &hitsCollectionName, G4int nofCells) : G4VSensitiveDetector(name) {
   collectionName.insert(hitsCollectionName);
 }
 
-PrtTriggerSD::~PrtTriggerSD() 
-{ 
-}
+PrtTriggerSD::~PrtTriggerSD() {}
 
-void PrtTriggerSD::Initialize(G4HCofThisEvent* hce)
-{ 
+void PrtTriggerSD::Initialize(G4HCofThisEvent *hce) {}
 
-}
-
-G4bool PrtTriggerSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist)
-{   
+bool PrtTriggerSD::ProcessHits(G4Step *aStep, G4TouchableHistory *hist) {
   // energy deposit
   G4double edep = aStep->GetTotalEnergyDeposit();
   G4ThreeVector globalpos = aStep->GetPostStepPoint()->GetPosition();
-  G4Track* track = aStep->GetTrack(); 
+  G4Track *track = aStep->GetTrack();
   G4ThreeVector g4pos = track->GetVertexPosition();
-  
-  PrtManager::Instance()->Event()->SetTrigger(1);
-  //PrtManager::Instance()->Event()->SetPosition(TVector3(globalpos.x(),globalpos.y(),globalpos.z()));
 
+  // PrtManager::Instance()->getEvent()->setTrigger(1);
   return true;
 }
 
-void PrtTriggerSD::EndOfEvent(G4HCofThisEvent*)
-{ 
- 
-}
-
+void PrtTriggerSD::EndOfEvent(G4HCofThisEvent *) {}

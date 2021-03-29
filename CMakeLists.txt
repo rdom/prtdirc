@@ -34,7 +34,7 @@ file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
 #----------------------------------------------------------------------------
 # Generate dictionary for root
 ROOT_GENERATE_DICTIONARY(G__Prt PrtHit.h PrtEvent.h PrtRun.h PrtLutNode.h LINKDEF src/PrtLinkDef.h MODULE Prt)
-add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtRun.cxx src/PrtLutNode.cxx G__Prt.cxx)
+add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtRun.cxx  src/PrtLutNode.cxx ../prttools/PrtTools.cxx G__Prt.cxx)
 #target_link_libraries(Prt ${ROOT_LIBRARIES})
 
 #----------------------------------------------------------------------------
