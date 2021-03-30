@@ -3,27 +3,28 @@
 #include <TVector3.h>
 #include <TInterpreter.h>
 #include <TClonesArray.h>
-#include "../../prttools/prttools.C"
+#include "../../prttools/PrtTools.h"
 
 #include "../src/PrtLutNode.h"
 
 void lutmean_cs(TString inFile = "../data/lut.root") {
   TString outFile = inFile.Copy().ReplaceAll(".root", ".cs_avr.root");
 
+  PrtTools t;  
   TClonesArray *fLutNew = new TClonesArray("PrtLutNode");
   TTree *fTreeNew = new TTree("prtlut", "Look-up table for DIRC. Averaged");
-  fTreeNew->Branch("LUT", &fLutNew, 256000, 2);
-
+  fTreeNew->Branch("LUT", &fLutNew, 256000, 2);  
+  
   TClonesArray &fLutaNew = *fLutNew;
-  for (Long64_t n = 0; n < prt_maxdircch; n++) {
+  for (Long64_t n = 0; n < t.maxdircch(); n++) {
     new ((fLutaNew)[n]) PrtLutNode(-1);
   }
 
   TFile *f = TFile::Open(inFile, "READ");
-  TTree *t = (TTree *)f->Get("prtlut");
+  TTree *tree = (TTree *)f->Get("prtlut");
   TClonesArray *fLut = new TClonesArray("PrtLutNode");
-  t->SetBranchAddress("LUT", &fLut);
-  t->GetEntry(0);
+  tree->SetBranchAddress("LUT", &fLut);
+  tree->GetEntry(0);
 
   std::vector<TVector3> vArray[100];
   std::vector<TVector3> lArray[100];

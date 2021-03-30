@@ -7,15 +7,17 @@
 
 PrtManager *PrtManager::fInstance = NULL;
 
-PrtManager::PrtManager(TString filename, int runtype) {
+PrtManager::PrtManager(TString filename, PrtRun *run) {
   fOutName = filename;
   fOutName = fOutName.Remove(fOutName.Last('.'));
-  fRunType = runtype;
-
-  if (fRunType != 2 && fRunType != 3) fRootFile = new TFile(filename, "RECREATE");
-
+  fRun = run;
+  fRunType = fRun->getRunType();
   fEvent = new PrtEvent();
-  fRun = new PrtRun();
+  
+  if (fRunType != 2 && fRunType != 3){
+    fRootFile = new TFile(filename, "RECREATE");
+    fRun->setMc(true);
+  }
   
   fRunTree = new TTree("header", "run info");
   fRunTree->Branch("PrtRun", "PrtRun", &fRun, 64000, 2);
@@ -30,8 +32,8 @@ PrtManager::PrtManager(TString filename, int runtype) {
     fTree = new TTree("prtlut", "Look-up table for the geometrical reconstruction.");
     fTree->Branch("LUT", &fLut, 256000, 2);
     TClonesArray &fLuta = *fLut;
-    for (Long64_t n = 0; n < 12 * 64; n++) {
-      new ((fLuta)[n]) PrtLutNode(n);
+    for (Long64_t i = 0; i < fRun->getNpmt()*fRun->getNpix(); i++) {
+      new ((fLuta)[i]) PrtLutNode(i);
     }        
   }
 
@@ -42,10 +44,10 @@ PrtManager::PrtManager(TString filename, int runtype) {
   std::cout << "PrtManager has been successfully initialized. " << std::endl;
 }
 
-PrtManager *PrtManager::Instance(TString outfile, int runtype) {
+PrtManager *PrtManager::Instance(TString outfile, PrtRun *run) {
   if (!fInstance) {
     std::cout << "Info in (PrtManager::Instance): Making a new instance. " << std::endl;
-    fInstance = new PrtManager(outfile, runtype);
+    fInstance = new PrtManager(outfile, run);
   }
   return fInstance;
 }
@@ -56,13 +58,10 @@ void PrtManager::addEvent(PrtEvent event) {
   }
 }
 
-void PrtManager::addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position, TVector3 vertex) {  
+void PrtManager::addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 vertex) {  
   if (fRunType == 0 || fRunType == 6) {
-    if (fEvent) {
-      fEvent->addHit(hit);
-    } else {
-      std::cout << "Event does not exist. Create it first. " << std::endl;
-    }
+    fEvent->setPosition(vertex);
+    fEvent->addHit(hit);
   }
   
   if (fRunType == 1 || fRunType == 5 || fRunType == 11) {
@@ -88,7 +87,6 @@ void PrtManager::save(){
     fRootFile->Write();
   }
 }
-
 
 void PrtManager::fillLut() {
   if (fRunType == 1 || fRunType == 5 || fRunType == 11) fTree->Fill();

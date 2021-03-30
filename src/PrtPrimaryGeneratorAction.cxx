@@ -123,12 +123,12 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
     // 						    fRadiatorL/2.-0.1));
 
     double angle = -G4UniformRand() * M_PI;
-    G4ThreeVector vec(0, 0, 1);
-    vec.setTheta(acos(G4UniformRand()));
-    vec.setPhi(2 * M_PI * G4UniformRand());
+    G4ThreeVector v(0, 0, 1);
+    v.setTheta(acos(G4UniformRand()));
+    v.setPhi(2 * M_PI * G4UniformRand());
 
-    // vec.rotateY(-M_PI/2.);
-    fParticleGun->SetParticleMomentumDirection(vec);
+    fParticleGun->SetParticleMomentumDirection(v);
+    PrtManager::Instance()->setMomentum(TVector3(v.x(), v.y(), v.z()));
   }
   if (fRun->getRunType() == 5) { // calibration light
     double shift = fRun->getTest3();

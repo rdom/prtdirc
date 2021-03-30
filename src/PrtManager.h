@@ -29,18 +29,19 @@ class PrtManager {
   TH1F *fHist;
 
  public:
-  PrtManager(TString outfile, int runtype);
+  PrtManager(TString outfile, PrtRun *run);
   ~PrtManager(){};
-  static PrtManager *Instance(TString outfile = "hits.root", int runtype = 0);
+  static PrtManager *Instance(TString outfile = "hits.root", PrtRun *run = nullptr);
   void save();
   void fill();
   void fillLut();
   void addEvent(PrtEvent event);
-  void addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 position, TVector3 vertex = TVector3(0, 0, 0));
+  void addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 vertex = TVector3(0, 0, 0));
   PrtEvent *getEvent() { return fEvent; }
 
   // mutators
   void setRun(PrtRun *v) { fRun = v; }
+  void setMomentum(TVector3 v) { fMomentum = v; }
 
   // accessors
   PrtRun *getRun() { return fRun; }

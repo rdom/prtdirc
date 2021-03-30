@@ -23,6 +23,8 @@
 #include "PrtRun.h"
 #include "PrtManager.h"
 #include "PrtLutReco.h"
+#include "../../prttools/PrtTools.h"
+
 
 namespace {
   void PrintUsage() {
@@ -104,10 +106,13 @@ int main(int argc,char** argv)
   if(batchmode.size()) gROOT->SetBatch(kTRUE);
   if(!events.size()) events = "1";
   
-  PrtManager::Instance(outfile,runtype);  
-  PrtRun *run = new PrtRun();
-    
-  run->setStudy(study);
+  PrtTools t;
+  PrtRun *run = t.find_run(0);
+  if(runtype == 2 || runtype == 3 || runtype == 4){
+    run = t.get_run(infile.c_str());
+  }
+  
+  if(study>0) run->setStudy(study);
   run->setRunType(runtype);
   
   if(physlist.size()) run->setPhysList(atoi(physlist));
@@ -127,7 +132,7 @@ int main(int argc,char** argv)
   if(beamZ.size())   run->setBeamZ(atof(beamZ));
   if(timeSigma.size())   run->setTimeSigma(atof(timeSigma));
 
-  PrtManager::Instance()->setRun(run);
+  PrtManager::Instance(outfile, run);
   
   if(runtype == 2 || runtype == 3 || runtype == 4){
     PrtLutReco * reco = new PrtLutReco(infile.c_str(),lutfile.c_str(),verbose); 

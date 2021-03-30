@@ -95,7 +95,7 @@ class PrtLutReco {
   TH1F *hTof[5], *hTofc[5];
   TH1F *hNph[5];
 
-  TH1F *hLnDiffGr2, *hLnDiffGr4, *hLnDiffTi2, *hLnDiffTi4;
+  TH1F *hLnDiffGr[5], *hLnDiffTi[5];
   TH1F *fHist0, *fHist0d, *fHist0r, *fHist0s, *fHist0i;
 
   PrtLutNode *fLutNode[5000];

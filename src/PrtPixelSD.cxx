@@ -399,7 +399,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent *hce) {
 
   fMcpLayout = PrtManager::Instance()->getRun()->getPmtLayout();
   fRunType = PrtManager::Instance()->getRun()->getRunType();
-
+  
   if (fMcpLayout == 2015) {
     for (int m = 0; m < 15; m++) {
       for (int i = 0; i < 64; i++) {
@@ -432,8 +432,8 @@ void PrtPixelSD::Initialize(G4HCofThisEvent *hce) {
   for (int ch = 0; ch < 12 * npix; ch++) {
     int mcp = ch / npix;
     int pix = ch % npix;
-    int col = pix / 2 - 8 * (pix / 16);
-    int row = pix % 2 + 2 * (pix / 16);
+    // int col = pix / 2 - 8 * (pix / 16);
+    // int row = pix % 2 + 2 * (pix / 16);
     // pix = col+sqrt(prt_npix)*row;
 
     fMap_Mpc[mcp][pix] = ch;
@@ -570,7 +570,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
   if (fRunType == 1 || fRunType == 5 || fRunType == 11 || fRunType == 6) {
-    PrtManager::Instance()->addHit(hit, localPos, digiPos, position, vertexPos);
+    PrtManager::Instance()->addHit(hit, localPos, digiPos, vertexPos);
     return true;
   }
 
@@ -582,7 +582,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   if (PrtManager::Instance()->getRun()->getGeometry() == 2021)
     charge_sharing = false; // no cs in mfield
-  if (fMcpLayout == 2030 || fMcpLayout == 2018) {
+  if (fMcpLayout == 2030) {
     charge_sharing = false;
     quantum_efficiency = false;
   }
