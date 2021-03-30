@@ -11,6 +11,9 @@
 #include "G4ParticleDefinition.hh"
 #include "globals.hh"
 
+#include "PrtManager.h"
+#include "PrtRun.h"
+
 class G4ParticleGun;
 class G4Event;
 class PrtPrimaryGeneratorMessenger;
@@ -27,11 +30,11 @@ class PrtPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction {
   void SetOptPhotonPolar(G4double);
 
  private:
-  int iter;
+  PrtRun *fRun;
+  int fPid, fPdg, iter;
+  double fRadiatorL, fRadiatorW, fRadiatorH;
   G4ParticleGun *fParticleGun;
-  G4ParticleDefinition *fParticleP;
-  G4ParticleDefinition *fParticlePi;
-  G4ParticleDefinition *fParticleKaon;
+  G4ParticleDefinition *fParticle[5];
   PrtPrimaryGeneratorMessenger *fGunMessenger;
 };
 

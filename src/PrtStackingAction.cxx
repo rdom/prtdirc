@@ -7,6 +7,7 @@
 #include "G4Track.hh"
 #include "G4ios.hh"
 #include "G4PhysicalConstants.hh"
+#include "G4RunManager.hh"
 
 #include "PrtManager.h"
 
@@ -115,7 +116,11 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track *aT
 }
 
 void PrtStackingAction::NewStage() {
-  if (PrtManager::Instance()->getRun()->getRunType() == 0) G4cout << "Number of Cerenkov photons produced in this event : " << fCerenkovCounter << G4endl;
+  int runtype = PrtManager::Instance()->getRun()->getRunType();
+
+  int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
+  if (eventNumber % 1 == 0 && runtype == 0) std::cout << "Event # " << eventNumber  << " # Cherenkov photons:  " << fCerenkovCounter;
+  if (eventNumber % 1000 == 0 && runtype != 0) std::cout << "Event # " << eventNumber  << " # Cherenkov photons:  " << fCerenkovCounter ;
 }
 
 void PrtStackingAction::PrepareNewEvent() {

@@ -521,12 +521,12 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   PrtHit hit;
   int mcpid = touchable->GetReplicaNumber(1);
-  int pixid = touchable->GetReplicaNumber(0);
+  int pixid = touchable->GetReplicaNumber(0)-1;
 
-  int ch = fMap_Mpc[mcpid][pixid - 1];
+  int ch = fMap_Mpc[mcpid][pixid];
 
   hit.setChannel(ch);
-  hit.setMcp(mcpid);
+  hit.setPmt(mcpid);
   hit.setPixel(pixid);
   hit.setPathInPrizm(pathId);
 
@@ -686,7 +686,7 @@ void PrtPixelSD::EndOfEvent(G4HCofThisEvent *) {
 
   memset(fMultHit, 0, sizeof(fMultHit[0][0]) * 16 * 16 * 12);
   int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-  if (eventNumber % 1 == 0 && fRunType == 0) std::cout << "Event # " << eventNumber << std::endl;
-  if (eventNumber % 1000 == 0 && fRunType != 0) std::cout << "Event # " << eventNumber << std::endl;
+  if (eventNumber % 1 == 0 && fRunType == 0) std::cout << " : " <<  PrtManager::Instance()->getEvent()->getHits().size() << std::endl;
+  if (eventNumber % 1000 == 0 && fRunType != 0) std::cout << " : " << PrtManager::Instance()->getEvent()->getHits().size() << std::endl;
   PrtManager::Instance()->fill();
 }

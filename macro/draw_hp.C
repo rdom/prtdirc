@@ -1,28 +1,24 @@
-#define prt__sim
-#include "../src/PrtHit.h"
-#include "../src/PrtEvent.h"
-#include "../../prttools/datainfo.C"
-#include "../../prttools/prttools.C"
+#include "../../prttools/PrtTools.h"
 
 void draw_hp(TString infile = "../build/hits.root") {
 
-  if (!prt_init(infile, 1)) return;
+  PrtTools t;  
+  if (!t.init_run(infile, 1)) return;
 
-  for (int ievent = 0; ievent < prt_entries; ievent++) {
-    prt_nextEvent(ievent, 1000);
-    for (auto hit : prt_event->GetHits()) {
-      int mcp = hit.GetMcpId();
-      int pix = hit.GetPixelId() - 1;
-      double time = hit.GetLeadTime();
-      int ch = map_mpc[mcp][pix];
-      
-      if (prt_isBadChannel(ch)) continue;
+  for (int ievent = 0; ievent < t.entries(); ievent++) {
+    t.next(ievent, 1000);
+    for (auto hit : t.event()->getHits()) {
+      int mcp = hit.getPmt();
+      int pix = hit.getPixel();// - 1;
+      double time = hit.getLeadTime();
+      int ch = hit.getChannel(); //t.map_mpc[mcp][pix];
+            
       if (mcp > 7) continue;
-      if (prt_pid == 4) prt_hdigi[mcp]->Fill(pix % 8, pix / 8);
+      if (t.pid() == 2) t.getdigi(mcp)->Fill(pix % 8, pix / 8);
     }
   }
 
-  auto cdigi = prt_drawDigi(2018, 0, 0);
-  prt_canvasAdd(cdigi);
-  prt_canvasSave("data/drawHP", 0);
+  auto cdigi = t.draw_digi(0, 0);
+  // t.add_canvas(cdigi);
+  // t.save_canvas("data/drawHP", 0);
 }

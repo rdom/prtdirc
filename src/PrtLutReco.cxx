@@ -607,7 +607,7 @@ void PrtLutReco::Run(int start, int end) {
       // if(test3 < gRandom->Uniform(0,1)) continue;
       hitTime = hit.getLeadTime();
       int pixid = hit.getPixel();
-      int mcpid = hit.getMcp();
+      int mcpid = hit.getPmt();
       int ch = hit.getChannel(); // ft.map_mpc[mcpid][pixid];
       int pathid = hit.getPathInPrizm();
 
@@ -1733,7 +1733,7 @@ int PrtLutReco::GetEdge(int mcpid, int pixid) {
   int x(0), y(0), piid(pixid + 1), nedge(0); // old
   for (auto hit : fEvent->getHits()) {
     int pid = hit.getPixel();
-    int mid = hit.getMcp();
+    int mid = hit.getPmt();
 
     if (mid != mcpid || pid == piid) continue;
     if (pid == piid - 1 && piid % 8 != 1) x -= 1;
@@ -1792,7 +1792,7 @@ void PrtLutReco::SearchClusters() {
     }
   }
   for (auto hit : fEvent->getHits()) {
-    mcpdata[hit.getMcp()][hit.getPixel()] = 1;
+    mcpdata[hit.getPmt()][hit.getPixel()] = 1;
   }
   getclusters();
 }

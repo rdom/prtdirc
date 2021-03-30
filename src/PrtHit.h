@@ -20,7 +20,7 @@ class PrtHit : public TObject {
 
   // accessors
   Int_t getChannel() { return fChannel; }
-  Int_t getMcp() { return fPmt; }
+  Int_t getPmt() { return fPmt; }
   Int_t getPixel() { return fPixel; }
   Double_t getLeadTime() { return fLeadTime; }
   Double_t getTotTime() { return fTotTime; }
@@ -29,7 +29,7 @@ class PrtHit : public TObject {
 
   // mutators
   void setChannel(Int_t val) { fChannel = val; }
-  void setMcp(Int_t val) { fPmt = val; }
+  void setPmt(Int_t val) { fPmt = val; }
   void setPixel(Int_t val) { fPixel = val; }
   void setLeadTime(Double_t val) { fLeadTime = val; }
   void setTotTime(Double_t val) { fTotTime = val; }

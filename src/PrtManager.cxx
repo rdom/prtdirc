@@ -84,7 +84,6 @@ void PrtManager::fill() {
 
 void PrtManager::save(){
   if (fRootFile) {
-    std::cout<<"saving "<<fRun->getLens() <<std::endl;
     fRunTree->Fill();
     fRootFile->Write();
   }
