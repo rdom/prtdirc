@@ -53,7 +53,7 @@ int main(int argc,char** argv)
     session,geomTheta,geomPhi,batchmode,lensId,particle,momentum,testVal1,testVal2,testVal3,
     prismStepX,prismStepY,beamZ,beamX,timeSigma,
     beamDimension, mcpLayout, infile = "hits.root", lutfile = "../data/lut.root";
-  G4int firstevent(0), runtype(0), study(0), verbose(0);
+  G4int firstevent(0), runtype(0), study(0), fid(0), verbose(0);
 
   G4long myseed = 345354;
   for ( G4int i=1; i<argc; i=i+2 ) {
@@ -76,6 +76,7 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-w" ) physlist  = argv[i+1];
     else if ( G4String(argv[i]) == "-s" ) runtype   = atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-study" ) study   = atoi(argv[i+1]);
+    else if ( G4String(argv[i]) == "-fid" ) fid   = atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-z" ) beamDimension  = argv[i+1];
     else if ( G4String(argv[i]) == "-c" ) mcpLayout = argv[i+1];
     else if ( G4String(argv[i]) == "-t1" ) testVal1   = argv[i+1];
@@ -107,12 +108,14 @@ int main(int argc,char** argv)
   if(!events.size()) events = "1";
   
   PrtTools t;
-  PrtRun *run = t.find_run(0);
+  PrtRun *run = t.find_run(study,fid);
+  
+  std::cout<<"run -- theta "<<run->getInfo() <<std::endl;
+  
   if(runtype == 2 || runtype == 3 || runtype == 4){
     run = t.get_run(infile.c_str());
   }
   
-  if(study>0) run->setStudy(study);
   run->setRunType(runtype);
   
   if(physlist.size()) run->setPhysList(atoi(physlist));

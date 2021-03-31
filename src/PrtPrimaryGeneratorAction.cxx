@@ -12,6 +12,12 @@
 
 PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGeneratorAction(), fParticleGun(0) {
   int n_particle = 1;
+  fRun = PrtManager::Instance()->getRun();
+  double mom = fRun->getMomentum();
+  fRadiatorL = fRun->getRadiatorL();
+  fRadiatorW = fRun->getRadiatorW();
+  fRadiatorH = fRun->getRadiatorH();
+
   fParticleGun = new G4ParticleGun(n_particle);
 
   // create a messenger for this class
@@ -28,9 +34,8 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGenerator
   fParticleGun->SetParticleDefinition(fParticle[4]);
   fParticleGun->SetParticleTime(0.0 * ns);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0 * cm, 0.0 * cm, 0.0 * cm));
-  fParticleGun->SetParticleMomentumDirection(G4ThreeVector(1., 0., 0.));
-  fParticleGun->SetParticleEnergy(7 * MeV);
-
+  fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, mom*GeV));
+  
   // int mid=-1, pid=-1;
   // G4ThreeVector vdirc,vmcp[12],vpix[64];
   // auto store = G4PhysicalVolumeStore::GetInstance();
@@ -46,10 +51,6 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGenerator
   //   }
   // }
 
-  fRun = PrtManager::Instance()->getRun();
-  fRadiatorL = fRun->getRadiatorL();
-  fRadiatorW = fRun->getRadiatorW();
-  fRadiatorH = fRun->getRadiatorH();
 
   iter = 0;
   fPid = 4;
@@ -78,11 +79,8 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
 
     PrtManager::Instance()->getEvent()->setPid(fPid);
     fParticleGun->SetParticleDefinition(fParticle[fPid]);  
-  }
-  
-  if (fRun->getBeamSize() == -1) { // random momentum
-    fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, 4.0 * GeV * G4UniformRand()));
-  }
+  } 
+
   if (fRun->getBeamSize() > 0) { // smearing and divergence
     double sigma = fRun->getBeamSize() * mm;
     z = fParticleGun->GetParticlePosition().z();

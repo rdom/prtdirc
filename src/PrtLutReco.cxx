@@ -312,10 +312,8 @@ void PrtLutReco::Run(int start, int end) {
   if (fPdfPath.Contains("beam_415_4")) pdfend = 50000;
   if (fPdfPath.Contains("beam_415_9")) pdfend = 200000;
   if (fPdfPath.Contains("beam_415_10")) pdfend = 300000;
-
   if (fPdfPath.Contains("beam_436")) pdfend = 50000;
   if (fPdfPath.Contains("beam_436_3")) pdfend = 10000;
-
   if (fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
 
   if (fMethod == 4) {
@@ -334,7 +332,7 @@ void PrtLutReco::Run(int start, int end) {
 
   double speed = 196.5; // 197  mm/ns
   double sigma[] = {0, 0, 0.0075, 0, 0.0076}, noise(0.25), range(5 * sigma[2]);
-  double cwindow = 0.05; // test1;
+  double cwindow = 0.05;
   for (int ievent = start;
        ievent < nEvents && (events[2] < end || events[4] < end) && ievent < pdfend; ievent++) {
     int nhhits(0);
@@ -592,22 +590,20 @@ void PrtLutReco::Run(int start, int end) {
     // double temp_ti[fmaxch] = {0};
 
     for (auto hit : fEvent->getHits()) {
-
+      
       hitTime = hit.getLeadTime();
       int pixid = hit.getPixel();
       int mcpid = hit.getPmt();
       int ch = hit.getChannel(); // ft.map_mpc[mcpid][pixid];
-      int pathid = hit.getPathInPrizm();            
-      
+      int pathid = hit.getPathInPrizm();
+
       // TString spathid = Form("%d",pathid);
       // if(pathid != 142) continue;
       // if(!spathid.BeginsWith("1")) continue;
       // if(!spathid.Contains("142")) continue;
       // std::cout<<"pathid "<<pathid<<std::endl;
 
-      
-      if (bsim)
-        hitTime += gRandom->Gaus(0, 0.1) + t0smear; // time resol. in case it was not simulated
+      if (bsim) hitTime += gRandom->Gaus(0, 0.1) + t0smear; // time resol. if not simulated
       else {
         if (fStudyId == 401) {
           double o = -0.9;
@@ -696,8 +692,7 @@ void PrtLutReco::Run(int start, int end) {
       // else reflected = kFALSE;
 
       // if(reflected) continue;
-      if (reflected)
-        lenz = 2 * radiatorL - posz;
+      if (reflected) lenz = 2 * radiatorL - posz;
       else
         lenz = posz;
 
@@ -715,9 +710,9 @@ void PrtLutReco::Run(int start, int end) {
       int size = fLutNode[ch]->Entries();
 
       for (int i = 0; i < size; i++) {
-		
+
         weight = 12 * fLutNode[ch]->GetWeight(i);
-        dird = fLutNode[ch]->GetEntryCs(i, nedge); // nedge=0
+	dird = fLutNode[ch]->GetEntryCs(i, nedge); // nedge=0
         // dird  = fLutNode[ch]->GetEntry(i);
         evtime = fLutNode[ch]->GetTime(i);
 
@@ -836,9 +831,9 @@ void PrtLutReco::Run(int start, int end) {
 
         }
       }
-      
-      if (fTimeImaging && isGoodHit_ti) {
 
+      if (fTimeImaging && isGoodHit_ti) {
+	
         if (fMethod == 2) {
           double t = hitTime;
           // if(fabs(besttdiff) < 0.3) t -= besttdiff;
@@ -892,7 +887,7 @@ void PrtLutReco::Run(int start, int end) {
           }
         }
       }
-      
+
       if (isGoodHit_gr) {
         hBounce->Fill(bestbounce);
         fHist1->Fill(hitTime);
@@ -1709,7 +1704,7 @@ int PrtLutReco::GetEdge(int mcpid, int pixid) {
   // 	if(pid==piid-8 && piid>8)  x+=1;
   // }
 
-  int x(0), y(0), piid(pixid + 1), nedge(0); // old
+  int x(0), y(0), piid(pixid), nedge(0); // old
   for (auto hit : fEvent->getHits()) {
     int pid = hit.getPixel();
     int mid = hit.getPmt();

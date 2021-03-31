@@ -21,6 +21,10 @@ example:
                 5    calibration
                 6    focal plane measurements
 
+-study  study id
+
+-fid  fild id
+
 -g    geometry configuration
                 1    in vacuum
                 2    in air

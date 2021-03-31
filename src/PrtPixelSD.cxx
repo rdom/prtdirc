@@ -399,6 +399,8 @@ void PrtPixelSD::Initialize(G4HCofThisEvent *hce) {
 
   fMcpLayout = PrtManager::Instance()->getRun()->getPmtLayout();
   fRunType = PrtManager::Instance()->getRun()->getRunType();
+  int npmt = PrtManager::Instance()->getRun()->getNpmt();
+  int npix = PrtManager::Instance()->getRun()->getNpix();
   
   if (fMcpLayout == 2015) {
     for (int m = 0; m < 15; m++) {
@@ -427,9 +429,9 @@ void PrtPixelSD::Initialize(G4HCofThisEvent *hce) {
     }
   }
 
-  int npix = 8 * 8;
+
   // create MPC map
-  for (int ch = 0; ch < 12 * npix; ch++) {
+  for (int ch = 0; ch < npmt * npix; ch++) {
     int mcp = ch / npix;
     int pix = ch % npix;
     // int col = pix / 2 - 8 * (pix / 16);
@@ -646,7 +648,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
     //   threshold=1;
     // }
     double x(localPos.x()), y(localPos.y());
-    int p(pixid);
+    int p(pixid+1);
     bool ok(false);
     double expd = exp(-(pixdim - fabs(x)) / chargesig);
 
@@ -669,7 +671,8 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
     }
 
     if (ok) {
-      hit.setPixel(p);
+      hit.setChannel(fMap_Mpc[mcpid][p]);
+      hit.setPixel(p-1);
       if (fMultHit[mcpid][p] == 0 || !dead_time)
         PrtManager::Instance()->addHit(hit, localPos, digiPos, position);
       fMultHit[mcpid][p]++;
