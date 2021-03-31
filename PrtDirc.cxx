@@ -59,7 +59,7 @@ int main(int argc,char** argv)
   for ( G4int i=1; i<argc; i=i+2 ) {
     if      ( G4String(argv[i]) == "-m" ) macro     = argv[i+1];
     //    else if ( G4String(argv[i]) == "-u" ) session   = argv[i+1];
-    else if ( G4String(argv[i]) == "-r" ) myseed    = atol(argv[i+1]);
+    else if ( G4String(argv[i]) == "-seed" ) myseed    = atol(argv[i+1]);
     else if ( G4String(argv[i]) == "-o" ) outfile   = argv[i+1];
     else if ( G4String(argv[i]) == "-i" ) infile    = argv[i+1];
     else if ( G4String(argv[i]) == "-u" ) lutfile   = argv[i+1];
@@ -74,7 +74,7 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-x" ) particle  = argv[i+1];
     else if ( G4String(argv[i]) == "-p" ) momentum  = argv[i+1];
     else if ( G4String(argv[i]) == "-w" ) physlist  = argv[i+1];
-    else if ( G4String(argv[i]) == "-s" ) runtype   = atoi(argv[i+1]);
+    else if ( G4String(argv[i]) == "-r" ) runtype   = atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-study" ) study   = atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-fid" ) fid   = atoi(argv[i+1]);
     else if ( G4String(argv[i]) == "-z" ) beamDimension  = argv[i+1];
@@ -109,9 +109,9 @@ int main(int argc,char** argv)
   
   PrtTools t;
   PrtRun *run = t.find_run(study,fid);
-  
-  std::cout<<"run -- theta "<<run->getInfo() <<std::endl;
-  
+
+  std::cout << "Run info =====================  " << std::endl << run->getInfo() << std::endl;
+
   if(runtype == 2 || runtype == 3 || runtype == 4){
     run = t.get_run(infile.c_str());
   }

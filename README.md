@@ -12,7 +12,7 @@ example:
 -i    input file name
 -u    look-up file name
 
--s    run type
+-r    run type
                 0    simulation
                 1    look-up table generation
                 2    geometrical reconstruction
@@ -99,7 +99,7 @@ example:
 -tr    time resolution [ns]
                0.2  (default)  
 
--r    seed number for the random generator 
+-seed   seed number for the random generator 
 
 -b    batch mode
                1    run silent (without GUI)

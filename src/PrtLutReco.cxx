@@ -214,7 +214,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose) {
   fHist0r = new TH1F("timediffr", snt, 500, -10, 10);
   fHist0s = new TH1F("timediffs", snt, 500, -10, 10);
   fHist0i = new TH1F("timediffi", snt, 500, -10, 10);
-
+  
   std::cout << "initialization done " << std::endl;
 }
 
@@ -249,10 +249,17 @@ void PrtLutReco::Run(int start, int end) {
   double radiatorW = (fRadiator == 2) ? 174.8 : 34.9;  // plate : bar
   double radiatorH = (fRadiator == 2) ? 1224.9 : 17.1; // plate : bar
 
+  std::cout<<"1 "<<1<<std::endl;
+  std::cout<<"frun "<<frun->getInfo()<<std::endl;
+  
   ft.set_palette(1);
   ft.create_maps();
+  std::cout<<"3 "<<3<<std::endl;
+  
   ft.init_digi();
-
+  std::cout<<"2 "<<2<<std::endl;
+  
+  
   outFile.ReplaceAll("reco_", Form("reco_%d_", frun->getId()));
   TFile file(outFile, "recreate");
   TTree tree("reco", "PrtLutReco");
