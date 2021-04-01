@@ -118,6 +118,7 @@ int main(int argc,char** argv)
   
   run->setRunType(runtype);
   
+  if(momentum.size()) run->setMomentum(atof(momentum));  
   if(physlist.size()) run->setPhysList(atoi(physlist));
   if(geometry.size()) run->setGeometry(atoi(geometry));
   if(radiator.size()) run->setRadiator(atoi(radiator));
@@ -199,7 +200,7 @@ int main(int argc,char** argv)
     }   
   }
 
-  if(momentum.size()) UImanager->ApplyCommand( "/gun/momentumAmp "+momentum);
+  // if(momentum.size()) UImanager->ApplyCommand( "/gun/momentumAmp "+momentum);
 
   if (batchmode.size()) { // batch mode
     UImanager->ApplyCommand("/run/beamOn " + events);

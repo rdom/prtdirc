@@ -13,8 +13,7 @@ void draw_hp(TString infile = "../build/hits.root") {
       double time = hit.getLeadTime();
       int ch = hit.getChannel();
             
-      if (mcp > 7) continue;
-      if (t.pid() == 2) t.getdigi(mcp)->Fill(pix % 8, pix / 8);
+      if (t.pid() == 2) t.fill_digi(mcp,pix);
     }
   }
 

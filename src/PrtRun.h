@@ -65,7 +65,7 @@ class PrtRun : public TObject {
   void setMomentum(Double_t v) { fMomentum = v; }
   void setGeometry(Int_t v) { fGeometry = v; }
   void setRadiator(Int_t v) { fRadiator = v; }
-  void setPmtLayout(Int_t v) { fPmtLayout = v; }
+  void setPmtLayout(Int_t v);
   void setLens(Int_t v) { fLens = v; }
   void setTrigger(Int_t v) { fTrigger = v; }
   void setNpmt(Int_t v) { fNpmt = v; }

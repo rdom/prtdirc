@@ -15,7 +15,7 @@ PrtStackingAction::PrtStackingAction() : G4UserStackingAction(), fScintillationC
 
   fQEtype = 0;
   if (PrtManager::Instance()->getRun()->getPmtLayout() == 2030) fQEtype = 1;
-
+  
   // create a detector efficiency function:
   {
     // quantum efficiency data from Alex Britting, Jan 25, 2011

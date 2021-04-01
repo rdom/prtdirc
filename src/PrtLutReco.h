@@ -56,7 +56,7 @@ class PrtLutReco {
   
   PrtRun *frun;
   PrtTools ft;
-  int fmaxch,fnpmt;
+  int fmaxch,fnpmt,fnpix;
   int fDetectorID;
   double fBboxNum, fPipehAngle, fDphi, fBarPhi;
   int fMethod;
@@ -86,8 +86,9 @@ class PrtLutReco {
   TF1 *fFit;
   TF1 *fFunc[5];
   double fAngle[5];
-  double fTest;
+  int fPk;
   double fCorr[12];
+  double fCorrSpr;
   TString fCorrPath;
   TString fPdfPath;
   TGraph *fPdf2[3072], *fPdf4[3072];

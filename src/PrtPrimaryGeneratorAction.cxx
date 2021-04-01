@@ -31,10 +31,12 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGenerator
   fParticle[1] = particleTable->FindParticle("mu+");
   fParticle[0] = particleTable->FindParticle("e-");
 
-  fParticleGun->SetParticleDefinition(fParticle[4]);
+  fParticleOP = particleTable->FindParticle("opticalphoton");
+
+  fParticleGun->SetParticleDefinition(fParticleOP);
   fParticleGun->SetParticleTime(0.0 * ns);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0 * cm, 0.0 * cm, 0.0 * cm));
-  fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, mom*GeV));
+  fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, mom*GeV));  
   
   // int mid=-1, pid=-1;
   // G4ThreeVector vdirc,vmcp[12],vpix[64];
@@ -50,7 +52,6 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGenerator
   //     gpix[m][p] = vdirc+(vmcp[m]+vpix[p]).rotateY(PrtManager::Instance()->GetAngle()*deg-180*deg);
   //   }
   // }
-
 
   iter = 0;
   fPid = 4;
@@ -79,6 +80,8 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
 
     PrtManager::Instance()->getEvent()->setPid(fPid);
     fParticleGun->SetParticleDefinition(fParticle[fPid]);  
+  }else{
+    fParticleGun->SetParticleDefinition(fParticleOP); 
   } 
 
   if (fRun->getBeamSize() > 0) { // smearing and divergence

@@ -523,10 +523,10 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   PrtHit hit;
   int mcpid = touchable->GetReplicaNumber(1);
-  int pixid = touchable->GetReplicaNumber(0)-1;
+  int pixid = touchable->GetReplicaNumber(0);
 
   int ch = fMap_Mpc[mcpid][pixid];
-
+  
   hit.setChannel(ch);
   hit.setPmt(mcpid);
   hit.setPixel(pixid);
@@ -567,7 +567,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   hit.setLeadTime(time);
   double wavelength = 1.2398 / (track->GetMomentum().mag() * 1E6) * 1000;
   hit.setTotTime(wavelength); // set photon wavelength
-
+ 
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
@@ -582,10 +582,10 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   bool dark_counts(true);
   bool transport_efficiency(true);
 
-  if (PrtManager::Instance()->getRun()->getGeometry() == 2021)
+  if (PrtManager::Instance()->getRun()->getGeometry() == 2021) charge_sharing = false;
+
+  if (fMcpLayout > 2020) {
     charge_sharing = false; // no cs in mfield
-  if (fMcpLayout == 2030) {
-    charge_sharing = false;
     quantum_efficiency = false;
   }
 

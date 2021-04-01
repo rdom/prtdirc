@@ -7,6 +7,14 @@ PrtRun::PrtRun()
     fTimeSigma(0), fSimOffset(0), fRadiatorL(0), fRadiatorW(0), fRadiatorH(0), fTest1(0), fTest2(0),
     fTest3(0) {}
 
+void PrtRun::setPmtLayout(Int_t v) {
+  if (v == 2030) {
+    fNpmt = 12;
+    fNpix = 256;
+  }
+  fPmtLayout = v;
+}
+
 TString PrtRun::getInfo() {
   TString info = fShortInfo;
   info += Form("Run type %d \n", fRunType);

@@ -137,6 +137,13 @@ PrtDetectorConstruction::PrtDetectorConstruction() : G4VUserDetectorConstruction
     fMirror[1] = 180;
   }
 
+  if (fRadiatorId == 20) {
+    fBar[0] = 17.1;
+    fBar[1] = fTest1;
+    fBar[2] = 1224.9;
+    fMirror[1] = 180;
+  }
+
   if (fRadiatorId == 5) {
     fBar[0] = 17.1;
     fBar[1] = 70;
@@ -201,6 +208,9 @@ PrtDetectorConstruction::PrtDetectorConstruction() : G4VUserDetectorConstruction
     radiatorStepX = 0;
   }
 
+  if (fGeomId > 2014 && (fRadiatorId > 1)) radiatorStepX = -(fBar[1] - fPrizm[0]) / 2.;
+  if (fRadiatorId > 2) radiatorStepX = 0;
+  
   fRun->setRadiatorL(fBar[2]);
   fRun->setRadiatorW(fBar[1]);
   fRun->setRadiatorH(fBar[0]);
@@ -269,13 +279,9 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
   // The Bar
   G4Box *gBar = new G4Box("gBar", fBar[0] / 2., fBar[1] / 2., fBar[2] / 2.);
 
-  if (fRunType == 6)
-    lBar = new G4LogicalVolume(gBar, OilMaterial, "lBar", 0, 0, 0);
-  else
-    lBar = new G4LogicalVolume(gBar, BarMaterial, "lBar", 0, 0, 0);
+  if (fRunType == 6) lBar = new G4LogicalVolume(gBar, OilMaterial, "lBar", 0, 0, 0);
+  else lBar = new G4LogicalVolume(gBar, BarMaterial, "lBar", 0, 0, 0);
 
-  if (fGeomId > 2014 && (fRadiatorId == 2)) radiatorStepX = -(fBar[1] - fPrizm[0]) / 2.;
-  if (fRadiatorId > 2) radiatorStepX = 0;
   wBar = new G4PVPlacement(0, G4ThreeVector(radiatorStepY, radiatorStepX, 0), lBar, "wBar", lDirc, false, 0);
 
   // radiator covered with grease
@@ -672,13 +678,12 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
     gPixel = new G4Box("gPixel", fMcpActive[0] / (2 * (double)mcpDimx), fMcpActive[1] / (2 * (double)mcpDimy), fMcpActive[2] / 20.);
     lPixel = new G4LogicalVolume(gPixel, BarMaterial, "lPixel", 0, 0, 0);
 
-    int pix = (fMcpLayout < 2019) ? 1 : 0;
     for (int i = 0; i < mcpDimx; i++) {
       for (int j = mcpDimy - 1; j >= 0; j--) {
         // if(i!=4 || j !=4 )continue; // for lut visualization
         double shiftx = i * (fMcpActive[0] / (double)mcpDimx) - fMcpActive[0] / 2. + fMcpActive[0] / (2 * (double)mcpDimx);
         double shifty = j * (fMcpActive[0] / (double)mcpDimy) - fMcpActive[0] / 2. + fMcpActive[0] / (2 * (double)mcpDimy);
-        new G4PVPlacement(0, G4ThreeVector(shiftx, shifty, 0), lPixel, "wPixel", lMcp, false, mcpDimx * j + i + pix);
+        new G4PVPlacement(0, G4ThreeVector(shiftx, shifty, 0), lPixel, "wPixel", lMcp, false, mcpDimx * j + i);
       }
     }
 
