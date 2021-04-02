@@ -4,7 +4,7 @@ void draw_hp(TString infile = "../build/hits.root") {
 
   PrtTools t(infile);
 
-  while(t.next()){
+  while (t.next()){
     for (auto hit : t.event()->getHits()) {
       int mcp = hit.getPmt();
       int pix = hit.getPixel();
