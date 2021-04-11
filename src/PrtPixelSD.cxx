@@ -429,7 +429,6 @@ void PrtPixelSD::Initialize(G4HCofThisEvent *hce) {
     }
   }
 
-
   // create MPC map
   for (int ch = 0; ch < npmt * npix; ch++) {
     int mcp = ch / npix;
@@ -669,10 +668,10 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
       ok = true;
       p += 8;
     }
-
+    p--;
     if (ok) {
       hit.setChannel(fMap_Mpc[mcpid][p]);
-      hit.setPixel(p-1);
+      hit.setPixel(p);
       if (fMultHit[mcpid][p] == 0 || !dead_time)
         PrtManager::Instance()->addHit(hit, localPos, digiPos, position);
       fMultHit[mcpid][p]++;

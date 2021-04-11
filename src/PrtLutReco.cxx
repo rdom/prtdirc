@@ -209,8 +209,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose) {
   }
   
   for (int i : {2, fPk}) {
-    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 34, 42);
-    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 34, 42);
+    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 32, 36);
+    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 32, 36);
     hNph[i] = new TH1F("nph_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
 
     hLnDiffGr[i] = new TH1F("hLnGr_"+ ft.name(i), ";ln L(p) - ln L(#pi);entries [#]", 120, -range, range);
@@ -315,7 +315,7 @@ void PrtLutReco::Run(int start, int end) {
   par6 = frun->getPrismStepY();
   timeRes = frun->getTimeSigma();
   fMethod = frun->getRunType();
-  bool bsim = 1;// frun->getMc();
+  bool bsim = frun->getMc();
   prtangle = frun->getTheta();// + test1 * TMath::RadToDeg();
   phi = frun->getPhi() + test2 * TMath::RadToDeg();
 
@@ -369,12 +369,11 @@ void PrtLutReco::Run(int start, int end) {
                 << events[2] << " " << events[fPk] << std::endl;
 
     if (bsim) posz = 0.5 * radiatorL - fEvent->getPosition().Z() + gRandom->Uniform(-5, 5);
-    else posz = fEvent->getPosition().Z();
-
+    else posz = fEvent->getPosition().Z()+40;
+    
     mom = fEvent->getMomentum().Mag();
-    if (bsim) mom /= 1000;
-
     pid = fEvent->getPid();
+    
     if (events[pid] >= end) continue;
 
     if (ievent - start == 0) {
@@ -384,7 +383,7 @@ void PrtLutReco::Run(int start, int end) {
       if (bsim) beamz = 0.5 * radiatorL - beamz;
 
       std::cout<<"mom "<<mom<<std::endl;
-      
+
       for (int i : {2, fPk}) {
         fAngle[i] = acos(sqrt(mom * mom + ft.mass(i) * ft.mass(i)) / mom /
                          1.4725); // 1.4738 = 370 = 3.35 // 1.4725 = 380 = 3.26
@@ -444,40 +443,24 @@ void PrtLutReco::Run(int start, int end) {
         // if(gch>=1115 && gch<=1120)
         hodo2++;
       }
+
       if (ndirc < 5) continue;
       if (!(hodo1 && hodo2)) continue;
       if (!(t3h && t3v)) continue;
       if (!t2) continue;
       if (!(str1 && stl1 && str2 && stl2)) continue;
-
+      
       double tof = fEvent->getTof();
       double tofPi = fEvent->getTofPi();
       double tofP = fEvent->getTofP();
       double s1 = 0, s2 = 0, c = 3 * 0.18; // 3 sigma cut
       hTof[pid]->Fill(tof);
 
-      if (fStudyId == 403 && fMethod != 4) {
-        tof = test1;
-        if (pid == 4 && tof < 34.45) continue;
-        if (pid == 2 && tof > 33.25) continue;
+      if (fStudyId == 403) {
+        if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue;
       }
-      if (fStudyId == 401 && fMethod != 4) {
-        tof = test1;
-        if (fabs(prtangle - 90) < 2) {
-          if (pid == 4 && tof < 32.7) continue;
-          if (pid == 2 && tof > 31.6) continue;
-        } else if (fabs(prtangle - 60) < 2) {
-          if (pid == 4 && tof < 34.2) continue;
-          if (pid == 2 && tof > 33.3) continue;
-        } else {
-          if (fMethod == 3) { // more stat for 3
-            if (pid == 4) continue;
-            if (pid == 2 && tof > 31.7) continue;
-          } else {
-            if (pid == 4 && tof < 32.85) continue;
-            if (pid == 2 && tof > 31.65) continue;
-          }
-        }
+      if (fStudyId == 401) {
+	if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue;	
       }
       if (fStudyId == 420) {
         tof = test1;
@@ -516,7 +499,6 @@ void PrtLutReco::Run(int start, int end) {
         if (pid == 2 && fabs(tofPi - tof) > 0.15 + fabs(c)) continue;
         if (pid == 4 && fabs(tofP - tof) > 0.15 + fabs(c)) continue;
       }
-
       if (fStudyId == 436) {
         if (fMethod == 4) {
           c = 0.2;
@@ -620,15 +602,15 @@ void PrtLutReco::Run(int start, int end) {
       hitTime = hit.getLeadTime();
       int pixid = hit.getPixel();
       int mcpid = hit.getPmt();
-      int ch = hit.getChannel(); // ft.map_mpc[mcpid][pixid];
+      int ch =  ft.map_pmtpix[mcpid][pixid]; // hit.getChannel();//
       int pathid = hit.getPathInPrizm();
-
+      
       // TString spathid = Form("%d",pathid);
       // if(pathid != 142) continue;
       // if(!spathid.BeginsWith("1")) continue;
       // if(!spathid.Contains("142")) continue;
       // std::cout<<"pathid "<<pathid<<std::endl;
-
+      
       if (bsim) hitTime += gRandom->Gaus(0, 0.1) + t0smear; // time resol. if not simulated
       else {
         if (fStudyId == 401) {
@@ -644,15 +626,15 @@ void PrtLutReco::Run(int start, int end) {
           hitTime += o;
         }
         if (fStudyId == 409) {
-          double o = 0.4;
-          if (fabs(prtangle - 20) < 1) o = -0.45;
+          double o = 0.0;
+          // if (fabs(prtangle - 20) < 1) o = -6;
           hitTime += o;
         }
 
         if (fStudyId == 420) hitTime += 0.62;
         if (fStudyId == 403) {
           double o = 0.05;
-          if (fabs(prtangle - 20) < 1) o = 0.2;
+          if (fabs(prtangle - 20) < 1) o = -1.2;
           if (fabs(prtangle - 25) < 1) o = -0.05;
           if (fabs(prtangle - 60) < 1) o = -0.05;
           if (fabs(prtangle - 85) < 1) o = 0.1;
@@ -686,7 +668,7 @@ void PrtLutReco::Run(int start, int end) {
           hitTime += o;
         }
       }
-
+      
       //======================================== dynamic cuts
       {
         { // time cuts
@@ -789,7 +771,7 @@ void PrtLutReco::Run(int start, int end) {
             } else if (fabs(prtangle - 60) < 15) {
               tangle -= 0.055 * tdiff / hitTime;
             } else {
-	      tangle -= 0.045 * tdiff / hitTime;
+	      tangle -= 0.035 * tdiff / hitTime;
             }
           }
 

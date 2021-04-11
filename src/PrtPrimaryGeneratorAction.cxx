@@ -181,7 +181,8 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
   fParticleGun->GeneratePrimaryVertex(anEvent);
 
   G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
-  dir *= fParticleGun->GetParticleMomentum();
+  dir *= fParticleGun->GetParticleMomentum()*0.001; // GeV/c
+  
   PrtManager::Instance()->getEvent()->setMomentum(TVector3(dir.x(), dir.y(), dir.z()));  
 }
 

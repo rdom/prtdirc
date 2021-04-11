@@ -49,13 +49,13 @@ int main(int argc,char** argv)
 #endif
   TApplication theApp("App", 0, 0);
 
-  G4String macro, events, geometry, radiator, physlist, outfile, 
-    session,geomTheta,geomPhi,batchmode,lensId,particle,momentum,testVal1,testVal2,testVal3,
-    prismStepX,prismStepY,beamZ,beamX,timeSigma,
-    beamDimension, mcpLayout, infile = "hits.root", lutfile = "../data/lut.root";
+  G4String macro, events, geometry, radiator, physlist, outfile, session, geomTheta, geomPhi,
+    batchmode, lensId, particle = "mix_pip", momentum, testVal1, testVal2, testVal3, prismStepX,
+                       prismStepY, beamZ, beamX, timeSigma, beamDimension, mcpLayout,
+                       infile = "hits.root", lutfile = "../data/lut.root";
   G4int firstevent(0), runtype(0), study(0), fid(0), verbose(0);
 
-  G4long myseed = 345354;
+  G4long myseed = 0;
   for ( G4int i=1; i<argc; i=i+2 ) {
     if      ( G4String(argv[i]) == "-m" ) macro     = argv[i+1];
     //    else if ( G4String(argv[i]) == "-u" ) session   = argv[i+1];
@@ -98,7 +98,13 @@ int main(int argc,char** argv)
       return 1;
     }
   }
-
+  if(runtype == 1) {
+    particle = "opticalphoton";
+    momentum = " 3.18e-09";
+    geomTheta = "180";
+    geomPhi ="0";
+  }
+  
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
   if(outfile=="" && (runtype == 1 || runtype == 5 || runtype == 11)) outfile = "../data/lut.root";  // lookup table generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
@@ -110,7 +116,7 @@ int main(int argc,char** argv)
   PrtTools t;
   PrtRun *run = t.find_run(study,fid);
 
-  std::cout << "Run info =====================  " << std::endl << run->getInfo() << std::endl;
+  std::cout << "=== Run info:  " << std::endl << run->getInfo() << std::endl;
 
   if(runtype == 2 || runtype == 3 || runtype == 4){
     run = t.get_run(infile.c_str());
@@ -153,10 +159,7 @@ int main(int argc,char** argv)
   G4RunManager * runManager = new G4RunManager;
 #endif
   
-  std::cout<<"SEED "<<myseed <<std::endl;
   G4Random::setTheSeed(myseed);
-  // Seed the random number generator manually
-  // if(myseed==345354) myseed = time(NULL);
   
   runManager->SetUserInitialization(new PrtDetectorConstruction());
   runManager->SetUserInitialization(new PrtPhysicsList());
