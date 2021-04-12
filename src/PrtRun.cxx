@@ -18,6 +18,7 @@ void PrtRun::setPmtLayout(Int_t v) {
 TString PrtRun::getInfo() {
   TString info = fShortInfo;
   info += Form("Run type %d \n", fRunType);
+  info += Form("MC %d \n", fMc);
   info += Form("Study %d \n", fStudy);
   info += Form("Geometry id %d \n", fGeometry);
   info += Form("Pmt layout id %d \n", fPmtLayout);

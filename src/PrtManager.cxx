@@ -14,7 +14,7 @@ PrtManager::PrtManager(TString filename, PrtRun *run) {
   fRunType = fRun->getRunType();
   fEvent = new PrtEvent();
   
-  if (fRunType != 2 && fRunType != 3){
+  if (fRunType < 2){
     fRootFile = new TFile(filename, "RECREATE");
     fRun->setMc(true);
   }

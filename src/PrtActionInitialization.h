@@ -7,7 +7,7 @@
 class PrtActionInitialization : public G4VUserActionInitialization
 {
 public:
-  PrtActionInitialization(G4String outfile);
+  PrtActionInitialization();
   virtual ~PrtActionInitialization();
 
   virtual void BuildForMaster() const;
@@ -15,8 +15,6 @@ public:
 
   virtual G4VSteppingVerbose* InitializeSteppingVerbose() const;
 
-private:
-  G4String fOutFile;
 };
 
 #endif

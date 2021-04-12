@@ -10,7 +10,7 @@ class G4Run;
 class PrtRunAction : public G4UserRunAction
 {
 public:
-  PrtRunAction(G4String outfile);
+  PrtRunAction();
   virtual ~PrtRunAction();
 
 public:
@@ -19,7 +19,6 @@ public:
 
 private:
   G4Timer* fTimer;
-  G4String fOutFile;
 };
 
 #endif

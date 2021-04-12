@@ -39,9 +39,8 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-PrtActionInitialization::PrtActionInitialization(G4String outfile)
+PrtActionInitialization::PrtActionInitialization()
   : G4VUserActionInitialization(){
-  fOutFile = outfile;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -53,7 +52,7 @@ PrtActionInitialization::~PrtActionInitialization()
 
 void PrtActionInitialization::BuildForMaster() const
 {
-  SetUserAction(new PrtRunAction(fOutFile));
+  SetUserAction(new PrtRunAction());
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -61,7 +60,7 @@ void PrtActionInitialization::BuildForMaster() const
 void PrtActionInitialization::Build() const
 {
   SetUserAction(new PrtPrimaryGeneratorAction());
-  SetUserAction(new PrtRunAction(fOutFile));
+  SetUserAction(new PrtRunAction());
   SetUserAction(new PrtSteppingAction());
   SetUserAction(new PrtStackingAction());
   SetUserAction(new PrtTrackingAction());

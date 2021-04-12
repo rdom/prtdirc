@@ -49,10 +49,10 @@ int main(int argc,char** argv)
 #endif
   TApplication theApp("App", 0, 0);
 
-  G4String macro, events, geometry, radiator, physlist, outfile, session, geomTheta, geomPhi,
+  G4String macro, events, geometry, radiator, physlist, session, geomTheta, geomPhi,
     batchmode, lensId, particle = "mix_pip", momentum, testVal1, testVal2, testVal3, prismStepX,
-                       prismStepY, beamZ, beamX, timeSigma, beamDimension, mcpLayout,
-                       infile = "hits.root", lutfile = "../data/lut.root";
+    prismStepY, beamZ, beamX, timeSigma, beamDimension, mcpLayout;
+  TString infile = "", lutfile = "", outfile = "";
   G4int firstevent(0), runtype(0), study(0), fid(0), verbose(0);
 
   G4long myseed = 0;
@@ -98,6 +98,7 @@ int main(int argc,char** argv)
       return 1;
     }
   }
+  
   if(runtype == 1) {
     particle = "opticalphoton";
     momentum = " 3.18e-09";
@@ -108,7 +109,6 @@ int main(int argc,char** argv)
   if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
   if(outfile=="" && (runtype == 1 || runtype == 5 || runtype == 11)) outfile = "../data/lut.root";  // lookup table generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
-  if(outfile=="" && (runtype == 2 || runtype == 3)) outfile = "reco.root"; // reconstruction
 
   if(batchmode.size()) gROOT->SetBatch(kTRUE);
   if(!events.size()) events = "1";
@@ -116,12 +116,19 @@ int main(int argc,char** argv)
   PrtTools t;
   PrtRun *run = t.find_run(study,fid);
 
-  std::cout << "=== Run info:  " << std::endl << run->getInfo() << std::endl;
-
-  if(runtype == 2 || runtype == 3 || runtype == 4){
-    run = t.get_run(infile.c_str());
+  if (runtype == 2 || runtype == 3 || runtype == 4) {
+    if (infile == "") {
+      infile = t.get_inpath();
+      std::cout << "--- infile  " << infile << std::endl;
+    }
+    run = t.get_run(infile);    
+    if (outfile == ""){
+      outfile = t.get_outpath();
+      if(run->getStudy() == 0 ) outfile = "reco.root";
+      std::cout << "--- outfile  " << outfile << std::endl;
+    }
   }
-  
+
   run->setRunType(runtype);
   
   if(momentum.size()) run->setMomentum(atof(momentum));  
@@ -143,9 +150,12 @@ int main(int argc,char** argv)
   if(timeSigma.size())   run->setTimeSigma(atof(timeSigma));
 
   PrtManager::Instance(outfile, run);
+      
+  std::cout << "=== Run info:  " << std::endl << run->getInfo() << std::endl;
+  
   
   if(runtype == 2 || runtype == 3 || runtype == 4){
-    PrtLutReco * reco = new PrtLutReco(infile.c_str(),lutfile.c_str(),verbose); 
+    PrtLutReco * reco = new PrtLutReco(infile,lutfile,verbose); 
     reco->Run(firstevent, atoi(events));
     return 0;
   }
@@ -163,7 +173,7 @@ int main(int argc,char** argv)
   
   runManager->SetUserInitialization(new PrtDetectorConstruction());
   runManager->SetUserInitialization(new PrtPhysicsList());
-  runManager->SetUserInitialization(new PrtActionInitialization(outfile));
+  runManager->SetUserInitialization(new PrtActionInitialization());
   runManager->Initialize();
 
   G4VisManager* visManager = new G4VisExecutive;
