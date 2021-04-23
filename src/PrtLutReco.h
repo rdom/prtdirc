@@ -63,8 +63,7 @@ class PrtLutReco {
   int fRadiator;
   int fStudyId;
   bool fTimeImaging;
-  bool fCreateCorr;
-
+  
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;
 
@@ -87,7 +86,8 @@ class PrtLutReco {
   TF1 *fFunc[5];
   double fAngle[5];
   int fPk;
-  double fCorr[12];
+  int fCor_level;
+  double fCor_angle[12] = {0}, fCor_time[12] = {0}, fCor_time_refl[2] = {0};
   double fCorrSpr;
   TString fCorrPath;
   TString fPdfPath;
@@ -100,10 +100,9 @@ class PrtLutReco {
   TH1F *fHist0, *fHist0d, *fHist0r, *fHist0s, *fHist0i;
 
   PrtLutNode *fLutNode[5000];
-  TH1F *fHistMcp[15];
+  TH1F *fHistMcp[15], *fHistTime[15], *fHistTimeRefl[2];
   TH1F *fHistCh[5000];
 
-  
   // cluster search
   int mcpdata[15][65];
   int cluster[15][65];

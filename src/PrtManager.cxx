@@ -9,7 +9,7 @@ PrtManager *PrtManager::fInstance = NULL;
 
 PrtManager::PrtManager(TString filename, PrtRun *run) {
   fOutName = filename;
-  fOutName = fOutName.Remove(fOutName.Last('.'));
+
   fRun = run;
   fRunType = fRun->getRunType();
   fEvent = new PrtEvent();
