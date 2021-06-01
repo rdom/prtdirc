@@ -355,7 +355,8 @@ void PrtLutReco::Run(int start, int end) {
   if (fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
 
   if (fMethod == 4) {
-    start = 0; //pdfend;
+    if(bsim) start = 0;
+    else start = pdfend;
     pdfend = nEvents;
     end = nEvents;
   }
@@ -496,7 +497,8 @@ void PrtLutReco::Run(int start, int end) {
     // SearchClusters();
 
     double t0smear = gRandom->Gaus(0, 0.1 + sm); // event t0 smearing
-
+    if (fMethod == 4) t0smear = 0;
+    
     // double temp_ti[fmaxch] = {0};
 
     for (auto hit : fEvent->getHits()) {
