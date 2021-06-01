@@ -11,6 +11,7 @@ example:
 -o    output file name
 -i    input file name
 -u    look-up file name
+-pdf  pdf file name
 
 -r    run type
                 0    simulation
@@ -18,8 +19,9 @@ example:
                 2    geometrical reconstruction
                 3    likelihood calculation
 		4    create pdf
-                5    calibration
+		5    simulate pdf
                 6    focal plane measurements
+                7    calibration
 
 -study  study id
 

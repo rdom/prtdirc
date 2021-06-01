@@ -72,8 +72,9 @@ TH2F *hLutCorrC = new TH2F("hLutCorrC", ";#theta_{l}sin(#varphi_{l});#theta_{l}c
 
 
 // -----   Default constructor   -------------------------------------------
-PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose) {
+PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int verbose) {
   fVerbose = verbose;
+  fPdfPath = pdffile;
   fChain = new TChain("data");
   fChain->Add(infile);
   fEvent = new PrtEvent();
@@ -146,6 +147,38 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose) {
     std::cout << "--- lut file not found  " << fCorrPath << std::endl;
   }
 
+  fTimeImaging = (fMethod == 4) ? true : false;
+
+  // read pdf
+  if (fPdfPath == "") {
+    fPdfPath = infile;
+    fPdfPath.ReplaceAll(".root", ".pdf1.root");
+  }
+  if (fMethod == 2) {
+    if (!gSystem->AccessPathName(fPdfPath)) {
+      std::cout << "--- reading  " << fPdfPath << std::endl;
+      TFile pdfFile(fPdfPath);
+      double sigma = 200; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
+      int binfactor = (int)(sigma / 50. + 0.1);
+      for (int i = 0; i < fmaxch; i++) {
+        auto hpdf2 = (TH1F *)pdfFile.Get(Form("hs_%d", i));
+        auto hpdf4 = (TH1F *)pdfFile.Get(Form("hf_%d", i));
+        if (sigma > 0) hpdf2->Rebin(binfactor);
+        if (sigma > 0) hpdf4->Rebin(binfactor);
+        // hpdf2->Smooth();
+        // hpdf4->Smooth();
+        fPdf2[i] = new TGraph(hpdf2);
+        fPdf4[i] = new TGraph(hpdf4);
+
+        fPdf2[i]->SetBit(TGraph::kIsSortedX);
+        fPdf4[i]->SetBit(TGraph::kIsSortedX);
+
+        fTimeImaging = true;
+      }
+    } else
+      fTimeImaging = false;
+  }
+
   // read corrections
   fCorrPath = PrtManager::Instance()->getOutName(); // infile;
   fCorrPath.ReplaceAll(".root", ".cor.root");
@@ -181,35 +214,6 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, int verbose) {
     std::cout << "--- corr file not found  " << fCorrPath << std::endl;
   }
 
-  fTimeImaging = (fMethod == 4) ? true : false;
-  fPdfPath = infile;
-  fPdfPath.ReplaceAll(".root", ".pdf1.root");
-
-  if (fMethod == 2) { // read pdf
-    if (!gSystem->AccessPathName(fPdfPath)) {
-      std::cout << "--- reading  " << fPdfPath << std::endl;
-      TFile pdfFile(fPdfPath);
-      double sigma = 200; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
-      int binfactor = (int)(sigma / 50. + 0.1);
-      for (int i = 0; i < fmaxch; i++) {
-        auto hpdf2 = (TH1F *)pdfFile.Get(Form("hs_%d", i));
-        auto hpdf4 = (TH1F *)pdfFile.Get(Form("hf_%d", i));
-        if (sigma > 0) hpdf2->Rebin(binfactor);
-        if (sigma > 0) hpdf4->Rebin(binfactor);
-        // hpdf2->Smooth();
-        // hpdf4->Smooth();
-        fPdf2[i] = new TGraph(hpdf2);
-        fPdf4[i] = new TGraph(hpdf4);
-
-        fPdf2[i]->SetBit(TGraph::kIsSortedX);
-        fPdf4[i]->SetBit(TGraph::kIsSortedX);
-
-        fTimeImaging = true;
-      }
-    } else
-      fTimeImaging = false;
-  }
- 
   for (int i = 0; i < fmaxch; i++) {
     fTime2[i] = new TH1F(Form("hs_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
     fTime4[i] = new TH1F(Form("hf_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
@@ -351,7 +355,7 @@ void PrtLutReco::Run(int start, int end) {
   if (fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
 
   if (fMethod == 4) {
-    start = pdfend;
+    start = 0; //pdfend;
     pdfend = nEvents;
     end = nEvents;
   }
@@ -556,6 +560,11 @@ void PrtLutReco::Run(int start, int end) {
       int bestbounce = 0;
       double besttangle = 0, besttdiff = 100;
       int size = fLutNode[ch]->Entries();
+
+      if (fMethod == 4 && bsim) {
+        isGoodHit_ti = true;
+        size = 0;
+      }
 
       for (int i = 0; i < size; i++) {
 
@@ -1292,7 +1301,7 @@ bool PrtLutReco::FindPeak(double &cangle, double &spr, double &cangle_pi, double
       // }
 
       if (fCor_level < 2) { // corrections
-        std::cout << "Writing " << fCorrPath << std::endl;
+        std::cout << "--- writing " << fCorrPath << std::endl;
 
         TFile fc(fCorrPath, "recreate");
         TTree *tc = new TTree("corr", "corr");

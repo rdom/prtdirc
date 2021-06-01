@@ -119,8 +119,8 @@ void PrtStackingAction::NewStage() {
   int runtype = PrtManager::Instance()->getRun()->getRunType();
 
   int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-  if (eventNumber % 1 == 0 && runtype == 0) std::cout << "Event # " << eventNumber  << " # Cherenkov photons:  " << fCerenkovCounter;
-  if (eventNumber % 1000 == 0 && runtype != 0) std::cout << "Event # " << eventNumber  << " # Cherenkov photons:  " << fCerenkovCounter ;
+  if (eventNumber % 1 == 0 && (runtype == 0 || runtype == 5) ) std::cout << "Event # " << eventNumber  << " # Cherenkov photons:  " << fCerenkovCounter;
+  else if (eventNumber % 1000 == 0 && runtype != 0) std::cout << "Event # " << eventNumber  << " # Cherenkov photons:  " << fCerenkovCounter ;
 }
 
 void PrtStackingAction::PrepareNewEvent() {

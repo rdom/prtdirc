@@ -14,7 +14,7 @@ PrtManager::PrtManager(TString filename, PrtRun *run) {
   fRunType = fRun->getRunType();
   fEvent = new PrtEvent();
   
-  if (fRunType < 2){
+  if (fRunType < 2 || fRunType == 5){
     fRootFile = new TFile(filename, "RECREATE");
     fRun->setMc(true);
   }
@@ -22,12 +22,12 @@ PrtManager::PrtManager(TString filename, PrtRun *run) {
   fRunTree = new TTree("header", "run info");
   fRunTree->Branch("PrtRun", "PrtRun", &fRun, 64000, 2);
 
-  if (fRunType == 0 || fRunType == 6) {
+  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
     fTree = new TTree("data", "Prototype hits tree");
     fTree->Branch("PrtEvent", "PrtEvent", &fEvent, 64000, 2);
   }
 
-  if (fRunType == 1 || fRunType == 5 || fRunType == 11) {
+  if (fRunType == 1 || fRunType == 7 || fRunType == 11) {
     fLut = new TClonesArray("PrtLutNode");
     fTree = new TTree("prtlut", "Look-up table for the geometrical reconstruction.");
     fTree->Branch("LUT", &fLut, 256000, 2);
@@ -53,29 +53,32 @@ PrtManager *PrtManager::Instance(TString outfile, PrtRun *run) {
 }
 
 void PrtManager::addEvent(PrtEvent event) {
-  if (fRunType == 0 || fRunType == 6) {
+  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
     fEvent = new PrtEvent(event);
   }
 }
 
-void PrtManager::addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 vertex) {  
-  if (fRunType == 0 || fRunType == 6) {
+void PrtManager::addHit(PrtHit hit) {
+  fEvent->addHit(hit);
+}
+
+void PrtManager::addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 vertex) {
+  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
     fEvent->setPosition(vertex);
     fEvent->addHit(hit);
-  }
-  
-  if (fRunType == 1 || fRunType == 5 || fRunType == 11) {
+  } else if (fRunType == 1 || fRunType == 7 || fRunType == 11) {
     if (fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle) {
       int ch = hit.getChannel();
       double time = hit.getLeadTime();
       // if (fRunType == 11) time -= fTime;
-      ((PrtLutNode *)(fLut->At(ch)))->AddEntry(ch, fMomentum, hit.getPathInPrizm(), 0, time, localpos, digipos, 0, vertex);
+      ((PrtLutNode *)(fLut->At(ch)))
+        ->AddEntry(ch, fMomentum, hit.getPathInPrizm(), 0, time, localpos, digipos, 0, vertex);
     }
   }
 }
 
 void PrtManager::fill() {
-  if (fRunType == 0 || fRunType == 6) {
+  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
     fTree->Fill();
     fEvent->Clear();
   }
@@ -89,5 +92,5 @@ void PrtManager::save(){
 }
 
 void PrtManager::fillLut() {
-  if (fRunType == 1 || fRunType == 5 || fRunType == 11) fTree->Fill();
+  if (fRunType == 1 || fRunType == 7 || fRunType == 11) fTree->Fill();
 }

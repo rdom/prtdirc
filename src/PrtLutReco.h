@@ -33,7 +33,7 @@ class PrtLutReco {
 
  public:
   // Standard constructors
-  PrtLutReco(TString infile, TString lutfile, int verbose = 0);
+  PrtLutReco(TString infile, TString lutfile,TString pdffile, int verbose = 0);
 
   // Destructor
   ~PrtLutReco();

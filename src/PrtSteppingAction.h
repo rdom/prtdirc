@@ -19,9 +19,10 @@ class PrtSteppingAction : public G4UserSteppingAction {
   virtual void UserSteppingAction(const G4Step *);
 
  private:
-  G4int fScintillationCounter;
-  G4int fCerenkovCounter;
-  G4int fEventNumber;
+  int fRunType;
+  int fScintillationCounter;
+  int fCerenkovCounter;
+  int fEventNumber;
 };
 
 #endif

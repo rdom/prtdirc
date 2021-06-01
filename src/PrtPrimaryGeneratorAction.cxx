@@ -131,7 +131,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
     fParticleGun->SetParticleMomentumDirection(v);
     PrtManager::Instance()->setMomentum(TVector3(v.x(), v.y(), v.z()));
   }
-  if (fRun->getRunType() == 5) { // calibration light
+  if (fRun->getRunType() == 7) { // calibration light
     double shift = fRun->getTest3();
 
     fParticleGun->SetParticlePosition(G4ThreeVector(-fRadiatorL / 2. + 0.1 - shift, 0, 5 + tan(45 * M_PI / 180.) * shift + 25));

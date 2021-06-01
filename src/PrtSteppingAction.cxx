@@ -15,6 +15,7 @@ PrtSteppingAction::PrtSteppingAction() : G4UserSteppingAction() {
   fScintillationCounter = 0;
   fCerenkovCounter = 0;
   fEventNumber = -1;
+  fRunType = PrtManager::Instance()->getRun()->getRunType();
 }
 
 PrtSteppingAction::~PrtSteppingAction() {}
@@ -30,8 +31,8 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
   }
 
   G4Track *track = step->GetTrack();
-  int parentId = track->GetParentID();
 
+  // int parentId = track->GetParentID();  
   // std::cout<<"parentId   "<<parentId <<std::endl;
   // std::cout<<"length  "<<track->GetTrackLength() << " step num "<< track->GetCurrentStepNumber()
   // <<std::endl;
@@ -39,14 +40,12 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
   if (track->GetCurrentStepNumber() > 50000 || track->GetTrackLength() > 10000) {
     track->SetTrackStatus(fStopAndKill);
   }
-
-  int runtype = PrtManager::Instance()->getRun()->getRunType();
-
-  if (runtype == 11 || runtype == 1) {
+  
+  if (fRunType == 11 || fRunType == 1) {
     TString aname = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
     TString bname = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 
-    if (runtype == 11 && aname == "wBar" && bname == "wOpticalGrease") {
+    if (fRunType == 11 && aname == "wBar" && bname == "wOpticalGrease") {
       G4ThreeVector dir = step->GetPreStepPoint()->GetMomentum();
       TVector3 v(dir.x(), dir.y(), dir.z());
       v.RotateY(-(TMath::Pi() - 20 * TMath::Pi() / 180.));
@@ -55,7 +54,7 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
     }
 
     // stop photons at the edge of the lens for LUT
-    if (runtype == 1 && aname == "wLens3" && bname == "wDirc") {
+    if (fRunType == 1 && aname == "wLens3" && bname == "wDirc") {
       track->SetTrackStatus(fStopAndKill);
     }
   }

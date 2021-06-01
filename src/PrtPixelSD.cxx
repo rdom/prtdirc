@@ -452,12 +452,28 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // }
 
   // if ( edep==0. && stepLength == 0. ) return false;
-
+  
   if (step == 0) return false;
 
   // G4ThreeVector translation = hist->GetTranslation();
   // G4ThreeVector localpos = step->GetPreStepPoint()->GetPhysicalVolume()->GetObjectTranslation();
   G4TouchableHistory *touchable = (G4TouchableHistory *)(step->GetPostStepPoint()->GetTouchable());
+  double time = step->GetPreStepPoint()->GetLocalTime();
+  
+  PrtHit hit;
+  int mcpid = touchable->GetReplicaNumber(1);
+  int pixid = touchable->GetReplicaNumber(0);
+  int ch = fMap_Mpc[mcpid][pixid];
+  
+  hit.setChannel(ch);
+  hit.setPmt(mcpid);
+  hit.setPixel(pixid);
+
+  if (fRunType == 5) {
+    hit.setLeadTime(time);
+    PrtManager::Instance()->addHit(hit);
+    return true;
+  }
 
   // Get cell id
   int layerNumber = touchable->GetReplicaNumber(0);
@@ -520,15 +536,6 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
     }
   }
 
-  PrtHit hit;
-  int mcpid = touchable->GetReplicaNumber(1);
-  int pixid = touchable->GetReplicaNumber(0);
-
-  int ch = fMap_Mpc[mcpid][pixid];
-  
-  hit.setChannel(ch);
-  hit.setPmt(mcpid);
-  hit.setPixel(pixid);
   hit.setPathInPrizm(pathId);
 
   // hit.SetPosition(globalPos);
@@ -559,7 +566,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // // ------------------------------------------------------
 
   // time since track created
-  double time = step->GetPreStepPoint()->GetLocalTime();
+
   if (fRunType == 0)
     time = G4RandGauss::shoot(time, PrtManager::Instance()->getRun()->getTimeSigma());
 
@@ -570,7 +577,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
-  if (fRunType == 1 || fRunType == 5 || fRunType == 11 || fRunType == 6) {
+  if (fRunType > 0) {
     PrtManager::Instance()->addHit(hit, localPos, digiPos, vertexPos);
     return true;
   }
@@ -688,7 +695,7 @@ void PrtPixelSD::EndOfEvent(G4HCofThisEvent *) {
 
   memset(fMultHit, 0, sizeof(fMultHit[0][0]) * 16 * 16 * 12);
   int eventNumber = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
-  if (eventNumber % 1 == 0 && fRunType == 0) std::cout << " : " <<  PrtManager::Instance()->getEvent()->getHits().size() << std::endl;
-  if (eventNumber % 1000 == 0 && fRunType != 0) std::cout << " : " << PrtManager::Instance()->getEvent()->getHits().size() << std::endl;
+  if (eventNumber % 1 == 0 && (fRunType == 0 || fRunType == 5)) std::cout << " : " <<  PrtManager::Instance()->getEvent()->getHits().size() << std::endl;
+  else if (eventNumber % 1000 == 0 && fRunType != 0) std::cout << " : " << PrtManager::Instance()->getEvent()->getHits().size() << std::endl;
   PrtManager::Instance()->fill();
 }

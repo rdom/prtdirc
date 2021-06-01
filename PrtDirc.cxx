@@ -52,7 +52,7 @@ int main(int argc,char** argv)
   G4String macro, events, geometry, radiator, physlist, session, geomTheta, geomPhi,
     batchmode, lensId, particle = "mix_pip", momentum, testVal1, testVal2, testVal3, prismStepX,
     prismStepY, beamZ, beamX, timeSigma, beamDimension, mcpLayout;
-  TString infile = "", lutfile = "", outfile = "";
+  TString infile = "", lutfile = "", pdffile = "", outfile = "";
   G4int firstevent(0), runtype(0), study(0), fid(0), verbose(0);
 
   G4long myseed = 0;
@@ -63,6 +63,7 @@ int main(int argc,char** argv)
     else if ( G4String(argv[i]) == "-o" ) outfile   = argv[i+1];
     else if ( G4String(argv[i]) == "-i" ) infile    = argv[i+1];
     else if ( G4String(argv[i]) == "-u" ) lutfile   = argv[i+1];
+    else if ( G4String(argv[i]) == "-pdf" ) pdffile   = argv[i+1];
     else if ( G4String(argv[i]) == "-g" ) geometry  = argv[i+1];
     else if ( G4String(argv[i]) == "-h" ) radiator  = argv[i+1];
     else if ( G4String(argv[i]) == "-a" ) geomTheta   = argv[i+1];
@@ -106,8 +107,8 @@ int main(int argc,char** argv)
     geomPhi ="0";
   }
   
-  if(outfile=="" && runtype == 0) outfile = "hits.root"; // simulation
-  if(outfile=="" && (runtype == 1 || runtype == 5 || runtype == 11)) outfile = "../data/lut.root";  // lookup table generation
+  if(outfile=="" && runtype == 0 || runtype == 5) outfile = "hits.root"; // simulation
+  if(outfile=="" && (runtype == 1 || runtype == 7 || runtype == 11)) outfile = "../data/lut.root";  // lookup table generation
   if(outfile=="" && runtype == 6) outfile = "focalplane.root";  // focal plane simulation
 
   if(batchmode.size()) gROOT->SetBatch(kTRUE);
@@ -152,10 +153,9 @@ int main(int argc,char** argv)
   PrtManager::Instance(outfile, run);
       
   std::cout << "=== Run info:  " << std::endl << run->getInfo() << std::endl;
-  
-  
-  if(runtype == 2 || runtype == 3 || runtype == 4){
-    PrtLutReco * reco = new PrtLutReco(infile,lutfile,verbose); 
+
+  if (runtype == 2 || runtype == 3 || runtype == 4) {
+    PrtLutReco *reco = new PrtLutReco(infile, lutfile, pdffile, verbose);
     reco->Run(firstevent, atoi(events));
     return 0;
   }
