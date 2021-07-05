@@ -44,7 +44,7 @@ set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fno-trapping-math -ftree-vectorize -fno-math-errno")
 set(CMAKE_CXX_FLAGS "-Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
 
-add_executable(prtdirc PrtDirc.cxx ${sources})
+add_executable(prtdirc ${sources})
 target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Prt -lSpectrum -lHistPainter)
 
 #----------------------------------------------------------------------------

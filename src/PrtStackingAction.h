@@ -28,6 +28,7 @@ class PrtStackingAction : public G4UserStackingAction {
   int fCerenkovCounter;
   TGraph *fDetEff[2];
   int fQEtype;
+  int fRunType;
 };
 
 #endif

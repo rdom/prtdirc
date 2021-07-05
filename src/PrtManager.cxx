@@ -8,8 +8,8 @@
 PrtManager *PrtManager::fInstance = NULL;
 
 PrtManager::PrtManager(TString filename, PrtRun *run) {
-  fOutName = filename;
 
+  fOutName = filename;
   fRun = run;
   fRunType = fRun->getRunType();
   fEvent = new PrtEvent();
@@ -64,7 +64,7 @@ void PrtManager::addHit(PrtHit hit) {
 
 void PrtManager::addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 vertex) {
   if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
-    fEvent->setPosition(vertex);
+    // fEvent->setPosition(vertex);
     fEvent->addHit(hit);
   } else if (fRunType == 1 || fRunType == 7 || fRunType == 11) {
     if (fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle) {

@@ -33,22 +33,21 @@ void PrtBarSD::Initialize(G4HCofThisEvent *hce) {
   hce->AddHitsCollection(hcID, fHitsCollection);
 }
 
-G4bool PrtBarSD::ProcessHits(G4Step *aStep, G4TouchableHistory *hist) {
+G4bool PrtBarSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   // energy deposit
-  G4double edep = aStep->GetTotalEnergyDeposit();
-  G4Track *track = aStep->GetTrack();
+  G4Track *track = step->GetTrack();
   G4String ParticleName = track->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
   if (ParticleName == "opticalphoton") return true;
 
-  // if (edep==0.) return false;
-
   PrtBarHit *newHit = new PrtBarHit();
-  newHit->SetTrackID(aStep->GetTrack()->GetTrackID());
-  newHit->SetEdep(edep);
-  newHit->SetPos(aStep->GetPostStepPoint()->GetPosition());
+  newHit->SetTrackID(step->GetTrack()->GetTrackID());
+  newHit->SetPos(step->GetPostStepPoint()->GetPosition());
   newHit->SetMom(track->GetMomentum());
 
+  // G4double edep = step->GetTotalEnergyDeposit();
+  // newHit->SetEdep(edep);
+  
   // // store normal to the closest boundary
   // G4Navigator *theNavigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
   // double fP = track->GetDynamicParticle()->GetTotalMomentum();
@@ -57,6 +56,11 @@ G4bool PrtBarSD::ProcessHits(G4Step *aStep, G4TouchableHistory *hist) {
 
   fHitsCollection->insert(newHit);
 
+  G4ThreeVector gpos = step->GetPostStepPoint()->GetPosition();
+  G4TouchableHistory *touchable = (G4TouchableHistory *)(step->GetPostStepPoint()->GetTouchable());
+  G4ThreeVector lpos = touchable->GetHistory()->GetTopTransform().TransformPoint(gpos);  
+  PrtManager::Instance()->getEvent()->setPosition(TVector3(lpos.x(), lpos.y(), lpos.z()));
+  
   return true;
 }
 

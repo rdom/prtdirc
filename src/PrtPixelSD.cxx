@@ -458,8 +458,10 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // G4ThreeVector translation = hist->GetTranslation();
   // G4ThreeVector localpos = step->GetPreStepPoint()->GetPhysicalVolume()->GetObjectTranslation();
   G4TouchableHistory *touchable = (G4TouchableHistory *)(step->GetPostStepPoint()->GetTouchable());
+  // time since track created  
   double time = step->GetPreStepPoint()->GetLocalTime();
-  
+
+  G4Track *track = step->GetTrack();
   PrtHit hit;
   int mcpid = touchable->GetReplicaNumber(1);
   int pixid = touchable->GetReplicaNumber(0);
@@ -470,14 +472,19 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   hit.setPixel(pixid);
 
   if (fRunType == 5) {
+    time = track->GetTrackLength() / track->CalculateVelocityForOpticalPhoton();
     hit.setLeadTime(time);
     PrtManager::Instance()->addHit(hit);
     return true;
   }
 
+  G4ThreeVector g4pos = track->GetVertexPosition();
+  G4ThreeVector lp = touchable->GetHistory()->GetTransform(1).TransformPoint(g4pos); // pos in wDirc
+  TVector3 position(lp.x(), lp.y(), lp.z());
+
   // Get cell id
   int layerNumber = touchable->GetReplicaNumber(0);
-  G4Track *track = step->GetTrack();
+
   const G4DynamicParticle *dynParticle = track->GetDynamicParticle();
   G4ParticleDefinition *particle = dynParticle->GetDefinition();
   G4String ParticleName = particle->GetParticleName();
@@ -502,7 +509,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   G4ThreeVector localvec = touchable->GetHistory()->GetTopTransform().TransformAxis(globalvec);
 
   G4ThreeVector g4mom = track->GetVertexMomentumDirection(); // track->GetMomentum();
-  G4ThreeVector g4pos = track->GetVertexPosition();
+ 
 
   TVector3 globalPos(inPrismpos.x(), inPrismpos.y(), inPrismpos.z());
   TVector3 localPos(localpos.x(), localpos.y(), localpos.z());
@@ -515,8 +522,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   translation = touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(), translation.y(), translation.z());
   TVector3 vertexPos(g4pos.x(), g4pos.y(), g4pos.z());
-  G4ThreeVector lp = touchable->GetHistory()->GetTransform(1).TransformPoint(g4pos); // pos in wDirc
-  TVector3 position(lp.x(), lp.y(), lp.z());
+ 
 
   // information from prizm
   G4SDManager *fSDM = G4SDManager::GetSDMpointer();
@@ -565,7 +571,6 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // }
   // // ------------------------------------------------------
 
-  // time since track created
 
   if (fRunType == 0)
     time = G4RandGauss::shoot(time, PrtManager::Instance()->getRun()->getTimeSigma());
@@ -577,7 +582,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
-  if (fRunType > 0) {
+  if (fRunType == 1) {
     PrtManager::Instance()->addHit(hit, localPos, digiPos, vertexPos);
     return true;
   }

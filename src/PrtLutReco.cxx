@@ -158,7 +158,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
     if (!gSystem->AccessPathName(fPdfPath)) {
       std::cout << "--- reading  " << fPdfPath << std::endl;
       TFile pdfFile(fPdfPath);
-      double sigma = 200; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
+      double sigma = 400; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
       int binfactor = (int)(sigma / 50. + 0.1);
       for (int i = 0; i < fmaxch; i++) {
         auto hpdf2 = (TH1F *)pdfFile.Get(Form("hs_%d", i));
@@ -496,9 +496,7 @@ void PrtLutReco::Run(int start, int end) {
     
     // SearchClusters();
 
-    double t0smear = gRandom->Gaus(0, 0.1 + sm); // event t0 smearing
-    if (fMethod == 4) t0smear = 0;
-    
+    double t0smear = gRandom->Gaus(0, 0.1 + sm); // event t0 smearing    
     // double temp_ti[fmaxch] = {0};
 
     for (auto hit : fEvent->getHits()) {
@@ -555,17 +553,20 @@ void PrtLutReco::Run(int start, int end) {
       hitTime += fCor_time_refl[reflected];
       if (ft.is_bad_channel(ch)) continue;
 
-      int nedge = GetEdge(mcpid, pixid);
+      int nedge = 0;
       // if(cluster[mcpid][pixid]>4) continue;
-
+      
       bool isGoodHit_gr(0), isGoodHit_ti(0);
       int bestbounce = 0;
       double besttangle = 0, besttdiff = 100;
       int size = fLutNode[ch]->Entries();
 
       if (fMethod == 4 && bsim) {
+	hitTime += gRandom->Gaus(0, 0.2);
         isGoodHit_ti = true;
-        size = 0;
+	size = 0;
+      }else{
+	nedge = GetEdge(mcpid, pixid);
       }
 
       for (int i = 0; i < size; i++) {
@@ -733,15 +734,16 @@ void PrtLutReco::Run(int start, int end) {
 
         if (fMethod == 4) { // create pdf
           double t = hitTime;
+	  double w = 1;
           // temp_ti[ch] = t;
           // if(fabs(besttdiff) < 0.3) t -= besttdiff;
           if (pid == fPk) {
             total4++;
-            fTime4[ch]->Fill(t);
+            fTime4[ch]->Fill(t,w);
           }
           if (pid == 2) {
             total2++;
-            fTime2[ch]->Fill(t);
+            fTime2[ch]->Fill(t,w);
           }
         }
       }
@@ -768,14 +770,14 @@ void PrtLutReco::Run(int start, int end) {
     }
 
     if (fMethod == 2 && fTimeImaging) { // time imaging
-      sumti = 2 * (sumti4 - sumti2) + 30 * sum_nph;
+      sumti = 1.5 * (sumti4 - sumti2) + 30 * sum_nph;
       if (sumti != 0) hLnDiffTi[pid]->Fill(sumti);      
     }
 
     double sumgr = sum1 - sum2 + 30 * sum_nph;
     if (sumgr != 0) {
       hNph[pid]->Fill(nhhits);
-      hLnDiffGr[pid]->Fill(2*sumgr);
+      hLnDiffGr[pid]->Fill(1*sumgr);
       likelihood = sumgr;
       events[pid]++;
     }

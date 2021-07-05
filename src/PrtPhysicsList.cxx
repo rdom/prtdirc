@@ -37,6 +37,7 @@ PrtPhysicsList::PrtPhysicsList()
   SetVerboseLevel(0);
   fPhysList = PrtManager::Instance()->getRun()->getPhysList();
   fRunType = PrtManager::Instance()->getRun()->getRunType();
+  //  if (fRunType == 5) fPhysList = 1;
 }
 
 PrtPhysicsList::~PrtPhysicsList() {

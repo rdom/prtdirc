@@ -13,6 +13,7 @@
 
 PrtStackingAction::PrtStackingAction() : G4UserStackingAction(), fScintillationCounter(0), fCerenkovCounter(0) {
 
+  fRunType = PrtManager::Instance()->getRun()->getRunType();      
   fQEtype = 0;
   if (PrtManager::Instance()->getRun()->getPmtLayout() == 2030) fQEtype = 1;
   
@@ -79,14 +80,22 @@ PrtStackingAction::~PrtStackingAction() {}
 
 G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track *aTrack) {
 
-  if (aTrack->GetDefinition() == G4OpticalPhoton::OpticalPhotonDefinition()) { // particle is optical photon
-    if (aTrack->GetParentID() > 0) {                                           // particle is secondary
+  if (aTrack->GetDefinition() ==
+      G4OpticalPhoton::OpticalPhotonDefinition()) { // particle is optical photon
+    if (aTrack->GetParentID() > 0) {                // particle is secondary
       if (aTrack->GetCreatorProcess()->GetProcessName() == "Scintillation") fScintillationCounter++;
       if (aTrack->GetCreatorProcess()->GetProcessName() == "Cerenkov") fCerenkovCounter++;
     }
   }
 
-  if (PrtManager::Instance()->getRun()->getRunType() == 0) { // for the simulation run
+  if (fRunType == 5) {
+    G4String ParticleName =
+      aTrack->GetDynamicParticle()->GetParticleDefinition()->GetParticleName();
+    // kill secondaries
+    if (aTrack->GetParentID() == 1 && ParticleName != "opticalphoton") return fKill;
+  }
+
+  if (fRunType == 0) { // for the simulation run
 
     // if(aTrack->GetDefinition()->GetParticleName()=="opticalphoton"
     //    && aTrack->GetParentID()!=1)  return fKill;
@@ -95,7 +104,7 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track *aT
 
     // kill opticalphotons from secondaries
     // if(aTrack->GetParentID() == 1 && ParticleName == "opticalphoton" ) 	  return fKill;
-
+    
     if (ParticleName == "opticalphoton") {
 
       // //tmp phs cut
@@ -104,11 +113,12 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track *aT
       if (aTrack->GetPosition().z() < -4000) return fKill; // disc dirc
 
       double lambda = 197.0 * 2.0 * pi / (aTrack->GetMomentum().mag() * 1.0E6);
-      // apply detector efficiency at the production stage:
-      if (true) {
+
+      if (true) { // apply detector efficiency at the production stage:
         double ra = gRandom->Uniform(0, 1);
         if (ra > fDetEff[fQEtype]->Eval(lambda)) return fKill;
       }
+
     }
   }
 

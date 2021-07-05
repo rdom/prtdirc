@@ -25,6 +25,7 @@ PrtPrizmSD::PrtPrizmSD(
                             G4int nofCells)
   : G4VSensitiveDetector(name), fHitsCollection(NULL){
   collectionName.insert(hitsCollectionName);
+  fRunType = PrtManager::Instance()->getRun()->getRunType();
 }
 
 PrtPrizmSD::~PrtPrizmSD(){ 
@@ -42,6 +43,8 @@ void PrtPrizmSD::Initialize(G4HCofThisEvent* hce){
 
 G4bool PrtPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
 
+  if(fRunType == 5) return true;
+  
   G4StepPoint* pPostStepPoint = aStep->GetPostStepPoint(); 
   if (pPostStepPoint->GetStepStatus() == fGeomBoundary){
     PrtPrizmHit* newHit = new PrtPrizmHit();

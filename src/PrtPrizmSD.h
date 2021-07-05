@@ -32,6 +32,7 @@ public:
 
 private: 
   PrtPrizmHitsCollection* fHitsCollection;
+  int fRunType;
 };
 
 
