@@ -134,7 +134,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
   if (fRun->getRunType() == 7) { // calibration light
     double shift = fRun->getTest3();
 
-    fParticleGun->SetParticlePosition(G4ThreeVector(-fRadiatorL / 2. + 140 -shift, 0, tan(33 * deg) * shift -30));
+    fParticleGun->SetParticlePosition(G4ThreeVector(-fRadiatorL / 2. + 170 -shift, 0, tan(33 * deg) * shift -30));
     double angle = -G4UniformRand() * M_PI;
     G4ThreeVector vec(0, 0, 1);
     vec.setTheta(acos(G4UniformRand()));
