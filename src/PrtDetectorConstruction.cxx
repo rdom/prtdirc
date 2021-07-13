@@ -628,16 +628,17 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
   fPrismShift = G4ThreeVector((fPrizm[2] + fPrizm[3]) / 4. - fPrizm[3] / 2., 0, 0.5 * fBar[2] + greased + 0.5 * fPrizm[1] + fLens[2]);
   new G4PVPlacement(xRot, fPrismShift, lPrizm, "wPrizm", lDirc, false, 0);
 
-  if (fGeomId == 5) { // calibration
-    double cheight = 75;
+  if (fRunType == 7) { // calibration
+    double height = 75;
+    double cheight = height/tan(33 * deg);
     double cwidth = 75;
     double shift = fTest3;
-    G4Trap *gPrizmC = new G4Trap("gPrizmC", cwidth, cheight, cheight, 0.00000000000001);
+    G4Trap *gPrizmC = new G4Trap("gPrizmC", cwidth, cheight, height, 0.00000000000001);
     lPrizmC = new G4LogicalVolume(gPrizmC, BarMaterial, "lPrizmC", 0, 0, 0);
     G4RotationMatrix *xRotC = new G4RotationMatrix();
-    xRotC->rotateX(M_PI / 2. * rad);
-    xRotC->rotateZ(M_PI * rad);
-    G4ThreeVector fPrismShiftC = G4ThreeVector(cheight - cheight / 4. + fPrizm[3] / 2. + tan(45 * M_PI / 180.) * shift, 0, fBar[2] / 2. + cheight / 2. + fLens[2] + shift);
+    xRotC->rotateX(M_PI / 2.);
+    xRotC->rotateZ(M_PI);
+    G4ThreeVector fPrismShiftC = G4ThreeVector(height - height / 4. + fPrizm[3] / 2. + tan(33 * deg) * shift, 0, fBar[2] / 2. + cheight / 2. + fLens[2] + shift + 0.1);
     new G4PVPlacement(xRotC, fPrismShiftC, lPrizmC, "wPrizmC", lDirc, false, 0);
   }
 

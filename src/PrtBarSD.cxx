@@ -15,7 +15,8 @@
 
 G4Mutex PrtBarSD::fMutex = G4MUTEX_INITIALIZER;
 
-PrtBarSD::PrtBarSD(const G4String &name, const G4String &hitsCollectionName, G4int nofCells) : G4VSensitiveDetector(name), fHitsCollection(NULL) {
+PrtBarSD::PrtBarSD(const G4String &name, const G4String &hitsCollectionName, G4int nofCells)
+  : G4VSensitiveDetector(name), fHitsCollection(NULL) {
 
   G4AutoLock tuberier(&fMutex);
   collectionName.insert(hitsCollectionName);
@@ -47,20 +48,20 @@ G4bool PrtBarSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   // G4double edep = step->GetTotalEnergyDeposit();
   // newHit->SetEdep(edep);
-  
   // // store normal to the closest boundary
-  // G4Navigator *theNavigator = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking();
-  // double fP = track->GetDynamicParticle()->GetTotalMomentum();
-  // double fEnergy = track->GetDynamicParticle()->GetTotalEnergy();
-  // double cherenkov = acos(1 / (1.47125 * (fP / fEnergy)));
+  // G4Navigator *theNavigator =
+  // G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking(); double fP =
+  // track->GetDynamicParticle()->GetTotalMomentum(); double fEnergy =
+  // track->GetDynamicParticle()->GetTotalEnergy(); double cherenkov = acos(1 / (1.47125 * (fP /
+  // fEnergy)));
 
   fHitsCollection->insert(newHit);
 
   G4ThreeVector gpos = step->GetPostStepPoint()->GetPosition();
   G4TouchableHistory *touchable = (G4TouchableHistory *)(step->GetPostStepPoint()->GetTouchable());
-  G4ThreeVector lpos = touchable->GetHistory()->GetTopTransform().TransformPoint(gpos);  
+  G4ThreeVector lpos = touchable->GetHistory()->GetTopTransform().TransformPoint(gpos);
   PrtManager::Instance()->getEvent()->setPosition(TVector3(lpos.x(), lpos.y(), lpos.z()));
-  
+
   return true;
 }
 
@@ -68,8 +69,8 @@ void PrtBarSD::EndOfEvent(G4HCofThisEvent *) {
 
   if (verboseLevel > 1) {
     G4int nofHits = fHitsCollection->entries();
-    G4cout << "\n-------->Bar Hits Collection: in this event they are " << nofHits << " hits in the tracker chambers: " << G4endl;
-    for (G4int i = 0; i < nofHits; i++)
-      (*fHitsCollection)[i]->Print();
+    G4cout << "\n-------->Bar Hits Collection: in this event they are " << nofHits
+           << " hits in the tracker chambers: " << G4endl;
+    for (G4int i = 0; i < nofHits; i++) (*fHitsCollection)[i]->Print();
   }
 }

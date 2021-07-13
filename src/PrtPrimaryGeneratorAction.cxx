@@ -36,8 +36,8 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGenerator
   fParticleGun->SetParticleDefinition(fParticleOP);
   fParticleGun->SetParticleTime(0.0 * ns);
   fParticleGun->SetParticlePosition(G4ThreeVector(0.0 * cm, 0.0 * cm, 0.0 * cm));
-  fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, mom*GeV));  
-  
+  fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, mom * GeV));
+
   // int mid=-1, pid=-1;
   // G4ThreeVector vdirc,vmcp[12],vpix[64];
   // auto store = G4PhysicalVolumeStore::GetInstance();
@@ -134,7 +134,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
   if (fRun->getRunType() == 7) { // calibration light
     double shift = fRun->getTest3();
 
-    fParticleGun->SetParticlePosition(G4ThreeVector(-fRadiatorL / 2. + 0.1 - shift, 0, 5 + tan(45 * M_PI / 180.) * shift + 25));
+    fParticleGun->SetParticlePosition(G4ThreeVector(-fRadiatorL / 2. + 140 -shift, 0, tan(33 * deg) * shift -30));
     double angle = -G4UniformRand() * M_PI;
     G4ThreeVector vec(0, 0, 1);
     vec.setTheta(acos(G4UniformRand()));

@@ -79,7 +79,7 @@ example:
 -phi  azimuth angle between particle beam and bar radiator
 
 -e    number of simulated events
--f     number of the first event for the reconstruction
+-f    number of the first event for the reconstruction
 
 -x    particle type
               "pi+" 
