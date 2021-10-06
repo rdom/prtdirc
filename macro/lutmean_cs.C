@@ -17,7 +17,7 @@ void lutmean_cs(TString inFile = "../data/lut.root") {
 
   auto run = t.get_run(inFile);
   int nch = run->getNpmt()*run->getNpix();
-
+ 
   TClonesArray &fLutaNew = *fLutNew;
   for (Long64_t n = 0; n < nch; n++) {
     new ((fLutaNew)[n]) PrtLutNode(-1);
@@ -28,6 +28,12 @@ void lutmean_cs(TString inFile = "../data/lut.root") {
   TClonesArray *fLut = new TClonesArray("PrtLutNode");
   tree->SetBranchAddress("LUT", &fLut);
   tree->GetEntry(0);
+
+  // TCanvas *c = new TCanvas("c", "c", 0, 0, 800, 1200);
+  // c->Divide(1, 2);
+  // TH1F *histNode = new TH1F("LutNode", "Node vs Multiplicity", 30000, 0, 150000);
+  // TH1F *hTime = new TH1F("hTime", "Time", 5000, 0, 10);
+  // TH1F *hDir = new TH1F("hDir", "X component", 1000, -1, 1);
 
   std::vector<TVector3> vArray[100];
   std::vector<TVector3> lArray[100];
@@ -80,6 +86,8 @@ void lutmean_cs(TString inFile = "../data/lut.root") {
         if (lArray[j][v].X() < cut) {
           sum[1] += vArray[j][v];
           weight[1]++;
+	  // hDir->Fill(vArray[j][v].X());
+	  // hTime->Fill(tArray[j][v]);
         }
         if (lArray[j][v].X() < cut && lArray[j][v].Y() > cut) {
           sum[2] += vArray[j][v];
@@ -114,6 +122,15 @@ void lutmean_cs(TString inFile = "../data/lut.root") {
         sumt += tArray[j][v];
       }
 
+      // c->cd(1);
+      // hTime->Draw();
+      // c->cd(2);
+      // hDir->Draw();
+      // c->Update();  
+      // c->WaitPrimitive();
+      // hDir->Reset();
+      // hTime->Reset();
+      
       if (weight[0] < 5) continue;
 
       for (int s = 0; s < 9; s++) {

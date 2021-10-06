@@ -7,7 +7,8 @@ void offsets_evl(TString in = "~/data/jul18/401/lut_beam_401_20S_cs_avr.root"){
   t->GetEntry(0);
 
   double dist,cns = 197.0;
-  TVector3 dir, dif = TVector3(260,0,980.5); //diffuser positioin
+  TVector3 dir, dif = TVector3(260,0,980.5); //diffuser positioin 2018
+  dif = TVector3(260,0,600); //diffuser positioin 2017
   PrtLutNode *node;
   std::cout<<"clut->GetEntriesFast() "<<clut->GetEntriesFast()<<std::endl;
 

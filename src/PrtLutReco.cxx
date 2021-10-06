@@ -131,7 +131,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
                           80, -0.05, 0.05); // 150
   }
 
-  // read lut
+  // read lut  
   if (lutfile == "") lutfile = ft.get_lutpath();
   if (!gSystem->AccessPathName(lutfile)) {
     std::cout << "--- reading  " << lutfile << std::endl;
@@ -144,7 +144,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
       fLutNode[i] = (PrtLutNode *)fLut->At(i);
     }
   } else {
-    std::cout << "--- lut file not found  " << fCorrPath << std::endl;
+    std::cout << "--- lut file not found  " << lutfile << std::endl;
   }
 
   fTimeImaging = (fMethod == 4) ? true : false;
@@ -230,8 +230,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
   }
   
   for (int i : {2, fPk}) {
-    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 32, 36);
-    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 32, 36);
+    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36);
+    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36);
     hNph[i] = new TH1F("nph_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
 
     hLnDiffGr[i] = new TH1F("hLnGr_"+ ft.name(i), ";ln L(p) - ln L(#pi);entries [#]", 120, -range, range);
@@ -337,9 +337,9 @@ void PrtLutReco::Run(int start, int end) {
   bool bsim = frun->getMc();
 
   if( fCor_level == 0) timeRes = 1.5;
-  
-  prtangle = frun->getTheta() + test1 * TMath::RadToDeg();
-  phi = frun->getPhi() + test2 * TMath::RadToDeg();
+
+  prtangle = frun->getTheta(); // + test1 * TMath::RadToDeg();
+  phi = frun->getPhi();        // + test2 * TMath::RadToDeg();
 
   int nEvents = fChain->GetEntries();
   if (end == 0) end = nEvents;
@@ -371,7 +371,7 @@ void PrtLutReco::Run(int start, int end) {
 
   double speed = 196.5; // 197  mm/ns
   double sigma[] = {0, 0, 0.0075, 0, 0.0076}, noise(0.25), range(5 * sigma[2]);
-  double cwindow = 0.05;
+  double cwindow = 10.08;
 
   if(fnpix>65){
     speed = 195.5;
@@ -463,10 +463,10 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       if (ndirc < 5) continue;
-      if (!(hodo1 && hodo2)) continue;
-      if (!(t3h && t3v)) continue;
-      if (!t2) continue;
-      if (!(str1 && stl1 && str2 && stl2)) continue;
+      // if (!(hodo1 && hodo2)) continue;
+      // if (!(t3h && t3v)) continue;
+      // if (!t2) continue;
+      // if (!(str1 && stl1 && str2 && stl2)) continue;
       
       double tof = fEvent->getTof();
       double tofPi = fEvent->getTofPi();
@@ -476,15 +476,25 @@ void PrtLutReco::Run(int start, int end) {
 
       // tof cuts
       if (fabs(mom - 7) < 0.1) {
-        if (fMethod == 4) {
-          if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
-	  if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+        if (fStudyId >= 400) {
+          if (fMethod == 4) {
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+          } else {
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.65) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+          }
         } else {
-          if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.65) continue;
-	  if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+          if (fMethod == 4) {
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+          } else {
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+          }
         }
       }
-      
+
       hTofc[pid]->Fill(tof);
     } else {
       if (fStudyId == 415 || fStudyId == 436) {
@@ -573,7 +583,7 @@ void PrtLutReco::Run(int start, int end) {
 
         weight = 12 * fLutNode[ch]->GetWeight(i);
         if (fnpix > 64) dird = fLutNode[ch]->GetEntry(i);
-        else dird = fLutNode[ch]->GetEntryCs(i, nedge);
+        else dird = fLutNode[ch]->GetEntryCs(i, nedge);	
         evtime = fLutNode[ch]->GetTime(i);	
         int lpathid = fLutNode[ch]->GetPathId(i);
 
@@ -587,7 +597,7 @@ void PrtLutReco::Run(int start, int end) {
         if (ltheta > TMath::PiOver2()) ltheta = TMath::Pi() - ltheta;
         int iphi = nphi * (lphi) / TMath::TwoPi();
         int itheta = ntheta * (ltheta) / TMath::PiOver2();
-	
+
         for (int u = 0; u < 4; u++) {
           if (u == 0) dir = dird;
           if (u == 1) dir.SetXYZ(-dird.X(), dird.Y(), dird.Z());
@@ -609,8 +619,7 @@ void PrtLutReco::Run(int start, int end) {
           double tdiff = hitTime - luttime;
           fHist0->Fill(tdiff);
           if (reflected) fHist0r->Fill(tdiff);
-          else
-            fHist0d->Fill(tdiff);
+          else fHist0d->Fill(tdiff);
           if (samepath) fHist0i->Fill(tdiff);
           tangle = momInBar.Angle(dir) + fCor_angle[mcpid];
 
@@ -688,7 +697,7 @@ void PrtLutReco::Run(int start, int end) {
               fgg_i++;
             }
           }
-        }	
+        }
       }
       
       if (fTimeImaging && isGoodHit_ti) {
@@ -1102,10 +1111,10 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       { // bounce
-        ft.add_canvas("bounce", 800, 400);
-        hBounce->SetTitle(Form("theta %3.1f , TOF PID = %d", a, pid));
-        hBounce->Scale(1 / 4000.);
-        hBounce->Draw("hist");
+        // ft.add_canvas("bounce", 800, 400);
+        // hBounce->SetTitle(Form("theta %3.1f , TOF PID = %d", a, pid));
+        // hBounce->Scale(1 / 4000.);
+        // hBounce->Draw("hist");
       }
 
       { // lut corrections

@@ -113,7 +113,7 @@ int main(int argc, char **argv) {
   if (batchmode.size()) gROOT->SetBatch(kTRUE);
   if (!events.size()) events = "1";
 
-  PrtTools t;
+  PrtTools t(study);
   PrtRun *run = t.find_run(study, fid);
 
   if (runtype == 2 || runtype == 3 || runtype == 4) {
