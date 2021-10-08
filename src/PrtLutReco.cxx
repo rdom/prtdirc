@@ -84,6 +84,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
   fMethod = frun->getRunType();
   fStudyId = frun->getStudy();
   fRadiator = frun->getRadiator();
+  fLens = frun->getLens();
   int fileId = frun->getId();
   fPk = 4;
   if (frun->getPid() == 10002) fPk = 3; //  kaon
@@ -179,39 +180,44 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
   fCorrPath = PrtManager::Instance()->getOutName(); // infile;
   fCorrPath.ReplaceAll(".root", ".cor.root");
   fCorrPath.ReplaceAll("reco_", Form("reco_%d_", fileId));
-  if (!gSystem->AccessPathName(fCorrPath)) {
-    std::cout << "--- reading  " << fCorrPath << std::endl;
-    int pmt, level;
-    double cor_angle, cor_time, cor_time_0, cor_time_1;
-    TChain ch("corr");
-    ch.Add(fCorrPath);
-    ch.SetBranchAddress("pmt", &pmt);
-    ch.SetBranchAddress("level", &level);
-    ch.SetBranchAddress("cor_angle", &cor_angle);
-    ch.SetBranchAddress("cor_time", &cor_time);
-    ch.SetBranchAddress("cor_time_0", &cor_time_0);
-    ch.SetBranchAddress("cor_time_1", &cor_time_1);
-    ch.SetBranchAddress("spr_pi", &fCorrSpr);
+  if (fLens == 3) {
+    if (!gSystem->AccessPathName(fCorrPath)) {
+      std::cout << "--- reading  " << fCorrPath << std::endl;
+      int pmt, level;
+      double cor_angle, cor_time, cor_time_0, cor_time_1;
+      TChain ch("corr");
+      ch.Add(fCorrPath);
+      ch.SetBranchAddress("pmt", &pmt);
+      ch.SetBranchAddress("level", &level);
+      ch.SetBranchAddress("cor_angle", &cor_angle);
+      ch.SetBranchAddress("cor_time", &cor_time);
+      ch.SetBranchAddress("cor_time_0", &cor_time_0);
+      ch.SetBranchAddress("cor_time_1", &cor_time_1);
+      ch.SetBranchAddress("spr_pi", &fCorrSpr);
 
-    for (int i = 0; i < ch.GetEntries(); i++) {
-      ch.GetEvent(i);
-      if (level == 2)
-        fCor_angle[pmt] =
-          (fabs(cor_angle) < 0.012) ? cor_angle : cor_angle / fabs(cor_angle) * 0.012;
-      fCor_time[pmt] = cor_time;
-      fCor_time_refl[0] = cor_time_0 * 0.9;
-      fCor_time_refl[1] = cor_time_1 * 0.9;
-      std::cout << "L" << level << "   pmt " << pmt << "  " << fCor_angle[pmt] << " dt "
-                << fCor_time[pmt] << "  spr " << fCorrSpr << " refl " << fCor_time_refl[0] << " "
-                << fCor_time_refl[1] << std::endl;
+      for (int i = 0; i < ch.GetEntries(); i++) {
+        ch.GetEvent(i);
+        if (level == 2)
+          fCor_angle[pmt] =
+            (fabs(cor_angle) < 0.012) ? cor_angle : cor_angle / fabs(cor_angle) * 0.012;
+        fCor_time[pmt] = cor_time;
+        fCor_time_refl[0] = cor_time_0 * 0.9;
+        fCor_time_refl[1] = cor_time_1 * 0.9;
+        std::cout << "L" << level << "   pmt " << pmt << "  " << fCor_angle[pmt] << " dt "
+                  << fCor_time[pmt] << "  spr " << fCorrSpr << " refl " << fCor_time_refl[0] << " "
+                  << fCor_time_refl[1] << std::endl;
+      }
+      fCor_level = level;
+    } else {
+      fCorrSpr = 0.01;
+      fCor_level = 0;
+      std::cout << "--- corr file not found  " << fCorrPath << std::endl;
     }
-    fCor_level = level;
-  } else {
-    fCorrSpr = 0.01;
-    fCor_level = 0;
-    std::cout << "--- corr file not found  " << fCorrPath << std::endl;
+  }else{
+    fCor_level = 2;
+    std::cout << "--- corr file skipped for L != 3" << std::endl;
   }
-
+  
   for (int i = 0; i < fmaxch; i++) {
     fTime2[i] = new TH1F(Form("hs_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
     fTime4[i] = new TH1F(Form("hf_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
@@ -231,6 +237,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
     hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36);
     hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36);
     hNph[i] = new TH1F("nph_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
+    hNph_ti[i] = new TH1F("nph_ti_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
 
     hLnDiffGr[i] =
       new TH1F("hLnGr_" + ft.name(i), ";ln L(p) - ln L(#pi);entries [#]", 120, -range, range);
@@ -267,10 +274,11 @@ void PrtLutReco::Run(int start, int end) {
   bool testTrRes = false;
 
   TString outFile = PrtManager::Instance()->getOutName();
-  double theta(0), phi(0), cangle(0), spr(0), trr(0), nph(0), nph_err(0), cangle_pi(0), spr_pi(0),
-    trr_pi(0), nph_pi(0), nph_pi_err(0), par1(0), par2(0), par3(0), par4(0), par5(0), par6(0),
-    test1(0), test2(0), test3(0), sep_gr(0), sep_gr_err(0), sep_ti(0), sep_ti_err(0), beamx(0),
-    beamz(0), nnratio_p(0), nnratio_pi(0), timeRes(0);
+  double theta(0), phi(0), cangle(0), spr(0), trr(0), nph(0), nph_err(0), nph_ti(0), nph_ti_err(0),
+    cangle_pi(0), spr_pi(0), trr_pi(0), nph_pi(0), nph_pi_err(0), nph_pi_ti(0), nph_pi_ti_err(0),
+    par1(0), par2(0), par3(0), par4(0), par5(0), par6(0), test1(0), test2(0), test3(0), sep_gr(0),
+    sep_gr_err(0), sep_ti(0), sep_ti_err(0), beamx(0), beamz(0), nnratio_p(0), nnratio_pi(0),
+    timeRes(0);
   double minChangle(0);
   double maxChangle(1);
   double criticalAngle = asin(1.00028 / 1.47125); // n_quarzt = 1.47125; //(1.47125 <==> 390nm)
@@ -311,6 +319,11 @@ void PrtLutReco::Run(int start, int end) {
   tree.Branch("spr_pi", &spr_pi, "spr_pi/D");
   tree.Branch("trr_pi", &trr_pi, "trr_pi/D");
 
+  tree.Branch("nph_ti", &nph_ti, "nph_ti/D");
+  tree.Branch("nph_ti_err", &nph_ti_err, "nph_ti_err/D");
+  tree.Branch("nph_pi_ti", &nph_pi_ti, "nph_pi_ti/D");
+  tree.Branch("nph_pi_ti_err", &nph_pi_ti_err, "nph_pi_ti_err/D");
+  
   tree.Branch("pid_tof", &pid, "pid/I");
   tree.Branch("pid_dist", &distPid, "distPid/I");
   tree.Branch("pid_lh", &likePid, "likePid/I");
@@ -372,10 +385,10 @@ void PrtLutReco::Run(int start, int end) {
   double sigma[] = {0, 0, 0.0075, 0, 0.0076}, noise(0.25), range(5 * sigma[2]);
   double cwindow = 0.05;
 
-  if (fMethod == 4 && fStudyId == 317) {
-    cwindow = 0.2;
-    timeRes = 10;
-  }
+  // if (fMethod == 4 && fStudyId == 317) {
+  //   cwindow = 0.2;
+  //   timeRes = 10;
+  // }
 
   if (fnpix > 65) {
     speed = 195.5;
@@ -386,7 +399,7 @@ void PrtLutReco::Run(int start, int end) {
 
   for (int ievent = start;
        ievent < nEvents && (events[2] < end || events[fPk] < end) && ievent < pdfend; ievent++) {
-    int nhhits(0);
+    int nhhits(0), nhhits_ti(0);
 
     fChain->GetEntry(ievent);
     double angle1(0), angle2(0), sum1(0), sum2(0), sumti(0), sumti2(0), sumti4(0);
@@ -703,9 +716,12 @@ void PrtLutReco::Run(int start, int end) {
         }
       }
 
+      if (fRadiator == 2) isGoodHit_ti = true;
+
       if (fTimeImaging && isGoodHit_ti) {
 
         if (fMethod == 2) {
+	  nhhits_ti++;
           double t = hitTime;
           // if(fabs(besttdiff) < 0.3) t -= besttdiff;
           double noiseti = 1e-5;
@@ -782,6 +798,7 @@ void PrtLutReco::Run(int start, int end) {
     }
 
     if (fMethod == 2 && fTimeImaging) { // time imaging
+      hNph_ti[pid]->Fill(nhhits_ti);
       sumti = 1.5 * (sumti4 - sumti2) + 30 * sum_nph;
       if (sumti != 0) hLnDiffTi[pid]->Fill(sumti);
     }
@@ -871,6 +888,16 @@ void PrtLutReco::Run(int start, int end) {
       nph_pi = r->Parameter(1);
       nph_pi_err = r->ParError(1);
     }
+    if (hNph_ti[fPk]->GetEntries() > 20) {
+      auto r = hNph_ti[fPk]->Fit("gaus", "SQ", "", 0, 200);
+      nph_ti = r->Parameter(1);
+      nph_ti_err = r->ParError(1);
+    }
+    if (hNph_ti[2]->GetEntries() > 20) {
+      auto r = hNph_ti[2]->Fit("gaus", "SQ", "", 0, 200);
+      nph_pi_ti = r->Parameter(1);
+      nph_pi_ti_err = r->ParError(1);
+    }
 
     // nph = ft.fit(hNph[fPk],40,10,50,1).X();
     gROOT->SetBatch(0);
@@ -956,8 +983,11 @@ void PrtLutReco::Run(int start, int end) {
     if (fVerbose) {
       std::cout << "nnratio_pi " << nnratio_pi << " " << end << "  " << hNph[2]->GetEntries()
                 << std::endl;
-      std::cout << Form("p  SPR = %2.2F N = %2.2f +/- %2.2f", spr, nph, nph_err) << std::endl;
-      std::cout << Form("pi SPR = %2.2F N = %2.2f +/- %2.2f", spr_pi, nph_pi, nph_pi_err)
+      std::cout << Form("p  SPR = %2.2F N = %2.2f +/- %2.2f  Nti= %2.2f +/- %2.2f", spr, nph,
+                        nph_err, nph_ti, nph_ti_err)
+                << std::endl;
+      std::cout << Form("pi SPR = %2.2F N = %2.2f +/- %2.2f  Nti= %2.2f +/- %2.2f", spr_pi, nph_pi,
+                        nph_pi_err, nph_pi_ti, nph_pi_ti_err)
                 << std::endl;
       std::cout << "sep gr " << sep_gr << " +/- " << sep_gr_err << std::endl;
       std::cout << "sep ti " << sep_ti << " +/- " << sep_ti_err << std::endl;
@@ -1154,7 +1184,8 @@ void PrtLutReco::Run(int start, int end) {
             f->SetLineColor(kRed + 1);
           }
           hNph[i]->Draw((i == 2) ? "" : "same");
-          leg->AddEntry(hNph[i], ft.name(i), "lp");
+	  hNph_ti[i]->Draw("same");
+          leg->AddEntry(hNph[i], ft.name(i), "lp");	  
         }
         leg->Draw();
       }

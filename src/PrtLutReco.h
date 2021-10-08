@@ -61,6 +61,7 @@ class PrtLutReco {
   double fBboxNum, fPipehAngle, fDphi, fBarPhi;
   int fMethod;
   int fRadiator;
+  int fLens;
   int fStudyId;
   bool fTimeImaging;
   
@@ -94,7 +95,7 @@ class PrtLutReco {
   TGraph *fPdf2[3072], *fPdf4[3072];
   TH1F *fTime2[3072], *fTime4[3072];
   TH1F *hTof[5], *hTofc[5];
-  TH1F *hNph[5];
+  TH1F *hNph[5], *hNph_ti[5];
 
   TH1F *hLnDiffGr[5], *hLnDiffTi[5];
   TH1F *fHist0, *fHist0d, *fHist0r, *fHist0s, *fHist0i;
