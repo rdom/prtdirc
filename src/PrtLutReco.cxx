@@ -367,7 +367,7 @@ void PrtLutReco::Run(int start, int end) {
   if (fPdfPath.Contains("S.pdf1.root")) pdfend = 5000;
 
   if (fMethod == 4) {
-    if (bsim) start = 0;
+    if (bsim) start = 5000;
     else start = pdfend;
     pdfend = nEvents;
     end = nEvents;
@@ -716,7 +716,7 @@ void PrtLutReco::Run(int start, int end) {
         }
       }
 
-      if (fRadiator == 2) isGoodHit_ti = true;
+      if (fLens != 3) isGoodHit_ti = true;
 
       if (fTimeImaging && isGoodHit_ti) {
 
@@ -800,7 +800,7 @@ void PrtLutReco::Run(int start, int end) {
     if (fMethod == 2 && fTimeImaging) { // time imaging
       hNph_ti[pid]->Fill(nhhits_ti);
       sumti = 1.5 * (sumti4 - sumti2) + 30 * sum_nph;
-      if (sumti != 0) hLnDiffTi[pid]->Fill(sumti);
+      if (sumti != 0) hLnDiffTi[pid]->Fill(3*sumti);
     }
 
     double sumgr = sum1 - sum2 + 30 * sum_nph;
