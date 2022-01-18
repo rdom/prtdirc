@@ -369,8 +369,8 @@ void PrtLutReco::Run(int start, int end) {
   if (fMethod == 4) {
     if (bsim) start = 5000;
     else start = pdfend;
-    pdfend = nEvents;
-    end = nEvents;
+    pdfend = 500000; //nEvents;
+    end = pdfend;
   }
 
   std::cout << "--- run started for [" << start << "," << end << "]" << std::endl;
@@ -482,6 +482,7 @@ void PrtLutReco::Run(int start, int end) {
       if (ndirc < 5) continue;
       // if (!(hodo1 && hodo2)) continue;
       // if (!(t3h && t3v)) continue;
+      // if (!(t3v)) continue;
       // if (!t2) continue;
       // if (!(str1 && stl1 && str2 && stl2)) continue;
 
@@ -503,11 +504,13 @@ void PrtLutReco::Run(int start, int end) {
           }
         } else {
           if (fMethod == 4) {
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+            // if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
+            // if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+	    if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.30) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.80) continue;
           } else {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue;
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.80) continue;
           }
         }
       }
@@ -533,7 +536,7 @@ void PrtLutReco::Run(int start, int end) {
       int mcpid = hit.getPmt();
       int ch = ft.map_pmtpix[mcpid][pixid]; // hit.getChannel();//
       int pathid = hit.getPathInPrizm();
-
+ 
       // TString spathid = Form("%d",pathid);
       // if(pathid != 142) continue;
       // if(!spathid.BeginsWith("1")) continue;
@@ -577,7 +580,7 @@ void PrtLutReco::Run(int start, int end) {
       // hitTime += fCor_time[mcpid];
       hitTime += fCor_time_refl[reflected];
       if (ft.is_bad_channel(ch)) continue;
-
+ 
       int nedge = 0;
       // if(cluster[mcpid][pixid]>4) continue;
 
@@ -593,7 +596,7 @@ void PrtLutReco::Run(int start, int end) {
       } else {
         nedge = GetEdge(mcpid, pixid);
       }
-
+ 
       for (int i = 0; i < size; i++) {
 
         weight = 12 * fLutNode[ch]->GetWeight(i);
@@ -800,7 +803,7 @@ void PrtLutReco::Run(int start, int end) {
     if (fMethod == 2 && fTimeImaging) { // time imaging
       hNph_ti[pid]->Fill(nhhits_ti);
       sumti = 1.5 * (sumti4 - sumti2) + 30 * sum_nph;
-      if (sumti != 0) hLnDiffTi[pid]->Fill(3*sumti);
+      if (sumti != 0) hLnDiffTi[pid]->Fill(1 * sumti);
     }
 
     double sumgr = sum1 - sum2 + 30 * sum_nph;

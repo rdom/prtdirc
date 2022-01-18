@@ -42,8 +42,8 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
   }
   
   if (fRunType == 11 || fRunType == 1) {
-    TString aname = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-    TString bname = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
+    G4String aname = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+    G4String bname = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 
     if (fRunType == 11 && aname == "wBar" && bname == "wOpticalGrease") {
       G4ThreeVector dir = step->GetPreStepPoint()->GetMomentum();
