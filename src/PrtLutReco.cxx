@@ -234,8 +234,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
   }
 
   for (int i : {2, fPk}) {
-    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36);
-    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36);
+    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 70, 76);
+    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 70, 76); //30 36
     hNph[i] = new TH1F("nph_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
     hNph_ti[i] = new TH1F("nph_ti_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
 
@@ -369,7 +369,7 @@ void PrtLutReco::Run(int start, int end) {
   if (fMethod == 4) {
     if (bsim) start = 5000;
     else start = pdfend;
-    pdfend = 500000; //nEvents;
+    pdfend = nEvents;
     end = pdfend;
   }
 
@@ -409,7 +409,7 @@ void PrtLutReco::Run(int start, int end) {
                 << events[2] << " " << events[fPk] << std::endl;
 
     if (bsim) posz = 0.5 * radiatorL - fEvent->getPosition().Z() + gRandom->Uniform(-5, 5);
-    else posz = fEvent->getPosition().Z() + 40;
+    else posz = fEvent->getPosition().Z() + 30;
 
     mom = fEvent->getMomentum().Mag();
     pid = fEvent->getPid();
@@ -436,7 +436,7 @@ void PrtLutReco::Run(int start, int end) {
       momInBar.RotateZ(phi * TMath::DegToRad());
       momInBar0 = momInBar;
     }
-
+        
     // //smear track
     // momInBar = momInBar0;
     // double smearangle = 0.002; // gRandom.Gaus(0,test1);
@@ -509,8 +509,8 @@ void PrtLutReco::Run(int start, int end) {
 	    if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.30) continue;
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.80) continue;
           } else {
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue;
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.80) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.65) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
           }
         }
       }
@@ -543,7 +543,13 @@ void PrtLutReco::Run(int start, int end) {
       // if(!spathid.Contains("142")) continue;
       // std::cout<<"pathid "<<pathid<<std::endl;
 
+      // track resolution
+      // if (test3 < gRandom->Uniform()) continue;
+
       if (bsim) hitTime += gRandom->Gaus(0, 0.20) + t0smear; // time resol. if not simulated
+      double tres = 0.26;
+      if(mcpid > 4) tres = 0.29;
+      if (bsim && fStudyId < 400 && fStudyId > 300) hitTime += gRandom->Gaus(0, tres) + t0smear;
 
       //======================================== dynamic cuts
       {
