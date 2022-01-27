@@ -234,8 +234,8 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
   }
 
   for (int i : {2, fPk}) {
-    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 70, 76);
-    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 70, 76); //30 36
+    hTof[i] = new TH1F("tof_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36); //70 76
+    hTofc[i] = new TH1F("tofc_" + ft.name(i), ";TOF [ns];entries [#]", 500, 30, 36); //30 36
     hNph[i] = new TH1F("nph_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
     hNph_ti[i] = new TH1F("nph_ti_" + ft.name(i), ";detected photons [#];entries [#]", nrange, 0, nrange);
 
@@ -463,10 +463,26 @@ void PrtLutReco::Run(int start, int end) {
         if (gch == 514) t3h++;
         if (gch == 515) t3v++;
 
-        if (fMethod == 3) {
-          if (gch >= 1094 && gch <= 1101) hodo1++;
-        } else {
-          if (gch >= 1089 && gch <= 1106) hodo1++;
+        if (fStudyId < 400) {
+          t2 = 817;
+          t3h = 818;
+          t3v = 819;
+        }
+        if (fStudyId >= 400) {
+          if (fMethod == 3) {
+            if (gch >= 1094 && gch <= 1101) hodo1++;
+          } else {
+            if (gch >= 1089 && gch <= 1106) hodo1++;
+          }
+        }
+        if (fStudyId < 400) {
+          if (fMethod == 3) {
+            if (gch >= 1350 && gch <= 1352) hodo1++;
+            if (gch >= 1367 && gch <= 1372) hodo2++;
+          } else {
+            if (gch >= 1348 && gch <= 1354) hodo1++;
+            if (gch >= 1365 && gch <= 1372) hodo2++;
+          }
         }
 
         // if(gch>=1095 && gch<=1095) hodo1++;
@@ -476,11 +492,11 @@ void PrtLutReco::Run(int start, int end) {
         if (gch == 1146) stl2++;
 
         // if(gch>=1115 && gch<=1120)
-        hodo2++;
+        // hodo2++;
       }
 
       if (ndirc < 5) continue;
-      // if (!(hodo1 && hodo2)) continue;
+      if (!(hodo1 && hodo2)) continue;
       // if (!(t3h && t3v)) continue;
       // if (!(t3v)) continue;
       // if (!t2) continue;
@@ -504,12 +520,10 @@ void PrtLutReco::Run(int start, int end) {
           }
         } else {
           if (fMethod == 4) {
-            // if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
-            // if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
 	    if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.30) continue;
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.80) continue;
           } else {
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.65) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue;
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
           }
         }
