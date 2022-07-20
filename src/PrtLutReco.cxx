@@ -551,8 +551,8 @@ void PrtLutReco::Run(int start, int end) {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
           } else {
-            // if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue; // 0.65
-            // if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue; // 0.65
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
           }
         } else { // 2017
           if (fMethod == 4) {
