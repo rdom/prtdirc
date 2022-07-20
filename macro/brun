@@ -11,16 +11,20 @@ if [ "$1" == "0" ] ; then
     for i in {1..5}; do ../build/prtdirc -o b_h$i.root \
 					 -h 1 -l 3 -p 7.00 -a 20.00 -phi 0.00 -gz 442.00 -gx 85.00 -gsx 66.10 -gsy 16.80 -z 10.00 -g 2018 -c 2018 -study 403 \
 					 -s 1 -z 0 -a 180 -phi 0 -x "opticalphoton" -p "3.18 eV" -e 2000000 -b 1 \
-					 -r $tseed$i > b_l$i.log & done
+					 -seed $tseed$i > b_l$i.log & done
     
 else
     # for i in {1..5}; do ../build/prtdirc -o b_h$i.root \
     # 					 -h 1 -l 3 -p 7.00 -a 19.7 -phi 0.80 -gz 442.00 -gx 85.00 -gsx 66.10 -gsy 16.80 -z 10.00 -g 2018 -c 2018 -study 403 \
-    # 					 -z 10 -e 1000 -x "mix" -b 1 -r $tseed$i > b_l$i.log & done
+    # 					 -z 10 -e 1000 -x "mix" -b 1 -seed $tseed$i > b_l$i.log & done
+
+    # for i in {1..20}; do ../build/prtdirc -o b_h$i.root \
+    # 					  -h 1 -l 3 -p 7.00 -a 19.66 -phi -0.05 -gz 409.00 -gx 85.00 -gsx 65.00 -gsy 16.30 -z 10.00 -g 2018 -c 2018 -study 401 \
+    # 			                  -e 10000 -x "mix_pip" -b 1 -seed $tseed$i > b_l$i.log & done
 
     for i in {1..20}; do ../build/prtdirc -o b_h$i.root \
-					  -h 1 -l 3 -p 7.00 -a 19.66 -phi -0.05 -gz 409.00 -gx 85.00 -gsx 65.00 -gsy 16.30 -z 10.00 -g 2018 -c 2018 -study 401 \
-    			                  -e 10000 -x "mix_pip" -b 1 -r $tseed$i > b_l$i.log & done 
+					  -study 403 -r 0 -phi 0 -l 10 -w 11 \
+    			                  -e 2000 -x "mix_pip" -b 1 -seed $tseed$i > b_l$i.log & done 
 fi
 
 sleep 1

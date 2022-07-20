@@ -10,7 +10,8 @@
 #include "PrtPrimaryGeneratorAction.h"
 #include "PrtPrimaryGeneratorMessenger.h"
 
-PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGeneratorAction(), fParticleGun(0) {
+PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction()
+  : G4VUserPrimaryGeneratorAction(), fParticleGun(0) {
   int n_particle = 1;
   fRun = PrtManager::Instance()->getRun();
   double mom = fRun->getMomentum();
@@ -49,7 +50,8 @@ PrtPrimaryGeneratorAction::PrtPrimaryGeneratorAction() : G4VUserPrimaryGenerator
 
   // for(auto m=0; m<mid; m++){
   //   for(auto p=0; p<pid; p++){
-  //     gpix[m][p] = vdirc+(vmcp[m]+vpix[p]).rotateY(PrtManager::Instance()->GetAngle()*deg-180*deg);
+  //     gpix[m][p] =
+  //     vdirc+(vmcp[m]+vpix[p]).rotateY(PrtManager::Instance()->GetAngle()*deg-180*deg);
   //   }
   // }
 
@@ -69,21 +71,22 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
   PrtManager::Instance()->addEvent(PrtEvent());
   int pdg = fRun->getPid();
 
-  if(pdg >0){
-    if(pdg == 2212)  fPid = 4;
-    else if(pdg == 321)  fPid = 3;
-    else if(pdg == 211)  fPid = 2;
-    else if(pdg == 10001 && fPid > 2) fPid = 2;
-    else if(pdg == 10001 && fPid == 2) fPid = 4;
-    else if(pdg == 10002 && fPid > 2) fPid = 2;
-    else if(pdg == 10002 && fPid == 2) fPid = 3;
+  if (pdg > 0) {
+    if (pdg == 2212) fPid = 4;
+    else if (pdg == 321) fPid = 3;
+    else if (pdg == 211) fPid = 2;
+    else if (pdg == 10001 && fPid > 2) fPid = 2;
+    else if (pdg == 10001 && fPid == 2) fPid = 4;
+    else if (pdg == 10002 && fPid > 2) fPid = 2;
+    else if (pdg == 10002 && fPid == 2) fPid = 3;
 
     PrtManager::Instance()->getEvent()->setPid(fPid);
-    fParticleGun->SetParticleDefinition(fParticle[fPid]);  
-  }else{
-    fParticleGun->SetParticleDefinition(fParticleOP); 
-  } 
-
+    fParticleGun->SetParticleDefinition(fParticle[fPid]);
+  } else {
+    fParticleGun->SetParticleDefinition(fParticleOP);
+  }
+  // if (fRun->getRunType() == 11)  fParticleGun->SetParticleMomentum(G4ThreeVector(0, 0, (7 - 4 * G4UniformRand()) * GeV));    
+  
   if (fRun->getBeamSize() > 0) { // smearing and divergence
     double sigma = fRun->getBeamSize() * mm;
     z = fParticleGun->GetParticlePosition().z();
@@ -130,11 +133,21 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
 
     fParticleGun->SetParticleMomentumDirection(v);
     PrtManager::Instance()->setMomentum(TVector3(v.x(), v.y(), v.z()));
+
+    // for (int i = 0; i < 10; i++) {
+    //   for (int j = 0; j < 20; j++) {
+    //     fParticleGun->SetParticlePosition(G4ThreeVector(
+    //       fRun->getPrismStepY() + 5 - i, fRun->getPrismStepX() + 10 - j, fRadiatorL / 2. - 0.1));
+    //     fParticleGun->SetParticleMomentumDirection(v);
+    //     fParticleGun->GeneratePrimaryVertex(anEvent);
+    //   }
+    // }
   }
   if (fRun->getRunType() == 7) { // calibration light
     double shift = fRun->getTest3();
 
-    fParticleGun->SetParticlePosition(G4ThreeVector(-fRadiatorL / 2. + 170 -shift, 0, tan(33 * deg) * shift -30));
+    fParticleGun->SetParticlePosition(
+      G4ThreeVector(-fRadiatorL / 2. + 170 - shift, 0, tan(33 * deg) * shift - 30));
     double angle = -G4UniformRand() * M_PI;
     G4ThreeVector vec(0, 0, 1);
     vec.setTheta(acos(G4UniformRand()));
@@ -158,7 +171,8 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
     double lensThickness = 15;
     double separation = fRun->getBeamSize();
     if (separation < 0.001) separation = 10;
-    double rotShiftX = 0.5 * separation * std::cos(angle) + (0.5 * lensThickness + 0.1) * std::tan(angle);
+    double rotShiftX =
+      0.5 * separation * std::cos(angle) + (0.5 * lensThickness + 0.1) * std::tan(angle);
     double rotShiftY = -0.5 * fRadiatorL + 0.1;
 
     // fParticleGun->SetParticlePosition(G4ThreeVector(shiftx,shifty,shiftz));
@@ -181,9 +195,9 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
   fParticleGun->GeneratePrimaryVertex(anEvent);
 
   G4ThreeVector dir = fParticleGun->GetParticleMomentumDirection();
-  dir *= fParticleGun->GetParticleMomentum()*0.001; // GeV/c
-  
-  PrtManager::Instance()->getEvent()->setMomentum(TVector3(dir.x(), dir.y(), dir.z()));  
+  dir *= fParticleGun->GetParticleMomentum() * 0.001; // GeV/c
+
+  PrtManager::Instance()->getEvent()->setMomentum(TVector3(dir.x(), dir.y(), dir.z()));
 }
 
 void PrtPrimaryGeneratorAction::SetOptPhotonPolar() {

@@ -47,6 +47,7 @@ class PrtManager {
   // accessors
   PrtRun *getRun() { return fRun; }
   TString getOutName() { return fOutName; }
+  TVector3 getMomentum() { return fMomentum; }
 
  private:
   TString fOutName;

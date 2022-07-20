@@ -49,6 +49,7 @@ class PrtLutReco {
   void FitRing(double &x0, double &y0, double &theta);
   double fillLnDiffPPi(double cangle, int tofPid, double mom);
   double fillLnDiffPPi2(double cangle, int tofPid, double mom);
+  void BuildAnaPdf(TF1 &pdf2, TF1 &pdf4, int ch, TVector3 beamdir, TVector3 bardir, double lenz, int nedge, bool reflected, int mcpid);
   void ResetHists();
   int  getneighbours(int m, int p);
   void getclusters();
@@ -58,12 +59,14 @@ class PrtLutReco {
   PrtTools ft;
   int fmaxch,fnpmt,fnpix;
   int fDetectorID;
-  double fBboxNum, fPipehAngle, fDphi, fBarPhi;
+  double fBboxNum, fPipehAngle, fDphi, fBarPhi, fBeamZ;
   int fMethod;
   int fRadiator;
   int fLens;
   int fStudyId;
   bool fTimeImaging;
+  TVector3 fnX1, fnY1;
+  double fCriticalAngle;
   
   TClonesArray *fLut;
   TClonesArray *fTrackInfoArray;

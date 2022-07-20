@@ -31,25 +31,30 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
   }
 
   G4Track *track = step->GetTrack();
+  if (track->GetDefinition() != G4OpticalPhoton::OpticalPhotonDefinition()) return;
 
-  // int parentId = track->GetParentID();  
+  // int parentId = track->GetParentID();
   // std::cout<<"parentId   "<<parentId <<std::endl;
-  // std::cout<<"length  "<<track->GetTrackLength() << " step num "<< track->GetCurrentStepNumber()
+  // std::cout<<"length  "<<track->GetTrackLength() << " step num "<<
+  // track->GetCurrentStepNumber()
   // <<std::endl;
 
   if (track->GetCurrentStepNumber() > 50000 || track->GetTrackLength() > 10000) {
     track->SetTrackStatus(fStopAndKill);
   }
-  
+
   if (fRunType == 11 || fRunType == 1) {
     G4String aname = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
     G4String bname = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 
     if (fRunType == 11 && aname == "wBar" && bname == "wOpticalGrease") {
-      G4ThreeVector dir = step->GetPreStepPoint()->GetMomentum();
-      TVector3 v(dir.x(), dir.y(), dir.z());
-      v.RotateY(-(TMath::Pi() - 20 * TMath::Pi() / 180.));
-      PrtManager::Instance()->getEvent()->setMomentum(v);
+     
+      G4TouchableHistory *touchable = (G4TouchableHistory *)(step->GetPreStepPoint()->GetTouchable());
+      G4ThreeVector gdir = step->GetPreStepPoint()->GetMomentum();
+      G4ThreeVector ldir = touchable->GetHistory()->GetTopTransform().TransformAxis(gdir);
+      TVector3 v(ldir.x(), ldir.y(), ldir.z());
+
+      PrtManager::Instance()->setMomentum(v);
       PrtManager::Instance()->getEvent()->setTime(step->GetPreStepPoint()->GetLocalTime());
     }
 
@@ -57,6 +62,10 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
     if (fRunType == 1 && aname == "wLens3" && bname == "wDirc") {
       track->SetTrackStatus(fStopAndKill);
     }
+
+    // std::cout << "aname " << aname <<" "<<bname << std::endl;
+    
+    if (aname == "wDirc" && bname == "gExpHall") track->SetTrackStatus(fStopAndKill);
   }
 
   // if(aname=="Bar" && bname=="ExpHall" ) track->SetTrackStatus(fStopAndKill);

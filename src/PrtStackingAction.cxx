@@ -95,7 +95,7 @@ G4ClassificationOfNewTrack PrtStackingAction::ClassifyNewTrack(const G4Track *aT
     if (aTrack->GetParentID() == 1 && ParticleName != "opticalphoton") return fKill;
   }
 
-  if (fRunType == 0) { // for the simulation run
+  if (fRunType == 0 || fRunType == 11) { // for the simulation run
 
     // if(aTrack->GetDefinition()->GetParticleName()=="opticalphoton"
     //    && aTrack->GetParentID()!=1)  return fKill;

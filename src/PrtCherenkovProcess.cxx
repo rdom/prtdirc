@@ -235,8 +235,10 @@ G4VParticleChange *PrtCherenkovProcess::PostStepDoIt(const G4Track &aTrack, cons
  
     } while (rand * maxSin2 > sin2Theta);
 
-    double lambda = 197.0 * 2.0 * pi / (sampledEnergy * 1.0E6);
-    if (G4UniformRand() > fDetEff[fQEtype]->Eval(lambda)) continue; // pmt's quantum efficiency
+    if (runid == 5) {
+      double lambda = 197.0 * 2.0 * pi / (sampledEnergy * 1.0E6);
+      if (G4UniformRand() > fDetEff[fQEtype]->Eval(lambda)) continue; // pmt's quantum efficiency
+    }
 
     // Generate random position of photon on cone surface
     // defined by Theta

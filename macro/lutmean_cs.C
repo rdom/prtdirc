@@ -131,7 +131,7 @@ void lutmean_cs(TString inFile = "../data/lut.root") {
       // hDir->Reset();
       // hTime->Reset();
       
-      if (weight[0] < 5) continue;
+      if (weight[0] < 2) continue;
 
       for (int s = 0; s < 9; s++) {
         if (weight[s] == 0) {

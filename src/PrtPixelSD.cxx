@@ -442,6 +442,7 @@ void PrtPixelSD::Initialize(G4HCofThisEvent *hce) {
 }
 
 bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
+
   // // energy deposit
   // double edep = step->GetTotalEnergyDeposit();
 
@@ -462,6 +463,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   double time = step->GetPreStepPoint()->GetLocalTime();
 
   G4Track *track = step->GetTrack();
+  
   PrtHit hit;
   int mcpid = touchable->GetReplicaNumber(1);
   int pixid = touchable->GetReplicaNumber(0);
@@ -510,7 +512,6 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   G4ThreeVector g4mom = track->GetVertexMomentumDirection(); // track->GetMomentum();
  
-
   TVector3 globalPos(inPrismpos.x(), inPrismpos.y(), inPrismpos.z());
   TVector3 localPos(localpos.x(), localpos.y(), localpos.z());
 
@@ -521,8 +522,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
   translation = touchable->GetHistory()->GetTransform(1).TransformPoint(translation);
   TVector3 digiPos(translation.x(), translation.y(), translation.z());
-  TVector3 vertexPos(g4pos.x(), g4pos.y(), g4pos.z());
- 
+  TVector3 vertexPos(g4pos.x(), g4pos.y(), g4pos.z()); 
 
   // information from prizm
   G4SDManager *fSDM = G4SDManager::GetSDMpointer();
@@ -582,7 +582,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
   // time since event created
   // step->GetPreStepPoint()->GetGlobalTime()*1000
 
-  if (fRunType == 1) {
+  if (fRunType == 1 || fRunType == 11) {
     PrtManager::Instance()->addHit(hit, localPos, digiPos, vertexPos);
     return true;
   }

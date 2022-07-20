@@ -1082,6 +1082,7 @@ void PrtDetectorConstruction::DefineMaterials() {
   for (int i = 0; i < 25; i++) {
     Nlak33bEn[i] *= eV;
     Nlak33bAb[i] = (-0.8) / log(Nlak33bAb[i]) * 1 * cm; // account for glue in lens
+    // std::cout << "en " << Nlak33bEn[i] <<" "<<  Nlak33bAb[i] << std::endl;    
   }
 
   /**************************** REFRACTIVE INDEXES ****************************/
