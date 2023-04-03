@@ -103,7 +103,7 @@ PrtDetectorConstruction::PrtDetectorConstruction() : G4VUserDetectorConstruction
     fPrizm[3] = 30;
   }
 
-  if (fMcpLayout == 2017 || fMcpLayout == 2030) {
+  if (fMcpLayout == 2017 || fMcpLayout == 2030 || fMcpLayout == 2038) {
     fNCol = 4;
   }
 
@@ -667,6 +667,11 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
     // The MCP Pixel
     int mcpDimx = 8;
     int mcpDimy = 8;
+    if (fMcpLayout == 2038) {
+      mcpDimx = 8;
+      mcpDimy = 8;
+    }
+
     if (fMcpLayout == 2030) {
       mcpDimx = 16;
       mcpDimy = 16;
@@ -737,7 +742,7 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
           shifty = (fMcpTotal[0] + 3) * (j - 1);
         }
 
-        if (fMcpLayout == 2017 || fMcpLayout == 2030) {
+        if (fMcpLayout == 2017 || fMcpLayout == 2030 || fMcpLayout == 2038) {
           double msh = 3;
           shiftx = i * (fMcpTotal[0] + msh) - fPrizm[3] / 2 + fMcpActive[0] / 2. + 3;
           shifty = (fMcpTotal[0] + 3) * (j - 1);

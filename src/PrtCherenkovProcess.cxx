@@ -10,7 +10,7 @@ PrtCherenkovProcess::PrtCherenkovProcess(const G4String &processName, G4ProcessT
   : G4Cerenkov(processName, type) {
 
   fQEtype = 0;
-  if (PrtManager::Instance()->getRun()->getPmtLayout() == 2030) fQEtype = 1;
+  if (PrtManager::Instance()->getRun()->getPmtLayout() >= 2030) fQEtype = 1;
 
   // create a detector efficiency function:
   {

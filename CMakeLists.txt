@@ -25,18 +25,23 @@ find_package(ROOT REQUIRED)
 include_directories(SYSTEM ${Geant4_INCLUDE_DIR} ${ROOT_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/src)
 
+# add tensorflow, cppflow 
+include_directories($ENV{HOME}/usr/include)
+include_directories(cppflow/include)
+link_directories($ENV{HOME}/usr/lib)
+
 include(${ROOT_USE_FILE})
 include(${Geant4_USE_FILE})
 
 file(GLOB sources ${PROJECT_SOURCE_DIR}/src/*.cxx)
 file(GLOB headers ${PROJECT_SOURCE_DIR}/src/*.h)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 #----------------------------------------------------------------------------
 # Generate dictionary for root
-ROOT_GENERATE_DICTIONARY(G__Prt PrtHit.h PrtEvent.h PrtRun.h PrtLutNode.h LINKDEF src/PrtLinkDef.h MODULE Prt)
+ROOT_GENERATE_DICTIONARY(G__Prt PrtHit.h PrtEvent.h PrtRun.h PrtLutNode.h ../../prttools/PrtTools.h LINKDEF src/PrtLinkDef.h MODULE Prt)
 add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtRun.cxx  src/PrtLutNode.cxx ../prttools/PrtTools.cxx G__Prt.cxx)
-#target_link_libraries(Prt ${ROOT_LIBRARIES})
+target_link_libraries(Prt ${ROOT_LIBRARIES} -lSpectrum -lHistPainter)
 
 #----------------------------------------------------------------------------
 # Add the executable, and link it to the Geant4 libraries
@@ -44,8 +49,15 @@ add_library(Prt SHARED src/PrtHit.cxx src/PrtEvent.cxx src/PrtRun.cxx  src/PrtLu
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -fno-trapping-math -ftree-vectorize -fno-math-errno")
 set(CMAKE_CXX_FLAGS "-Wno-deprecated -Wno-maybe-uninitialized -Wno-unused-variable -Wno-unused-parameter -Wno-unused-but-set-variable")
 
+if(AI)
+  add_definitions( -DAI )
+  set(AI_LIB "-ltensorflow")
+else()
+  set(AI_LIB "")
+endif()
+
 add_executable(prtdirc ${sources})
-target_link_libraries(prtdirc -lGLU ${Geant4_LIBRARIES} ${ROOT_LIBRARIES} Prt -lSpectrum -lHistPainter)
+target_link_libraries(prtdirc -lGLU ${AI_LIB} ${Geant4_LIBRARIES} Prt)
 
 #----------------------------------------------------------------------------
 # Copy all scripts to the build directory, i.e. the directory in which we

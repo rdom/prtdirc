@@ -635,8 +635,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
       if (fMultHit[mcpid][pixid] == 0 || !dead_time)
         PrtManager::Instance()->addHit(hit, localPos, digiPos, position);
       fMultHit[mcpid][pixid]++;
-    } else
-      is_hit = false;
+    } else is_hit = false;
 
   } else {
     if (fMultHit[mcpid][pixid] == 0 || !dead_time || fMcpLayout == 0)

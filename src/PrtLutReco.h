@@ -64,6 +64,7 @@ class PrtLutReco {
   int fRadiator;
   int fLens;
   int fStudyId;
+  int fPmtLayout;
   bool fTimeImaging;
   TVector3 fnX1, fnY1;
   double fCriticalAngle;
@@ -100,7 +101,7 @@ class PrtLutReco {
   TH1F *hTof[5], *hTofc[5];
   TH1F *hNph[5], *hNph_ti[5];
 
-  TH1F *hLnDiffGr[5], *hLnDiffTi[5];
+  TH1F *hLnDiffGr[5], *hLnDiffTi[5], *hLnDiffNn[5];
   TH1F *fHist0, *fHist0d, *fHist0r, *fHist0s, *fHist0i;
 
   PrtLutNode *fLutNode[5000];

@@ -1,3 +1,21 @@
+## Installation
+```
+#install and initialize geant4 with -DGEANT4_USE_OPENGL_X11=ON -DGEANT4_USE_QT=ON
+
+git clone https://github.com/rdom/prttools
+git clone https://github.com/rdom/prtdirc
+cd prtdirc
+mkdir build
+cd build
+cmake ..
+make -j4
+
+#neural network
+install tensorflow libs, cppflow and run:
+cmake -DAI ..
+
+
+
 ##Synopsis
 ```
 prtdirc [OPTION] [ARGUMENT] ... [OPTION] [ARGUMENT]
