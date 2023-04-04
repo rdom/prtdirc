@@ -613,7 +613,7 @@ void PrtLutReco::Run(int start, int end) {
     // double temp_ti[fmaxch] = {0};
     double hitTime_ti;
     std::vector<double> vinput(512, 0.0);
-    std::vector<double> v2input(512, 0.0);
+    // std::vector<double> v2input(512, 0.0);
     
     for (auto hit : fEvent->getHits()) {
 
@@ -947,12 +947,18 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       if (isGoodHit_gr) {
-	vinput[ch] = 1;
-        hBounce->Fill(bestbounce);
-        fHist1->Fill(hitTime);
-        nhhits++;
-        nsHits++;
-        if (pid == 2) ft.fill_digi(mcpid, pixid);
+        // vinput[ch] = 1;
+        // vinput[ch] = hitTime / 50.;
+        int tx = 8 * (mcpid / 2) + pixid % 8;
+        int ty = 8 * (mcpid % 2) + pixid / 8;
+        int tc = 32 * ty + tx;
+	if (tc > 0) vinput[tc] = hitTime / 50.;
+	
+	hBounce->Fill(bestbounce);
+	fHist1->Fill(hitTime);
+	nhhits++;
+	nsHits++;
+  if (pid == 2) ft.fill_digi(mcpid, pixid);
       }
     }
 
@@ -985,11 +991,11 @@ void PrtLutReco::Run(int start, int end) {
       // Creates a tensor from the vector with shape [X_dim, Y_dim]
       // auto input = cppflow::tensor(vinput, {1, 512});
       // input = cppflow::cast(input, TF_FLOAT, TF_INT64);
-
+      // auto output = model(input);      
+      
       auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
-      input = cppflow::cast(input, TF_FLOAT, TF_FLOAT);
-
-      // auto output = model(input);
+      input = cppflow::cast(input, TF_FLOAT, TF_FLOAT, TF_FLOAT);
+      
       auto output = model({{"serving_default_conv2d_305_input:0", input}},{"StatefulPartitionedCall:0"})[0];
       auto t = cppflow::arg_max(output, 1).get_tensor();
       float *ll = static_cast<float *>(TF_TensorData(output.get_tensor().get()));
@@ -1073,8 +1079,8 @@ void PrtLutReco::Run(int start, int end) {
     double eff_nnt = ft.calculate_efficiency(hLnDiffNn[2], hLnDiffNn[fPk]);
     std::cout << "Eff NN = " << eff_nnt << std::endl;
 
-    if (eff_total[2] > 0) std::cout << "Eff NN = " << eff_nn[2] / (float)eff_total[2] << std::endl;
-    std::cout << "eff_total " << eff_total[2] << " eff_nn " << eff_nn[2] << std::endl;
+    if (eff_total[4] > 0) std::cout << "Eff NN = " << eff_nn[4] / (float)eff_total[4] << std::endl;
+    std::cout << "eff_total " << eff_total[4] << " eff_nn " << eff_nn[4] << std::endl;
   }
 
   if (fMethod == 4) { // create pdf
