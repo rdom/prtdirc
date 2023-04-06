@@ -29,11 +29,15 @@
 #include "TGraph.h"
 #include "CLHEP/Units/SystemOfUnits.h"
 
+#ifdef AI
+#include "cppflow/cppflow.h"
+#endif
+
 class PrtLutReco {
 
  public:
   // Standard constructors
-  PrtLutReco(TString infile, TString lutfile,TString pdffile, int verbose = 0);
+  PrtLutReco(TString infile, TString lutfile, TString pdffile, TString nnfile, int verbose = 0);
 
   // Destructor
   ~PrtLutReco();
@@ -96,6 +100,7 @@ class PrtLutReco {
   double fCorrSpr;
   TString fCorrPath;
   TString fPdfPath;
+  TString fNNPath;
   TGraph *fPdf2[3072], *fPdf4[3072];
   TH1F *fTime2[3072], *fTime4[3072];
   TH1F *hTof[5], *hTofc[5];
@@ -114,6 +119,10 @@ class PrtLutReco {
   int lneighbours[65];
   int lsize = 0;
 
+#ifdef AI
+  cppflow::model *fNNmodel;
+#endif
+  
 };
 
 #endif

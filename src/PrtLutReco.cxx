@@ -75,9 +75,10 @@ TH2F *hLutCorrC = new TH2F("hLutCorrC", ";#theta_{l}sin(#varphi_{l});#theta_{l}c
 TH2F *htdiff = new TH2F("htdiff", ";time [ns];#Delta t [ns]", 500, 3, 25, 500, -1, 1);
 
 // -----   Default constructor   -------------------------------------------
-PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int verbose) {
+PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, TString nnfile, int verbose) {
   fVerbose = verbose;
   fPdfPath = pdffile;
+  fNNPath = nnfile;
   fChain = new TChain("data");
   fChain->Add(infile);
   fEvent = new PrtEvent();
@@ -233,7 +234,20 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, int ver
     fCor_level = 2;
     std::cout << "--- corr file skipped for L != 3" << std::endl;
   }
-  
+
+  // read neural network model
+#ifdef AI
+  if (!gSystem->AccessPathName(fNNPath)) {
+    std::cout << "--- reading  " << fNNPath << std::endl;
+    fNNmodel = new cppflow::model(fNNPath.Data());
+    for (auto s : (*fNNmodel).get_operations()) {
+      std::cout << s << std::endl;
+    }
+  } else {
+    std::cout << "---- neural net model not found  " << fNNPath << std::endl;
+  }
+#endif
+
   for (int i = 0; i < fmaxch; i++) {
     fTime2[i] = new TH1F(Form("hs_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
     fTime4[i] = new TH1F(Form("hf_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
@@ -304,20 +318,7 @@ void PrtLutReco::Run(int start, int end) {
     nnratio_p(0), nnratio_pi(0), timeRes(0);
   double minChangle(0);
   double maxChangle(1);
-
-#ifdef AI
-  // cppflow::model model("../macro/models/prtai");
-  cppflow::model model("../macro/models/saved_cnnmodel");
-  std::cout << "----------------- " << std::endl;  
-  model.get_operations();
-  for(auto s : model.get_operations() ){
-    std::cout << "s " << s << std::endl;   
-  } 
   
-  std::cout << "----------------- " << std::endl;
-  
-#endif
-
   double radiatorL = frun->getRadiatorL();
   double radiatorW = frun->getRadiatorW();
   double radiatorH = frun->getRadiatorH();
@@ -613,8 +614,7 @@ void PrtLutReco::Run(int start, int end) {
     // double temp_ti[fmaxch] = {0};
     double hitTime_ti;
     std::vector<double> vinput(512, 0.0);
-    // std::vector<double> v2input(512, 0.0);
-    
+      
     for (auto hit : fEvent->getHits()) {
 
       hitTime = hit.getLeadTime();
@@ -622,6 +622,8 @@ void PrtLutReco::Run(int start, int end) {
       int mcpid = hit.getPmt();
       int ch = ft.map_pmtpix[mcpid][pixid]; // hit.getChannel();//
       int pathid = hit.getPathInPrizm();
+
+      if (pixid < 0) continue;
 
       // dead time
       if (bsim) {
@@ -947,18 +949,17 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       if (isGoodHit_gr) {
-        // vinput[ch] = 1;
-        // vinput[ch] = hitTime / 50.;
-        int tx = 8 * (mcpid / 2) + pixid % 8;
-        int ty = 8 * (mcpid % 2) + pixid / 8;
-        int tc = 32 * ty + tx;
-	if (tc > 0) vinput[tc] = hitTime / 50.;
-	
 	hBounce->Fill(bestbounce);
 	fHist1->Fill(hitTime);
 	nhhits++;
 	nsHits++;
-  if (pid == 2) ft.fill_digi(mcpid, pixid);
+	if (pid == 2) ft.fill_digi(mcpid, pixid);
+
+	int pix = pixid - 1;
+	int tx = 8 * (mcpid / 2) + pix % 8;
+	int ty = 8 * (mcpid % 2) + pix / 8;
+	int tc = 32 * ty + tx;
+	if (tc >= 0) vinput[tc] = hitTime; // / 50.;
       }
     }
 
@@ -985,30 +986,35 @@ void PrtLutReco::Run(int start, int end) {
 #ifdef AI
     if (1) { // newral network
 
-      // std::vector<int> input(6144,0);
-      // input = cppflow::cast(input, TF_UINT8, TF_FLOAT);
-
-      // Creates a tensor from the vector with shape [X_dim, Y_dim]
-      // auto input = cppflow::tensor(vinput, {1, 512});
-      // input = cppflow::cast(input, TF_FLOAT, TF_INT64);
-      // auto output = model(input);      
-      
       auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
-      input = cppflow::cast(input, TF_FLOAT, TF_FLOAT, TF_FLOAT);
+      input = cppflow::cast(input, TF_FLOAT, TF_FLOAT);
+      auto output = (*fNNmodel)(input);
+
+      // auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
+      // input = cppflow::cast(input, TF_FLOAT, TF_FLOAT, TF_FLOAT);
+      // auto o = std::vector<cppflow::tensor>();
+      // auto u = std::vector<cppflow::datatype>();
+      // u.push_back(TF_FLOAT);
+      // u.push_back(TF_FLOAT);
+      // o.push_back(input);
+      // // cppflow::string_format(o,"%s","%s",-1);
+      // cppflow::print(input, o,u,"",-1,-1);     
+      // auto output = (*fNNmodel)({{"serving_default_conv2d_305_input:0", input}},{"StatefulPartitionedCall:0"})[0];
+      // std::cout << "input " << input << std::endl;
       
-      auto output = model({{"serving_default_conv2d_305_input:0", input}},{"StatefulPartitionedCall:0"})[0];
+      
       auto t = cppflow::arg_max(output, 1).get_tensor();
       float *ll = static_cast<float *>(TF_TensorData(output.get_tensor().get()));
       int nn_pid = static_cast<int *>(TF_TensorData(t.get()))[0];
       if (nn_pid == 0) nn_pid = 2;
       if (nn_pid == 1) nn_pid = 4;
 
-      hLnDiffNn[pid]->Fill(5 * (ll[fPk] - ll[2]));
+      hLnDiffNn[pid]->Fill(1 * (ll[fPk] - ll[2]));
 
       // Show the predicted class
-      std::cout << output << std::endl;
-      std::cout << "PID " << pid << " nn " << nn_pid << std::endl;
-      if (pid == nn_pid) eff_nn[nn_pid]++;
+      // std::cout << output << std::endl;
+      // std::cout << "PID " << pid << " nn " << nn_pid << std::endl;
+      if (pid == nn_pid) eff_nn[pid]++;
       eff_total[pid]++;
     }
 #endif
@@ -1079,8 +1085,8 @@ void PrtLutReco::Run(int start, int end) {
     double eff_nnt = ft.calculate_efficiency(hLnDiffNn[2], hLnDiffNn[fPk]);
     std::cout << "Eff NN = " << eff_nnt << std::endl;
 
-    if (eff_total[4] > 0) std::cout << "Eff NN = " << eff_nn[4] / (float)eff_total[4] << std::endl;
-    std::cout << "eff_total " << eff_total[4] << " eff_nn " << eff_nn[4] << std::endl;
+    if (eff_total[2] > 0) std::cout << "Eff NN (pi) = " << eff_nn[2] / (float)eff_total[2] << std::endl;
+    if (eff_total[4] > 0) std::cout << "Eff NN (p) = " << eff_nn[4] / (float)eff_total[4] << std::endl;
   }
 
   if (fMethod == 4) { // create pdf
