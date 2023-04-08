@@ -6,7 +6,7 @@ import numpy as np
 
 import tensorflow as tf
 print("TensorFlow version:", tf.__version__)
-from tensorflow.keras.layers import Dense, Flatten, Conv2D, Discretization
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Discretization, Normalization
 from tensorflow.keras import Model
 from array import array
 
@@ -48,17 +48,20 @@ test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
 class PrtNN(Model):
   def __init__(self):
     super(PrtNN, self).__init__()
-    # self.conv1 = Conv2D(2, 4, activation='relu')
+    self.conv1 = Conv2D(filters=32,kernel_size=(1,2),kernel_initializer='glorot_uniform',
+                        activation='relu')
     self.disc = Discretization(bin_boundaries=[0.001])
+    self.norm = Normalization(axis=None)
     self.flatten = Flatten()
-    # self.d1 = Dense(5, input_shape = 512, activation='relu')
+    self.d1 = Dense(10, activation='relu')
     self.d2 = Dense(5)
 
   def call(self, x):
-      # x = self.conv1(x)
-      x = self.disc(x)
+      x = self.norm(x)
+      x = self.d1(x)
+      x = self.conv1(x)
+      # x = self.disc(x)
       x = self.flatten(x)
-      # x = self.d1(x)
       return self.d2(x)
 
   def model(self):
