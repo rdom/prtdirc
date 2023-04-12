@@ -18,33 +18,40 @@ import ROOT
 from ROOT import TFile, TTree, gROOT, addressof
 
 stat = int(sys.argv[1])
-        
+   
 def load_data(path="data.npz"):
     
     with np.load(path, allow_pickle=True) as f:
-        x_train, y_train = f["x_train"], f["y_train"]
-        x_test, y_test = f["x_test"], f["y_test"]
+        x_train, y_train = f["x_train"].astype("int32"), f["y_train"]
+        x_test, y_test = f["x_test"].astype("int32"), f["y_test"]
         
         return (x_train, y_train), (x_test, y_test)
 
 
-(x_train, y_train), (x_test, y_test) = load_data("data_stat_16x32_btc3_30000.npz")
+(x_train, y_train), (x_test, y_test) = load_data("data_stat_ind_30000.npz")
+
+stat = stat - stat % 32
 
 x_train = x_train[:stat]
 y_train = y_train[:stat]
     
-# Add a channels dimension
-# x_train = x_train[..., tf.newaxis].astype("float")
-# x_test = x_test[..., tf.newaxis].astype("float")
+# # Add a channels dimension
+# x_train = x_train[..., tf.newaxis].astype("int32")
+# x_test = x_test[..., tf.newaxis].astype("int32")
 
 # with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
 #     print(x_train)
 
 # exit()
 
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(1)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(1)
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
 
+
+# for x, y in train_ds:
+#     print(x, y)
+
+# tf.config.run_functions_eagerly(True)
 
 class PrtNN(Model):
   def __init__(self):
@@ -56,24 +63,22 @@ class PrtNN(Model):
     self.flatten = Flatten()
     self.d1 = Dense(10, activation='relu')
     self.d2 = Dense(5)
+    self.run_eagerly = 'True'
 
   def call(self, x):
 
-      # print(x)
-      # # paddings = tf.constant([[0, 0],[0, 0], [0, 0], [0, 100]])
-      # # x = tf.pad(x, paddings, "CONSTANT")
-      # print(x)
+      ones = tf.ones([32,100], tf.int32)      
+      z = tf.zeros([32,512,150], tf.int32)
+      x = tf.tensor_scatter_nd_update(z, x, ones)
 
-      # shape = tf.constant([32, 512, 150])
-      # x = tf.scatter_nd([[0,1,2],[1,1,2]], [1,1], shape)
-      
-      # print(x)
+      print(x)
+      # with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
+      #     print(x)
+
+      # exit()
       
       # x = tf.tensor_scatter_nd_update(x, [[0,0,0,1]], [3])
-      
-
-      # tf.print(x)
-      
+            
       # x = self.norm(x)
       # x = self.d1(x)
       # x = self.conv1(x)
@@ -83,7 +88,8 @@ class PrtNN(Model):
 
   def model(self):
       # x = tf.keras.Input(shape=(16,32,100))
-      x = tf.keras.Input(shape=(512,150))
+      x = tf.keras.Input(shape=(100,3))
+      x = tf.cast(x, tf.int32)
       return Model(inputs=[x], outputs=self.call(x))
   
 

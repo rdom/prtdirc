@@ -614,7 +614,8 @@ void PrtLutReco::Run(int start, int end) {
     // double temp_ti[fmaxch] = {0};
     double hitTime_ti;
     std::vector<double> vinput(512, 0.0);
-      
+    std::vector<int> vinput2d(512 * 150, 0);
+
     for (auto hit : fEvent->getHits()) {
 
       hitTime = hit.getLeadTime();
@@ -949,17 +950,22 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       if (isGoodHit_gr) {
-	hBounce->Fill(bestbounce);
-	fHist1->Fill(hitTime);
-	nhhits++;
-	nsHits++;
-	if (pid == 2) ft.fill_digi(mcpid, pixid);
+        hBounce->Fill(bestbounce);
+        fHist1->Fill(hitTime);
+        nhhits++;
+        nsHits++;
+        if (pid == 2) ft.fill_digi(mcpid, pixid);
 
-	int pix = pixid - 1;
-	int tx = 8 * (mcpid / 2) + pix % 8;
-	int ty = 8 * (mcpid % 2) + pix / 8;
-	int tc = 32 * ty + tx;
-	if (tc >= 0) vinput[tc] = hitTime; // / 50.;
+        int pix = pixid - 1;
+        int tx = 8 * (mcpid / 2) + pix % 8;
+        int ty = 8 * (mcpid % 2) + pix / 8;
+        int tc = 32 * ty + tx;
+        if (tc >= 0) vinput[tc] = hitTime; // / 50.;
+
+        if (hitTime < 30) {
+          int ic = ch * 150 + int(5 * hitTime);
+          vinput2d[ic] = 1;
+        }
       }
     }
 
@@ -986,8 +992,10 @@ void PrtLutReco::Run(int start, int end) {
 #ifdef AI
     if (1) { // newral network
 
-      auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
-      input = cppflow::cast(input, TF_FLOAT, TF_FLOAT);
+      // auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
+      auto input = cppflow::tensor(vinput2d, {1, 512, 150});
+      // input = cppflow::cast(input, TF_FLOAT, TF_FLOAT);
+      input = cppflow::cast(input, TF_INT64, TF_INT64);
       auto output = (*fNNmodel)(input);
 
       // auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
