@@ -34,8 +34,7 @@ while t.next() and t.i() < ne_train + 4000 :
         # tofP = fEvent->getTofP()
         pmt = hit.getPmt()
         pix = hit.getPixel() - 1
-        time = hit.getLeadTime()
-        
+        time = hit.getLeadTime()        
         ch = int(hit.getChannel())
         
         if time > 30 :

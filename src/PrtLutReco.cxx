@@ -615,6 +615,7 @@ void PrtLutReco::Run(int start, int end) {
     double hitTime_ti;
     std::vector<double> vinput(512, 0.0);
     std::vector<int> vinput2d(512 * 150, 0);
+    std::vector<int> vinputInd(100 * 3, 0);
 
     for (auto hit : fEvent->getHits()) {
 
@@ -965,6 +966,12 @@ void PrtLutReco::Run(int start, int end) {
         if (hitTime < 30) {
           int ic = ch * 150 + int(5 * hitTime);
           vinput2d[ic] = 1;
+
+          if (nhhits < 100) {
+            vinputInd[nhhits * 3 + 0] = 0;
+            vinputInd[nhhits * 3 + 1] = ch;
+            vinputInd[nhhits * 3 + 2] = int(5 * hitTime);	    
+          }
         }
       }
     }
@@ -991,11 +998,11 @@ void PrtLutReco::Run(int start, int end) {
 
 #ifdef AI
     if (1) { // newral network
-
       // auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
-      auto input = cppflow::tensor(vinput2d, {1, 512, 150});
+      // auto input = cppflow::tensor(vinput2d, {1, 512, 150});
+      auto input = cppflow::tensor(vinputInd, {1, 100, 3});
       // input = cppflow::cast(input, TF_FLOAT, TF_FLOAT);
-      input = cppflow::cast(input, TF_INT64, TF_INT64);
+      input = cppflow::cast(input, TF_INT32, TF_INT32);
       auto output = (*fNNmodel)(input);
 
       // auto input = cppflow::tensor(vinput, {1, 16, 32, 1});
@@ -1017,7 +1024,7 @@ void PrtLutReco::Run(int start, int end) {
       if (nn_pid == 0) nn_pid = 2;
       if (nn_pid == 1) nn_pid = 4;
 
-      hLnDiffNn[pid]->Fill(1 * (ll[fPk] - ll[2]));
+      hLnDiffNn[pid]->Fill(1.2 * (ll[fPk] - ll[2]));
 
       // Show the predicted class
       // std::cout << output << std::endl;

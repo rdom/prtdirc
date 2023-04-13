@@ -44,8 +44,10 @@ y_train = y_train[:stat]
 
 # exit()
 
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
+
+n_batches = 32
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(n_batches)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(n_batches)
 
 
 # for x, y in train_ds:
@@ -63,15 +65,17 @@ class PrtNN(Model):
     self.flatten = Flatten()
     self.d1 = Dense(10, activation='relu')
     self.d2 = Dense(5)
-    self.run_eagerly = 'True'
 
   def call(self, x):
 
-      ones = tf.ones([32,100], tf.int32)      
-      z = tf.zeros([32,512,150], tf.int32)
+      batches = x.shape[0]
+      if batches == None:
+          batches = 1 #n_batches
+          
+      ones = tf.ones([batches,100], tf.int32)      
+      z = tf.zeros([batches,512,150], tf.int32)
       x = tf.tensor_scatter_nd_update(z, x, ones)
 
-      print(x)
       # with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
       #     print(x)
 
@@ -146,10 +150,10 @@ for epoch in range(EPOCHS):
     f'Test Accuracy: {test_accuracy.result() * 100}'
   )
 
-tf.keras.utils.plot_model(model, to_file='model.png', show_shapes=True)
+# tf.keras.utils.plot_model(model, to_file='model.png', show_shapes=True)
 
 
-model.model().summary()
+# model.model().summary()
 model.save('models/prtai')
 
 
