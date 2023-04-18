@@ -33,7 +33,7 @@ while t.next() and t.i() < ne_train + 4000 :
         # tofPi = fEvent->getTofPi()
         # tofP = fEvent->getTofP()
         pmt = hit.getPmt()
-        pix = hit.getPixel() - 1
+        pix = hit.getPixel() # - 1
         time = hit.getLeadTime()        
         ch = int(hit.getChannel())
         
@@ -45,17 +45,25 @@ while t.next() and t.i() < ne_train + 4000 :
         # else :
         #     time = 10
 
-        time_bin = int(5*time)
+        time_bin = int(4*time)
+
+        for j in range(20):
+            if time_bin >= 50:
+                time_bin -= 50
+
+        if time_bin > 50:
+            continue
 
         tx = int(8 * (pmt // 2) + pix % 8);
         ty = int(8 * (pmt % 2) + pix / 8);
+        ic = tx * 16 + ty;
 
         if i < ne_train:
-            x_train[i,ind, 1] = ch
+            x_train[i,ind, 1] = ic
             x_train[i,ind, 2] = time_bin
             y_train[i] = t.pid()
         else :
-            x_test[i-ne_train,ind,1] = ch
+            x_test[i-ne_train,ind,1] = ic
             x_test[i-ne_train,ind,2] = time_bin
             y_test[i-ne_train] = t.pid()
 

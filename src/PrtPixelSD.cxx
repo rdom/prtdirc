@@ -680,7 +680,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
       p += 8;
     }
     p--;
-    if (ok) {
+    if (ok && p < PrtManager::Instance()->getRun()->getNpix() && p >= 0) {     
       hit.setChannel(fMap_Mpc[mcpid][p]);
       hit.setPixel(p);
       if (fMultHit[mcpid][p] == 0 || !dead_time)

@@ -957,20 +957,27 @@ void PrtLutReco::Run(int start, int end) {
         nsHits++;
         if (pid == 2) ft.fill_digi(mcpid, pixid);
 
-        int pix = pixid - 1;
+        int pix = pixid;// - 1;
         int tx = 8 * (mcpid / 2) + pix % 8;
         int ty = 8 * (mcpid % 2) + pix / 8;
         int tc = 32 * ty + tx;
         if (tc >= 0) vinput[tc] = hitTime; // / 50.;
 
         if (hitTime < 30) {
-          int ic = ch * 150 + int(5 * hitTime);
-          vinput2d[ic] = 1;
+          // int ic = ch * 150 + int(5 * hitTime);
+          // vinput2d[ic] = 1;
 
           if (nhhits < 100) {
-            vinputInd[nhhits * 3 + 0] = 0;
-            vinputInd[nhhits * 3 + 1] = ch;
-            vinputInd[nhhits * 3 + 2] = int(5 * hitTime);	    
+	    int ic = tx * 16 + ty;
+            int tb = 5 * hitTime;
+            for (int i = 0; i < 10; i++) {
+              if (tb >= 50) tb -= 50;
+            }
+            if (tb < 50) {
+              vinputInd[nhhits * 3 + 0] = 0;
+              vinputInd[nhhits * 3 + 1] = ic;
+              vinputInd[nhhits * 3 + 2] = tb;
+            }
           }
         }
       }

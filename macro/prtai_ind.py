@@ -30,8 +30,6 @@ def load_data(path="data.npz"):
 
 (x_train, y_train), (x_test, y_test) = load_data("data_stat_ind_30000.npz")
 
-stat = stat - stat % 32
-
 x_train = x_train[:stat]
 y_train = y_train[:stat]
     
@@ -45,9 +43,8 @@ y_train = y_train[:stat]
 # exit()
 
 
-n_batches = 32
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(n_batches)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(n_batches)
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
 
 
 # for x, y in train_ds:
@@ -58,36 +55,35 @@ test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(n_batches)
 class PrtNN(Model):
   def __init__(self):
     super(PrtNN, self).__init__()
-    self.conv1 = Conv2D(filters=32,kernel_size=(1,2),kernel_initializer='glorot_uniform',
+    self.conv1 = Conv2D(filters=16,kernel_size=(3,3),kernel_initializer='glorot_uniform',
                         activation='relu')
     self.disc = Discretization(bin_boundaries=[0.001])
     self.norm = Normalization(axis=None)
     self.flatten = Flatten()
-    self.d1 = Dense(10, activation='relu')
+    self.d1 = Dense(2, activation='relu')
     self.d2 = Dense(5)
 
   def call(self, x):
 
       batches = x.shape[0]
       if batches == None:
-          batches = 1 #n_batches
+          batches = 1
           
-      ones = tf.ones([batches,100], tf.int32)      
-      z = tf.zeros([batches,512,150], tf.int32)
+      ones = tf.ones([batches,100], tf.float32)      
+      z = tf.zeros([batches,512,50], tf.float32)
       x = tf.tensor_scatter_nd_update(z, x, ones)
+      x = tf.expand_dims(x, -1)
 
       # with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
       #     print(x)
 
       # exit()
       
-      # x = tf.tensor_scatter_nd_update(x, [[0,0,0,1]], [3])
-            
       # x = self.norm(x)
-      # x = self.d1(x)
       # x = self.conv1(x)
       # x = self.disc(x)
       x = self.flatten(x)
+      # x = self.d1(x)
       return self.d2(x)
 
   def model(self):
@@ -153,7 +149,7 @@ for epoch in range(EPOCHS):
 # tf.keras.utils.plot_model(model, to_file='model.png', show_shapes=True)
 
 
-# model.model().summary()
+model.model().summary()
 model.save('models/prtai')
 
 

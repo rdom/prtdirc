@@ -17,6 +17,9 @@ void draw_hp(TString infile = "../build/hits.root") {
       int ch = hit.getChannel();
       int pmt = hit.getPmt();
       int pix = hit.getPixel();
+
+      pmt = ch/64;
+      pix = ch%64;
       double time = hit.getLeadTime();
 
       if (!bl && t.pid() == 2) t.fill_digi(pmt, pix);
