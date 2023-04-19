@@ -16,14 +16,14 @@ cmake -DAI=1 ..
 ```
 
 
-##Synopsis
+## Synopsis
 ```
 prtdirc [OPTION] [ARGUMENT] ... [OPTION] [ARGUMENT]
 
 example:
 ./prtdirc -a 40 -l 0 -x "pi+" -p 1 -w 0 -g 0 -e 1
 ```
-##Options
+## Options
 ```
 
 -o    output file name
@@ -127,7 +127,7 @@ example:
 
 ```
 
-##Example of script usage from macro folder
+## Example of script usage from macro folder
 ```
 ./ba_scan -j6 -r0 -s5 -e50 -t1 -v0
 root da_scan.C'("r_spr39498736070.root","ttt1.root")'
