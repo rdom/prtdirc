@@ -13,7 +13,7 @@ make -j4
 #neural network
 install tensorflow libs, cppflow and run:
 cmake -DAI=1 ..
-
+```
 
 
 ##Synopsis
