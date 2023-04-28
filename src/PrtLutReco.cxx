@@ -172,7 +172,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, TString
     if (!gSystem->AccessPathName(fPdfPath)) {
       std::cout << "--- reading  " << fPdfPath << std::endl;
       TFile pdfFile(fPdfPath);
-      double sigma = 100; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
+      double sigma = 200; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
       if (fPmtLayout > 2029) sigma = 100;
       int binfactor = (int)(sigma / 50. + 0.1);
       for (int i = 0; i < fmaxch; i++) {
@@ -396,7 +396,7 @@ void PrtLutReco::Run(int start, int end) {
   int nEvents = fChain->GetEntries();
   if (end == 0) end = nEvents;
 
-  int pdfend = 100000;
+  int pdfend = 50000;
   if (fPdfPath.Contains("beam_415_2")) pdfend = 10000;
   if (fPdfPath.Contains("beam_415_3")) pdfend = 10000;
   if (fPdfPath.Contains("beam_415_4")) pdfend = 50000;
@@ -408,6 +408,7 @@ void PrtLutReco::Run(int start, int end) {
   if (fPdfPath.Contains("beam_s330_")) pdfend = 200000;
   if (fPdfPath.Contains("beam_s317_")) pdfend = 200000;
   if (fStudyId == 403) pdfend = 50000;
+  if (fMethod == 3) pdfend = nEvents;
 
   if (fMethod == 4) {
     if (bsim) start = 5000;
@@ -538,7 +539,8 @@ void PrtLutReco::Run(int start, int end) {
           if (fMethod == 3) {
             if (gch >= 1094 && gch <= 1101) hodo1++;
           } else {
-            if (gch >= 1089 && gch <= 1106) hodo1++;
+	    if (gch >= 1094 && gch <= 1101) hodo1++;
+            // if (gch >= 1089 && gch <= 1106) hodo1++;
           }
           // if (gch >= 1110 && gch <= 1118)
           hodo2++;
@@ -583,10 +585,11 @@ void PrtLutReco::Run(int start, int end) {
         } else if (fStudyId >= 400) {
           if (fMethod == 4) {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
-          } else {
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue; // 0.65
-	    if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
+          } else {	    
+	    if (fMethod == 3 && fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue;
+	    if (fMethod != 3 && fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.60) continue; // 0.65
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
           }
         } else { // 2017
           if (fMethod == 4) {
@@ -624,15 +627,14 @@ void PrtLutReco::Run(int start, int end) {
       int mcpid = hit.getPmt();
       int ch = ft.map_pmtpix[mcpid][pixid]; // hit.getChannel();//
       int pathid = hit.getPathInPrizm();
-
-      if (pixid < 0) continue;
+      if (pixid < 0 || pixid > 63) continue;
 
       // dead time
       if (bsim) {
         bool dead_channel = false;
         for (auto thit : fEvent->getHits()) {
       	  if (ch == thit.getChannel() && fabs(hitTime - thit.getLeadTime()) < 0.0001) continue; // same hit
-          if (ch == thit.getChannel() && hitTime - thit.getLeadTime() < 20) dead_channel = true; // 40 ns dead time
+          if (ch == thit.getChannel() && fabs(hitTime - thit.getLeadTime()) < 20) dead_channel = true; // 40 ns dead time
         }
         if (dead_channel) continue;
       }
@@ -644,19 +646,8 @@ void PrtLutReco::Run(int start, int end) {
       // std::cout<<"pathid "<<pathid<<std::endl;
 
       // track resolution
-      // if (test3 < gRandom->Uniform()) continue;
+      if (fMethod == 3 && test3 < gRandom->Uniform()) continue;
 
-      if (bsim) {
-	double tres = 0.42;
-        if (mcpid > 5) tres = 0.47;
-	if (fStudyId >= 400) tres = 0.2;
-	if(fPmtLayout > 2029) {
-	  tres = 0.1;
-	  t0smear = 0;
-	}
-	
-	hitTime += gRandom->Gaus(0, tres) + t0smear; // time resol. if not simulated
-      }
       //======================================== dynamic cuts
       {
         { // time cuts
@@ -674,6 +665,19 @@ void PrtLutReco::Run(int start, int end) {
       }
       //==================================================
 
+      if (bsim) {
+	double tres = 0.42;
+        // if (mcpid > 5) tres = 0.47;
+        if (fStudyId >= 400) tres = 0.18;
+	if(prtangle < 80)  tres = 0.1;  // account for z spread
+	if (mcpid > 5)  tres = 0.4;
+	if (fPmtLayout > 2029) {
+          tres = 0.1;
+          t0smear = 0;
+        }
+        hitTime += gRandom->Gaus(0, tres) + t0smear; // time resol. if not simulated
+      }      
+      
       if (fVerbose == 3) {
         // TVector3 cd = hit.getMomentum();
         // fHist5->Fill(cd.Theta()*TMath::Sin(cd.Phi()),cd.Theta()*TMath::Cos(cd.Phi()));

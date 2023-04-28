@@ -10,9 +10,11 @@ void draw_hp(TString infile = "../build/hits.root") {
 
   while (t.next() && t.i() < 10000) {
     bool bl = 0;
+
     for (auto hit : t.event()->getHits()) {
       if (hit.getChannel() == 517) bl = true;
     }
+
     for (auto hit : t.event()->getHits()) {
       int ch = hit.getChannel();
       int pmt = hit.getPmt();

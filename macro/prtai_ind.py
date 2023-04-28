@@ -28,7 +28,7 @@ def load_data(path="data.npz"):
         return (x_train, y_train), (x_test, y_test)
 
 
-(x_train, y_train), (x_test, y_test) = load_data("data_stat_ind_30000.npz")
+(x_train, y_train), (x_test, y_test) = load_data("data_stat_ind_f_30000.npz")
 
 x_train = x_train[:stat]
 y_train = y_train[:stat]
@@ -43,8 +43,8 @@ y_train = y_train[:stat]
 # exit()
 
 
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(32)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
+train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(16)
+test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(16)
 
 
 # for x, y in train_ds:
@@ -53,44 +53,48 @@ test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(32)
 # tf.config.run_functions_eagerly(True)
 
 class PrtNN(Model):
-  def __init__(self):
-    super(PrtNN, self).__init__()
-    self.conv1 = Conv2D(filters=16,kernel_size=(3,3),kernel_initializer='glorot_uniform',
-                        activation='relu')
-    self.disc = Discretization(bin_boundaries=[0.001])
-    self.norm = Normalization(axis=None)
-    self.flatten = Flatten()
-    self.d1 = Dense(2, activation='relu')
-    self.d2 = Dense(5)
+    def __init__(self):
+        super(PrtNN, self).__init__()
+        self.conv1 = Conv2D(filters=4,kernel_size=(1,2),kernel_initializer='glorot_uniform',
+                            activation='relu')
+        self.disc = Discretization(bin_boundaries=[0.001])
+        self.norm = Normalization(axis=None)
+        self.flatten = Flatten()
+        self.d1 = Dense(20, activation='relu')
+        self.d2 = Dense(5)
 
-  def call(self, x):
+    def call(self, x):
 
-      batches = x.shape[0]
-      if batches == None:
-          batches = 1
-          
-      ones = tf.ones([batches,100], tf.float32)      
-      z = tf.zeros([batches,512,50], tf.float32)
-      x = tf.tensor_scatter_nd_update(z, x, ones)
-      x = tf.expand_dims(x, -1)
+        batches = x.shape[0]
+        if batches == None:
+            batches = 1
 
-      # with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
-      #     print(x)
-
-      # exit()
+        # with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
+        #     print(x)
+        # exit()
+                
+        # convert indexes into tensor
+        b = tf.range(batches)               
+        b = tf.expand_dims(b, -1)
+        b = tf.repeat(b, repeats=100, axis=-1)
+        b = tf.expand_dims(b, -1)
+        x = tf.concat((b, x), axis=-1)          
+        ones = tf.ones([batches,100], tf.float32)      
+        z = tf.zeros([batches,512,50], tf.float32)
+        x = tf.tensor_scatter_nd_update(z, x, ones)
+        x = tf.expand_dims(x, -1)
       
-      # x = self.norm(x)
-      # x = self.conv1(x)
-      # x = self.disc(x)
-      x = self.flatten(x)
-      # x = self.d1(x)
-      return self.d2(x)
+        # x = self.norm(x)
+        x = self.conv1(x)
+        # x = self.disc(x)
+        x = self.flatten(x)
+        return self.d2(x)
 
-  def model(self):
-      # x = tf.keras.Input(shape=(16,32,100))
-      x = tf.keras.Input(shape=(100,3))
-      x = tf.cast(x, tf.int32)
-      return Model(inputs=[x], outputs=self.call(x))
+    def model(self):
+        # x = tf.keras.Input(shape=(16,32,100))
+        x = tf.keras.Input(shape=(100,3))
+        x = tf.cast(x, tf.int32)
+        return Model(inputs=[x], outputs=self.call(x))
   
 
 model = PrtNN()
