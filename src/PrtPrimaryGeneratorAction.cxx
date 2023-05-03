@@ -81,6 +81,7 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
     else if (pdg == 10002 && fPid == 2) fPid = 3;
 
     PrtManager::Instance()->getEvent()->setPid(fPid);
+    PrtManager::Instance()->getEvent()->setTof(fRun->getTheta()); // save thata into tof variable, as tof is not used in sims
     fParticleGun->SetParticleDefinition(fParticle[fPid]);
   } else {
     fParticleGun->SetParticleDefinition(fParticleOP);

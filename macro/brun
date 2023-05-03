@@ -3,9 +3,22 @@
 rm b_h*.root 
 rm b_l*.log
 
+threads=22
 tseed=$(($(date +%s%N)/1000000-1393400000000))
 
-echo $tseed
+start_time=$(date +%s)
+waitForMe (){
+    while : 
+    do 
+	activth=$(ps aux | grep "[p]rtdirc" | grep "dirc" | wc -l)
+	printf "\r$statusline [$activth] ---- [$(($(date +%s) - start_time)) s] "
+	if [ "$activth" -lt "$1" ]; then 
+	    break  
+	fi
+	sleep 1
+    done
+}
+
 
 if [ "$1" == "0" ] ; then 
     for i in {1..5}; do ../build/prtdirc -o b_h$i.root \
@@ -22,28 +35,16 @@ else
     # 					  -h 1 -l 3 -p 7.00 -a 19.66 -phi -0.05 -gz 409.00 -gx 85.00 -gsx 65.00 -gsy 16.30 -z 10.00 -g 2018 -c 2018 -study 401 \
     # 			                  -e 10000 -x "mix_pip" -b 1 -seed $tseed$i > b_l$i.log & done
 
-    for i in {1..20}; do ../build/prtdirc -o b_h$i.root \
-					  -study 403 -r 0 -phi 0 -l 10 -w 11 \
-    			                  -e 2000 -x "mix_pip" -b 1 -seed $tseed$i > b_l$i.log & done 
+    for a in `LANG=en_us seq 20 0.5 30`; do ../build/prtdirc -o b_h$a.root \
+					  -study 403 -r 0 -l 3 -w 0 -a $a \
+    			                  -e 5000 -x "mix_pip" -b 1 -seed $tseed$a > b_l$a.log & done 
 fi
 
+waitForMe 1
 sleep 1
-  
-while : 
-do
-    activth=$(ps aux | grep "[p]rt" | grep "b_h" | wc -l)
-    diffth=$(($maxnthr-$activth))
-    echo "We have $activth active prt simulations " 
-    if [ "$activth" -eq 0 ]; then 
-      break  
-    fi
-    sleep 2
-done
-
-sleep 2
 
 if [ "$1" == "0" ] ; then 
     hadd -f lut.root b_h*.root
 else
-    hadd -f hits.root b_h*.root
+    hadd -f hits_mix.root b_h*.root
 fi

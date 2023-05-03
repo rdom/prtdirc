@@ -9,7 +9,7 @@ import pathlib
 import numpy as np
 
 import tensorflow as tf
-print("TensorFlow version:", tf.__version__)
+# print("TensorFlow version:", tf.__version__)
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Discretization, Normalization
 from tensorflow.keras import Model
 from array import array
@@ -17,34 +17,46 @@ from array import array
 import ROOT
 from ROOT import TFile, TTree, gROOT, addressof
 
-stat = int(sys.argv[1])
+infile = sys.argv[1]
    
 def load_data(path="data.npz"):
     
     with np.load(path, allow_pickle=True) as f:
-        x_train, y_train = f["x_train"].astype("int32"), f["y_train"]
-        x_test, y_test = f["x_test"].astype("int32"), f["y_test"]
+        data_x, data_y = f["x_train"].astype("int32"), f["y_train"]
         
-        return (x_train, y_train), (x_test, y_test)
+        return (data_x, data_y)
 
 
-(x_train, y_train), (x_test, y_test) = load_data("data_stat_ind_f_30000.npz")
+# (data_x, data_y) = load_data("ind_97_30000.npz")
+(data_x, data_y) = load_data(infile)
 
-x_train = x_train[:stat]
-y_train = y_train[:stat]
-    
+
+if(len(sys.argv) > 2):
+    stat = int(sys.argv[2])
+else :
+    stat = data_x.shape[0]
+
+
+print("Number of events: ", stat)
+data_x = data_x[:stat]
+data_y = data_y[:stat]
+
+
+                                                    
 # # Add a channels dimension
-# x_train = x_train[..., tf.newaxis].astype("int32")
+# data_x = data_x[..., tf.newaxis].astype("int32")
 # x_test = x_test[..., tf.newaxis].astype("int32")
 
-# with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
-#     print(x_train)
+with np.printoptions(precision=0, suppress=True, linewidth=300, edgeitems=100):
+    print(data_x)
 
 # exit()
 
 
-train_ds = tf.data.Dataset.from_tensor_slices((x_train, y_train)).batch(16)
-test_ds = tf.data.Dataset.from_tensor_slices((x_test, y_test)).batch(16)
+data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).shuffle(stat).batch(32)
+train_ds, test_ds = tf.keras.utils.split_dataset(data_ds, left_size=0.8)
+
+print("Training on:", 32 * int(train_ds.cardinality())," Testing on: ", 32 * int(test_ds.cardinality()))
 
 
 # for x, y in train_ds:
@@ -60,7 +72,7 @@ class PrtNN(Model):
         self.disc = Discretization(bin_boundaries=[0.001])
         self.norm = Normalization(axis=None)
         self.flatten = Flatten()
-        self.d1 = Dense(20, activation='relu')
+        self.d1 = Dense(5, activation='relu')
         self.d2 = Dense(5)
 
     def call(self, x):
@@ -80,14 +92,15 @@ class PrtNN(Model):
         b = tf.expand_dims(b, -1)
         x = tf.concat((b, x), axis=-1)          
         ones = tf.ones([batches,100], tf.float32)      
-        z = tf.zeros([batches,512,50], tf.float32)
+        z = tf.zeros([batches,512+5,100], tf.float32) # 512,50
         x = tf.tensor_scatter_nd_update(z, x, ones)
         x = tf.expand_dims(x, -1)
       
-        # x = self.norm(x)
+        x = self.norm(x)
         x = self.conv1(x)
         # x = self.disc(x)
         x = self.flatten(x)
+        # x = self.d1(x)
         return self.d2(x)
 
     def model(self):

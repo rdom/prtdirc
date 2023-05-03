@@ -5,19 +5,31 @@ import numpy as np
 ROOT.gInterpreter.ProcessLine('#include "../../prttools/PrtTools.h"')
 ROOT.gSystem.Load('../build/libPrt.so')
 
-t = ROOT.PrtTools("/home/drc/data/jul18/403/beam_18215163732S.root") #  ../../prttools/hits.root
+# t = ROOT.PrtTools("/home/drc/data/jul18/403/beam_18215163732S.root") #  ../../prttools/hits.root
 # t = ROOT.PrtTools("/home/drc/data/jul18/403/beam_18215164946S.root")
 
-stat = int(sys.argv[1])
-ne_train = stat
-x_train = np.zeros((ne_train,100,2))
-y_train = np.zeros((ne_train,1))
 
-x_test = np.zeros((4000,100,2))
-y_test = np.zeros((4000,1))
+infile = "hits_403.root"
+if(len(sys.argv) > 1):
+    infile = sys.argv[1] 
 
-while t.next() and t.i() < ne_train + 4000 :
+t = ROOT.PrtTools(infile)
+
+nhits = 100
+timebins = 100
+entries = t.entries()
+print("running for ", entries, " events")
+x_train = np.zeros((entries,nhits,2))
+y_train = np.zeros((entries,1))
+
+
+while t.next() and t.i() < entries :
     i = t.i()
+    mom = t.event().getMomentum().Mag();
+    theta = t.event().getTof();
+    mom_bin = int(mom * 10)
+    theta_bin = int(theta * 5)
+    
     ind = 0
     for hit in t.event().getHits() :
         pmt = hit.getPmt()
@@ -30,30 +42,30 @@ while t.next() and t.i() < ne_train + 4000 :
 
         time_bin = int(4*time)
 
-        for j in range(20):
-            if time_bin >= 50:
-                time_bin -= 50
+        # for j in range(20):
+        #     if time_bin >= 50:
+        #         time_bin -= 50
 
-        if time_bin > 50:
+        if time_bin >= timebins:
             continue
 
         tx = int(8 * (pmt // 2) + pix % 8);
         ty = int(8 * (pmt % 2) + pix / 8);
         ic = tx * 16 + ty;
 
-        if i < ne_train:
-            x_train[i,ind, 0] = ic
-            x_train[i,ind, 1] = time_bin
-            y_train[i] = t.pid()
-        else :
-            x_test[i-ne_train,ind,0] = ic
-            x_test[i-ne_train,ind,1] = time_bin
-            y_test[i-ne_train] = t.pid()
+        x_train[i,ind, 0] = ic
+        x_train[i,ind, 1] = time_bin
+        y_train[i] = t.pid()
 
         ind = ind + 1
-        if(ind >= 100):
+        if(ind >= nhits):
             break
 
-
-nid = "data_stat_ind_f_" + str(ne_train);
-np.savez(nid, x_train= x_train, y_train=y_train, x_test=x_test, y_test= y_test)
+        # encode momentum and theta angle
+        x_train[i,98, 0] = 512
+        x_train[i,98, 1] = mom_bin            
+        x_train[i,99, 0] = 513 + int(theta_bin / nhits)
+        x_train[i,99, 1] = theta_bin % nhits        
+      
+outfile = infile.replace(".root","")
+np.savez(outfile, x_train= x_train, y_train=y_train)
