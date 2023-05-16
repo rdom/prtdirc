@@ -613,7 +613,8 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
     int nBouncesX = (int)(lengthx) / 17.1; // 17 bar height
     int nBouncesY = (int)(lengthy) / 35.9; // 36 bar width
-
+std::cout << "wavelength " << wavelength << std::endl;
+ 
     double ll = wavelength * wavelength;
     double n_quartz = sqrt(1. + (0.696 * ll / (ll - pow(0.068, 2))) +
                            (0.407 * ll / (ll - pow(0.116, 2))) + 0.897 * ll / (ll - pow(9.896, 2)));

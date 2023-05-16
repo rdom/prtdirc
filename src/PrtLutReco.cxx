@@ -420,7 +420,7 @@ void PrtLutReco::Run(int start, int end) {
   }
  
   std::cout << "--- run started for [" << start << "," << end << "]" << std::endl;
-   
+
   int nsHits(0), nsEvents(0), ninfit(1);
 
   if (start < 0) {
