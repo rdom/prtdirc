@@ -887,7 +887,7 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
   PhotocatodHamamatsuMPT->AddProperty("EFFICIENCY", PhotonEnergy, fQuantumEfficiency, num);
   PhotocatodHamamatsuMPT->AddProperty("REFLECTIVITY", PhotonEnergy, PMTReflectivity, num);
 
-  G4OpticalSurface *HamamatsuPMTOpSurface = new G4OpticalSurface("HamamatsuPMTOpSurface", glisur, polished, dielectric_metal);
+  G4OpticalSurface *HamamatsuPMTOpSurface = new G4OpticalSurface("HamamatsuPMTOpSurface", glisur, polished, dielectric_dielectric);
   HamamatsuPMTOpSurface->SetMaterialPropertiesTable(PhotocatodHamamatsuMPT);
 
   // // assignment to pad

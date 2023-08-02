@@ -162,12 +162,7 @@ int main(int argc, char **argv) {
 
   G4Random::setTheEngine(new CLHEP::RanecuEngine);
 
-#ifdef G4MULTITHREADED
-  G4MTRunManager *runManager = new G4MTRunManager;
-  if (nThreads > 0) runManager->SetNumberOfThreads(nThreads);
-#else
   G4RunManager *runManager = new G4RunManager;
-#endif
 
   G4Random::setTheSeed(myseed);
 

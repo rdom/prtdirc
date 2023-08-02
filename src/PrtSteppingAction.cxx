@@ -42,10 +42,10 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
   if (track->GetCurrentStepNumber() > 50000 || track->GetTrackLength() > 10000) {
     track->SetTrackStatus(fStopAndKill);
   }
+  G4String aname = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
+  G4String bname = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 
   if (fRunType == 11 || fRunType == 1) {
-    G4String aname = step->GetPreStepPoint()->GetPhysicalVolume()->GetName();
-    G4String bname = step->GetPostStepPoint()->GetPhysicalVolume()->GetName();
 
     if (fRunType == 11 && aname == "wBar" && bname == "wOpticalGrease") {
      
@@ -67,6 +67,8 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
     
     if (aname == "wDirc" && bname == "gExpHall") track->SetTrackStatus(fStopAndKill);
   }
+
+  if (aname == "wMcp" && bname == "wPixel") track->SetTrackStatus(fStopButAlive);
 
   // if(aname=="Bar" && bname=="ExpHall" ) track->SetTrackStatus(fStopAndKill);
   // if(step->GetPreStepPoint()->GetPosition().z()>1200 ) track->SetTrackStatus(fStopAndKill);

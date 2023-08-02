@@ -1,13 +1,14 @@
 import sys
 import os
+import re
 import numpy as np
 from array import array
 from ROOT import TFile, TTree
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 import tensorflow as tf
-from tf.keras import Model
-from tf.keras.layers import Dense, Flatten, Conv2D, Discretization, Normalization
+from tensorflow.keras import Model
+from tensorflow.keras.layers import Dense, Flatten, Conv2D, Discretization, Normalization, Dropout
 
 # print("TensorFlow version:", tf.__version__)
 
@@ -43,17 +44,19 @@ data_y = data_y[:stat]
 
 # exit()
 
-data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).shuffle(stat).batch(32)
-train_ds, test_ds = tf.keras.utils.split_dataset(data_ds, left_size=0.8)
+nbatches = 64
+# data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).shuffle(stat).batch(32)
+data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).batch(nbatches)
+train_ds, test_ds = tf.keras.utils.split_dataset(data_ds, left_size=0.75)
 
-print("Training on:", 32 * int(train_ds.cardinality()),
-      " Testing on: ", 32 * int(test_ds.cardinality()))
+print("Training on:", nbatches * int(train_ds.cardinality()),
+      " Testing on: ", nbatches * int(test_ds.cardinality()))
 
 
 # for x, y in train_ds:
 #     print(x, y)
 
-tf.config.run_functions_eagerly(True)
+# tf.config.run_functions_eagerly(True)
 
 timebins = 50
 
@@ -63,12 +66,13 @@ class PrtNN(Model):
         self.conv1 = Conv2D(filters=4,kernel_size=(2,2),
                             kernel_initializer='glorot_uniform',
                             activation='relu')
-        self.maxpool = tf.keras.layers.MaxPooling2D(pool_size=(5, 10))
+        self.maxpool = tf.keras.layers.MaxPooling2D(pool_size=(16, 5))
         self.disc = Discretization(bin_boundaries=[0.001])
         self.norm = Normalization(axis=None)
         self.flatten = Flatten()
         self.d1 = Dense(5, activation='relu')
         self.d2 = Dense(5)
+        self.drop = Dropout(0.2)
 
     def call(self, x):
 
@@ -91,7 +95,7 @@ class PrtNN(Model):
 
         # new way
         whits = tf.ones([batches,98], tf.float32)
-        wtracks = tf.fill([batches,2], 5.0)        
+        wtracks = tf.fill([batches,2], 2.0)        
         xhits, xtracks = tf.split(x, [98, 2], 1)        
         zhits = tf.zeros([batches,512,timebins], tf.float32)
         ztracks = tf.zeros([batches,20,timebins], tf.float32)
@@ -103,11 +107,11 @@ class PrtNN(Model):
 
         # old way
         # ones = tf.ones([batches,100], tf.float32)
-        # z = tf.zeros([batches,512 + 5,timebins], tf.float32) # 512,50
+        # z = tf.zeros([batches,512 + 20,timebins], tf.float32) # 512,50
         # x = tf.tensor_scatter_nd_update(zhit, x, ones)
 
 
-        x = tf.expand_dims(x, -1)
+        # x = tf.expand_dims(x, -1)
         
         # x = self.norm(x)
         # x = self.conv1(x)
@@ -115,6 +119,7 @@ class PrtNN(Model):
         # x = self.maxpool(x)
         # x = self.disc(x)
         x = self.flatten(x)
+        # x = self.drop(x)
         # x = self.d1(x)
         return self.d2(x)
 
@@ -132,6 +137,11 @@ train_loss = tf.keras.metrics.Mean(name='train_loss')
 train_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='train_accuracy')
 test_loss = tf.keras.metrics.Mean(name='test_loss')
 test_accuracy = tf.keras.metrics.SparseCategoricalAccuracy(name='test_accuracy')
+
+model.compile(optimizer='adam',
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=[tf.keras.metrics.SparseCategoricalAccuracy()])
+
 
 @tf.function
 def train_step(images, labels):
@@ -181,29 +191,33 @@ for epoch in range(EPOCHS):
 
 # tf.keras.utils.plot_model(model, to_file='model.png', show_shapes=True)
 
-
 model.model().summary()
-model.save('models/prtai')
+model.save('models/' + infile)
 
 
 print("Accuracy = ", faccuracy)
 
-rf = TFile("res_" + str(stat)  + ".root", "RECREATE")
+outfile = infile.replace("npz","ires.root")
+angle = float(re.findall(r'\d+.\d+', infile)[0])
+print(outfile, " theta = ", angle, " eff = ", float(faccuracy))
+
+# outfile = "res_" + str(stat)  + ".root"
+rf = TFile(outfile, "RECREATE")
 tree = TTree("T", "prtai")
 
 eff = array( 'f', [ 0 ] )
 sta = array( 'i', [ 0 ] )
-
-
+theta = array( 'f', [ 0 ] )
 
 tree.Branch( 'sta', sta, 'sta/I' )
 tree.Branch( 'eff', eff, 'eff/F' )
+tree.Branch( 'theta', theta, 'theta/F' )
 
 eff[0] = float(faccuracy)
 sta[0] = stat
+theta[0] = angle
 
 tree.Fill()
-tree.Print()
 tree.Write()
 
 

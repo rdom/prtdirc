@@ -541,7 +541,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
       refl++;
     }
   }
-
+ 
   hit.setPathInPrizm(pathId);
 
   // hit.SetPosition(globalPos);
@@ -613,7 +613,6 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
 
     int nBouncesX = (int)(lengthx) / 17.1; // 17 bar height
     int nBouncesY = (int)(lengthy) / 35.9; // 36 bar width
-std::cout << "wavelength " << wavelength << std::endl;
  
     double ll = wavelength * wavelength;
     double n_quartz = sqrt(1. + (0.696 * ll / (ll - pow(0.068, 2))) +
@@ -624,8 +623,7 @@ std::cout << "wavelength " << wavelength << std::endl;
     double totalProb = pow(bounce_probX, nBouncesX) * pow(bounce_probY, nBouncesY);
 
     if (G4UniformRand() > totalProb) {
-      // std::cout<<"photon lost in the radiator. n_bounces = ["<<nBouncesX<<" "<<nBouncesY<<"] with
-      // prob= "<<totalProb<<std::endl;
+      // std::cout<<"photon lost in the radiator. n_bounces = ["<<nBouncesX<<" "<<nBouncesY<<"] withprob= "<<totalProb<<std::endl;
       return true;
     }
   }
@@ -633,15 +631,16 @@ std::cout << "wavelength " << wavelength << std::endl;
   bool is_hit(true);
   if (fRunType == 0 && fMcpLayout >= 2015 && quantum_efficiency) {
     if (fQe_space[mcpid][pixid] > G4UniformRand()) {
-      if (fMultHit[mcpid][pixid] == 0 || !dead_time)
+      if (fMultHit[mcpid][pixid] == 0 || !dead_time)      
         PrtManager::Instance()->addHit(hit, localPos, digiPos, position);
       fMultHit[mcpid][pixid]++;
     } else is_hit = false;
 
   } else {
-    if (fMultHit[mcpid][pixid] == 0 || !dead_time || fMcpLayout == 0)
+    if (fMultHit[mcpid][pixid] == 0 || !dead_time || fMcpLayout == 0){
       PrtManager::Instance()->addHit(hit, localPos, digiPos, position);
     fMultHit[mcpid][pixid]++;
+    }
   }
 
   if (is_hit && charge_sharing) {

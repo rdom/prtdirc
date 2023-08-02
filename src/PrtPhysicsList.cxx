@@ -186,7 +186,7 @@ void PrtPhysicsList::ConstructOp() {
   fCerenkovProcess0->SetMaxBetaChangePerStep(10.0);
   fCerenkovProcess0->SetTrackSecondariesFirst(true);
 
-  fScintillationProcess->SetScintillationYieldFactor(1.);
+  // fScintillationProcess->SetScintillationYieldFactor(1.);
   fScintillationProcess->SetTrackSecondariesFirst(true);
 
   // Use Birks Correction in the Scintillation process

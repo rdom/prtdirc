@@ -36,12 +36,12 @@ else
     # 			                  -e 10000 -x "mix_pip" -b 1 -seed $tseed$i > b_l$i.log & done
 
     for a in `LANG=en_us seq 20 0.5 140`; do
-	# ../build/prtdirc -o hdata/b_h$a.root \
-	# 		 -study 403 -r 0 -l 3 -w 0 -a $a \
-    	# 		 -e 10000 -x "mix_pip" -b 1 -seed $tseed$a > hdata/b_l$a.log &
+	../build/prtdirc -o hdata/test_h$a.root \
+			 -study 403 -r 0 -l 3 -w 0 -a $a \
+    			 -e 4000 -x "mix_pip" -b 1 -seed $tseed$a > hdata/b_l$a.log &
 	
 	# root -b -q draw_pat.C"(\"hdata/b_h$a.root\")"
-	python convert_ind.py hdata/b_h$a.root &
+	# python convert_ind.py hdata/b_h$a.root &
 	
 	waitForMe $threads
     done 
