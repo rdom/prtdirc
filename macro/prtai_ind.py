@@ -10,7 +10,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.layers import Dense, Flatten, Conv2D, Discretization, Normalization, Dropout
 
-# print("TensorFlow version:", tf.__version__)
+print("TensorFlow version:", tf.__version__)
 
 infile = sys.argv[1]
    
@@ -44,9 +44,9 @@ data_y = data_y[:stat]
 
 # exit()
 
-nbatches = 64
-# data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).shuffle(stat).batch(32)
-data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).batch(nbatches)
+nbatches = 32
+data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).shuffle(stat).batch(nbatches)
+# data_ds = tf.data.Dataset.from_tensor_slices((data_x, data_y)).batch(nbatches)
 train_ds, test_ds = tf.keras.utils.split_dataset(data_ds, left_size=0.75)
 
 print("Training on:", nbatches * int(train_ds.cardinality()),
@@ -66,7 +66,7 @@ class PrtNN(Model):
         self.conv1 = Conv2D(filters=4,kernel_size=(2,2),
                             kernel_initializer='glorot_uniform',
                             activation='relu')
-        self.maxpool = tf.keras.layers.MaxPooling2D(pool_size=(16, 5))
+        self.maxpool = tf.keras.layers.MaxPooling2D(pool_size=(2, 2))
         self.disc = Discretization(bin_boundaries=[0.001])
         self.norm = Normalization(axis=None)
         self.flatten = Flatten()
@@ -95,7 +95,7 @@ class PrtNN(Model):
 
         # new way
         whits = tf.ones([batches,98], tf.float32)
-        wtracks = tf.fill([batches,2], 2.0)        
+        wtracks = tf.fill([batches,2], 5.0)        
         xhits, xtracks = tf.split(x, [98, 2], 1)        
         zhits = tf.zeros([batches,512,timebins], tf.float32)
         ztracks = tf.zeros([batches,20,timebins], tf.float32)
@@ -105,13 +105,13 @@ class PrtNN(Model):
         # with np.printoptions(precision=0, linewidth=300, edgeitems=100):
         #     print(x)
 
-        # old way
+        # # old way
         # ones = tf.ones([batches,100], tf.float32)
-        # z = tf.zeros([batches,512 + 20,timebins], tf.float32) # 512,50
-        # x = tf.tensor_scatter_nd_update(zhit, x, ones)
+        # zhits = tf.zeros([batches,512 + 20,timebins], tf.float32) # 512,50
+        # x = tf.tensor_scatter_nd_update(zhits, x, ones)
 
 
-        # x = tf.expand_dims(x, -1)
+        x = tf.expand_dims(x, -1)
         
         # x = self.norm(x)
         # x = self.conv1(x)

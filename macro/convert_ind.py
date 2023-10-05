@@ -47,6 +47,7 @@ while t.next() and t.i() < entries :
 
         time_bin = int(4*time)
 
+        # fold time
         for j in range(10):
             if time_bin >= 50:
                 time_bin -= 50
