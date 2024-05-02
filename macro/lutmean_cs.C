@@ -3,9 +3,13 @@
 #include <TVector3.h>
 #include <TInterpreter.h>
 #include <TClonesArray.h>
-#include "../../prttools/PrtTools.h"
 
+#if defined(__ACLIC__)
+#include "../../prttools/PrtTools.h"
 #include "../src/PrtLutNode.h"
+#else
+R__LOAD_LIBRARY(../build/libPrt.so)
+#endif
 
 void lutmean_cs(TString inFile = "../data/lut.root") {
   TString outFile = inFile.Copy().ReplaceAll(".root", ".cs_avr.root");

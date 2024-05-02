@@ -163,7 +163,7 @@ G4VParticleChange *PrtOpBoundaryProcess::PostStepDoIt(const G4Track &aTrack, con
 
   // kill photons outside bar and prizm
   if (GetStatus() == FresnelRefraction && bname == "wDirc") {
-    // rd for air gap
+    // rd should be commented for the air gap study
     if (fLensId != 4) particleChange->ProposeTrackStatus(fStopAndKill);
   }
 

@@ -67,6 +67,7 @@ void PrtSteppingAction::UserSteppingAction(const G4Step *step) {
     
     if (aname == "wDirc" && bname == "gExpHall") track->SetTrackStatus(fStopAndKill);
   }
+  if (aname == "wDirc" && bname == "gExpHall") track->SetTrackStatus(fStopAndKill);
 
   if (aname == "wMcp" && bname == "wPixel") track->SetTrackStatus(fStopButAlive);
 

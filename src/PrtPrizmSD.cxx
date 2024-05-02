@@ -48,9 +48,18 @@ G4bool PrtPrizmSD::ProcessHits(G4Step* aStep, G4TouchableHistory* hist){
   G4StepPoint* pPostStepPoint = aStep->GetPostStepPoint(); 
   if (pPostStepPoint->GetStepStatus() == fGeomBoundary){
     PrtPrizmHit* newHit = new PrtPrizmHit();
-    
-    newHit->SetTrackID  (aStep->GetTrack()->GetTrackID());
-    newHit->SetPos (aStep->GetPostStepPoint()->GetPosition());
+
+    newHit->SetTrackID(aStep->GetTrack()->GetTrackID());
+
+    G4TouchableHistory *touchable = (G4TouchableHistory *)(aStep->GetPostStepPoint()->GetTouchable());
+    G4ThreeVector localpos =
+      //touchable->GetHistory()->GetTopTransform().TransformPoint(pPostStepPoint->GetPosition());
+      touchable->GetHistory()->GetTransform(2).TransformPoint(pPostStepPoint->GetPosition());
+    // G4ThreeVector translation =
+    //   touchable->GetHistory()->GetTopTransform().Inverse().TransformPoint(G4ThreeVector(0, 0, 0));
+    // localpos = touchable->GetHistory()->GetTransform(0).TransformPoint(localpos);
+    newHit->SetPos(localpos);
+    // newHit->SetPos(aStep->GetPostStepPoint()->GetPosition());
 
     // // store normal to the closest boundary
     G4Navigator* theNavigator 

@@ -90,11 +90,11 @@ class PrtNN(Model):
         b = tf.repeat(b, repeats=100, axis=-1)
         b = tf.expand_dims(b, -1)
         x = tf.concat((b, x), axis=-1)          
-        # with np.printoptions(precision=0, linewidth=300, edgeitems=100):
-        #     print(x)
+        with np.printoptions(precision=0, linewidth=300, edgeitems=100):
+            print(x)
 
         # new way
-        whits = tf.ones([batches,98], tf.float32)
+        whits = tf.ones([batches,98], tf.float32) # 98 - max number of hits
         wtracks = tf.fill([batches,2], 5.0)        
         xhits, xtracks = tf.split(x, [98, 2], 1)        
         zhits = tf.zeros([batches,512,timebins], tf.float32)

@@ -540,7 +540,15 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
       if (phit->GetNormalId() > 0) pathId = pathId * 10 + phit->GetNormalId();
       refl++;
     }
+    // // store hitposition in prism
+    // hit.setChannel(phit->GetPos().x()*1000);
+    // hit.setLeadTime(phit->GetPos().y());
+    // hit.setTotTime(phit->GetPos().z());
+    // hit.setPathInPrizm(phit->GetNormalId());
+    // PrtManager::Instance()->addHit(hit, localPos, digiPos, position);      
   }
+  // return true;
+  
  
   hit.setPathInPrizm(pathId);
 
