@@ -202,7 +202,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, TString
   fCorrPath = PrtManager::Instance()->getOutName(); // infile;
   fCorrPath.ReplaceAll(".root", ".cor.root");
   fCorrPath.ReplaceAll("reco_", Form("reco_%d_", fileId));
-  if (fLens == 3) {
+  if (fLens == 3 || fLens == 0) {
     if (!gSystem->AccessPathName(fCorrPath)) {
       std::cout << "--- reading  " << fCorrPath << std::endl;
       int pmt, level;
@@ -650,16 +650,7 @@ void PrtLutReco::Run(int start, int end) {
 
           // if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.5) continue;
           // if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
-        } else if (fStudyId == 461) {
-          // if (fMethod == 4) {
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.3) continue;
-          // } else {
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.55) continue;
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
-          // }
-        }
-
-        else if (fStudyId >= 400) {
+        } else if (fStudyId >= 400) {
           if (fMethod == 4) {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
@@ -1291,7 +1282,7 @@ void PrtLutReco::Run(int start, int end) {
     
   }
 
-  int nrange = 100;
+  int nrange = 200;
   if (fMethod == 2) {
     TF1 *ff;
     gROOT->SetBatch(1);
