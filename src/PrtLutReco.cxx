@@ -176,7 +176,7 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, TString
     if (!gSystem->AccessPathName(fPdfPath)) {
       std::cout << "--- reading  " << fPdfPath << std::endl;
       TFile pdfFile(fPdfPath);
-      double sigma = 400; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
+      double sigma = 200; // PrtManager::Instance()->GetTest1();// 400;//250; // ps
       //if (fStudyId == 317 || fStudyId == 316) sigma = 250;
       if (fPmtLayout > 2029) sigma = 100;
       int binfactor = (int)(sigma / 50. + 0.1);
@@ -258,12 +258,12 @@ PrtLutReco::PrtLutReco(TString infile, TString lutfile, TString pdffile, TString
     fTime4[i] = new TH1F(Form("hf_%d", i), "pdf;LE time [ns]; entries [#]", 1000, 0, 50);
   }
 
-  int nrange = 160;
+  int nrange = 200;
   if (fnpix > 65) {
     nrange = 200;
   }
  
-  int range = 15;
+  int range = 50;
   int mrange0 = 30, mrange = 37;
   if(mom < 5) {
     range = 150;
@@ -491,31 +491,35 @@ void PrtLutReco::Run(int start, int end) {
 
     fChain->GetEntry(ievent);
     double angle1(0), angle2(0), sum1(0), sum2(0), sumti(0), sumti2(0), sumti4(0), sumati2(0), sumati4(0);
-    // double noiseti = 1e-5; // 5
-    double noiseti = 5e-5; // 5
- 
-    // add noise    
-    // for (int i = 0; i < test3; i++) {
-    //   PrtHit hit;
-    //   int ch = gRandom->Uniform(0,512);
-      
-    //   hit.setChannel(ch);
-    //   hit.setPmt(ch / 64);
-    //   hit.setPixel(ch % 64);
-    //   hit.setLeadTime(0.001 * gRandom->Uniform(0,100000));
+    double noiseti = 1e-5; // 5
+    //double noiseti = 5e-5; // 5
 
-    //   fEvent->addHit(hit);
+    // // add noise for laser study
+    // if (bsim) {
+    //   int lphotons = gRandom->Uniform(test3 - 25, test3 + 25);
+    //   double timeofpulse = gRandom->Uniform(-50, 50);
+    //   for (int i = 0; i < lphotons; i++) {
+    //     PrtHit hit;
+    //     int ch = gRandom->Uniform(0, 512);
+
+    //     hit.setChannel(ch);
+    //     hit.setPmt(ch / 64);
+    //     hit.setPixel(ch % 64);
+    //     hit.setLeadTime(gRandom->Uniform(timeofpulse - 0.5, timeofpulse + 0.5));
+
+    //     fEvent->addHit(hit);
+    //   }
     // }
 
     if (ievent % 1000 == 0)
       std::cout << "Event # " << ievent << " has " << fEvent->getHits().size() << " hits "
                 << events[2] << " " << events[fPk] << std::endl;
 
-    // if (bsim) posz = 0.5 * radiatorL - fEvent->getPosition().Z()0.5 * radiatorL - fEvent->getPosition().Z();
-    // else posz = fEvent->getPosition().Z() + 30;    
+    if (bsim) posz = 0.5 * radiatorL - fEvent->getPosition().Z();
+    else posz = fEvent->getPosition().Z() + 30;    
     
-    if (bsim) posz = beamz;// + gRandom->Uniform(-5, 5);
-    else posz = beamz + 30;
+    // if (bsim) posz = beamz;// + gRandom->Uniform(-5, 5);
+    // else posz = beamz + 30;
 
     mom = fEvent->getMomentum().Mag();
     pid = fEvent->getPid();
@@ -548,11 +552,11 @@ void PrtLutReco::Run(int start, int end) {
       bardir = bardir.Unit();
     }
 
-    //smear track
-    momInBar = momInBar0;
-    double smearangle = gRandom->Gaus(0,test1);    
-    momInBar.RotateY(smearangle);
-    momInBar.Rotate(gRandom->Uniform(0,TMath::TwoPi()),momInBar0);
+    // //smear track
+    // momInBar = momInBar0;
+    // double smearangle = gRandom->Gaus(0,test1);    
+    // momInBar.RotateY(smearangle);
+    // momInBar.Rotate(gRandom->Uniform(0,TMath::TwoPi()),momInBar0);
 
     // if (fVerbose == 3) {
     beamdir = TVector3(momInBar.X(), momInBar.Y(), momInBar.Z());
@@ -564,11 +568,17 @@ void PrtLutReco::Run(int start, int end) {
     double tof, tofPi, tofP, sm = 0;
     if (!bsim) {
       int gch, ndirc(0), t2(0), t3h(0), t3v(0), str1(0), stl1(0), str2(0), stl2(0);
-      int hodo1(0), hodo2(0);
+      int hodo1(0), hodo2(0), ndirc_window(0);
 
       for (auto hit : fEvent->getHits()) {
         gch = hit.getChannel();
         if (gch < fmaxch) ndirc++;
+
+        // // laser study
+        // if (gch < fmaxch) {
+        //   double t = hit.getLeadTime();
+        //   if (t > -50 && t < 50) ndirc_window++;
+        // }
 
         if (gch == 513) t2++;
         if (gch == 514) t3h++;
@@ -583,8 +593,8 @@ void PrtLutReco::Run(int start, int end) {
           if (fMethod == 3) {
             if (gch >= 1094 && gch <= 1101) hodo1++;
           } else {
-	    if (gch >= 1094 && gch <= 1101) hodo1++;
-            // if (gch >= 1089 && gch <= 1106) hodo1++;
+	    // if (gch >= 1094 && gch <= 1101) hodo1++;
+            if (gch >= 1089 && gch <= 1106) hodo1++;
           }
           // if (gch >= 1110 && gch <= 1118)
           hodo2++;
@@ -611,6 +621,9 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       if (ndirc < 5) continue;
+
+      // if(fMethod != 4 && fabs(ndirc_window - test1) > 25) continue; // laser study
+      
       if (!(hodo1 && hodo2)) continue;
 
       // if (!(t3h && t3v)) continue;
@@ -629,31 +642,42 @@ void PrtLutReco::Run(int start, int end) {
       if (fabs(mom - 7) < 0.1) {
         if (fStudyId == 460) {
           if (fMethod == 4) {
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.3) continue;
           } else {
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.69) continue;
-            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.88) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.55) continue;
+            if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
           }
-        } else if (fStudyId >= 400) {
+
+          // if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.5) continue;
+          // if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
+        } else if (fStudyId == 461) {
+          // if (fMethod == 4) {
+          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.3) continue;
+          // } else {
+          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.55) continue;
+          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
+          // }
+        }
+
+        else if (fStudyId >= 400) {
           if (fMethod == 4) {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.25) continue;
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
-          } else {	    
-	    if (fMethod == 3 && fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue;
-	    if (fMethod != 3 && fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.4) continue; // 0.6
+          } else {
+            if (fMethod == 3 && fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue;
+            if (fMethod != 3 && fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.6) continue; // 0.6
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.95) continue;
           }
         } else { // 2017
-          // if (fMethod == 4) {
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.30) continue; // 0.35
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
-          // } else {
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.50) continue; // 65
-          //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
-          // }
+                 // if (fMethod == 4) {
+                 //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.30) continue; // 0.35
+                 //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+                 // } else {
+                 //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.50) continue; // 65
+                 //   if (fabs(0.5 * fabs(tofPi + tofP) - tof) > 0.85) continue;
+                 // }
 
-	  if (fMethod == 4) {
+          if (fMethod == 4) {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.4) continue; // 0.35
           } else {
             if (fabs(0.5 * fabs(tofPi + tofP) - tof) < 0.58) continue; // 0.58
@@ -662,6 +686,7 @@ void PrtLutReco::Run(int start, int end) {
       }
 
       hTofc[pid]->Fill(tof);
+      
     } else {
       if (fStudyId == 415 || fStudyId == 436) {
         if (fabs(mom - 3) < 0.1) sm = 0.35;
@@ -678,27 +703,35 @@ void PrtLutReco::Run(int start, int end) {
     double t0smear = gRandom->Gaus(0, 0.1 + sm); // event t0 smearing
     // double temp_ti[fmaxch] = {0};
     double hitTime_ti;
+
+#ifdef AI
     std::vector<double> vinput(512, 0.0);
     std::vector<int> vinput2d(512 * 150, 0);
     std::vector<int> vinputInd(100 * 3, 0);
-
+#endif
+    
     for (auto hit : fEvent->getHits()) {
 
       hitTime = hit.getLeadTime();
       int pixid = hit.getPixel();
+
       int mcpid = hit.getPmt();
       int ch = ft.map_pmtpix[mcpid][pixid]; // hit.getChannel();//
       int pathid = hit.getPathInPrizm();
       if (pixid < 0 || pixid > 63) continue;
 
-      // dead time
-      if (bsim) {
+      if (bsim) { // dead time
         bool dead_channel = false;
         for (auto thit : fEvent->getHits()) {
-      	  if (ch == thit.getChannel() && fabs(hitTime - thit.getLeadTime()) < 0.0001) continue; // same hit
-          if (ch == thit.getChannel() && fabs(hitTime - thit.getLeadTime()) < 20) dead_channel = true; // 40 ns dead time
+          if (ch == thit.getChannel() && fabs(hitTime - thit.getLeadTime()) < 0.0001)
+            continue; // same hit
+          if (ch == thit.getChannel() && hitTime > thit.getLeadTime() &&
+              hitTime - thit.getLeadTime() < 40) {
+            dead_channel = true; // 40 ns dead time
+            break;
+          }
         }
-        if (dead_channel) continue;
+	if (dead_channel) continue;
       }
 
       // TString spathid = Form("%d",pathid);
@@ -708,7 +741,7 @@ void PrtLutReco::Run(int start, int end) {
       // std::cout<<"pathid "<<pathid<<std::endl;
 
       // track resolution
-      if (fMethod == 3 && test3 < gRandom->Uniform()) continue;
+      // if (fMethod == 3 && test3 < gRandom->Uniform()) continue;
 
       //======================================== dynamic cuts
       {
@@ -733,6 +766,7 @@ void PrtLutReco::Run(int start, int end) {
 	double tres = 0.32;
         // if (mcpid > 5) tres = 0.47;
         if (fStudyId >= 400) tres = 0.18;
+	if (fStudyId == 460) tres = 0.25;
 	//if(prtangle < 80)  tres = 0.1;  // account for z spread
 	if (mcpid > 5)  tres = 0.45;
 	if (fPmtLayout > 2029) {
@@ -1254,34 +1288,43 @@ void PrtLutReco::Run(int start, int end) {
     efile.Write();
     efile.Close();
     std::cout << "total2 " << total2 << " total4 " << total4 << std::endl;
-
     
   }
-  
-  int nrange = 2000;
+
+  int nrange = 100;
   if (fMethod == 2) {
     TF1 *ff;
     gROOT->SetBatch(1);
+    
     if (hNph[fPk]->GetEntries() > 20) {
       auto r = hNph[fPk]->Fit("gaus", "SQ", "", 0, nrange);
-      nph = r->Parameter(1);
-      nph_err = r->ParError(1);
-    }
+      if (r > -1) {
+        nph = r->Parameter(1);
+        nph_err = r->ParError(1);
+      }
+    }    
     if (hNph[2]->GetEntries() > 20) {
       auto r = hNph[2]->Fit("gaus", "SQ", "", 0, nrange);
-      nph_pi = r->Parameter(1);
-      nph_pi_err = r->ParError(1);
+      if (r > -1) {
+        nph_pi = r->Parameter(1);
+        nph_pi_err = r->ParError(1);
+      }
     }
     if (hNph_ti[fPk]->GetEntries() > 20) {
       auto r = hNph_ti[fPk]->Fit("gaus", "SQ", "", 0, nrange);
-      nph_ti = r->Parameter(1);
-      nph_ti_err = r->ParError(1);
+      if (r > -1) {
+        nph_ti = r->Parameter(1);
+        nph_ti_err = r->ParError(1);
+      }
     }
     if (hNph_ti[2]->GetEntries() > 20) {
       auto r = hNph_ti[2]->Fit("gaus", "SQ", "", 0, nrange);
-      nph_pi_ti = r->Parameter(1);
-      nph_pi_ti_err = r->ParError(1);
+      if (r > -1) {
+        nph_pi_ti = r->Parameter(1);
+        nph_pi_ti_err = r->ParError(1);
+      }
     }
+    
 
     // nph = ft.fit(hNph[fPk],40,10,50,1).X();
     gROOT->SetBatch(0);
@@ -1343,13 +1386,14 @@ void PrtLutReco::Run(int start, int end) {
           ff->SetLineColor(kBlack);
         }
 	if (true) { // handle tails
-          hLnDiffTi[fPk]->Fit("gaus", "SQ", "", m1 - 2 * s1, 500);
+          hLnDiffTi[fPk]->Fit("gaus", "Q", "", m1 - 2 * s1, 50);
           ff = hLnDiffTi[fPk]->GetFunction("gaus");
           if (ff) {
             m1 = ff->GetParameter(1);
             s1 = ff->GetParameter(2);
             dm1 = ff->GetParError(1);
             ds1 = ff->GetParError(2);
+	    ff->SetLineColor(kBlack);
           }
         }
 
@@ -1366,13 +1410,14 @@ void PrtLutReco::Run(int start, int end) {
           ff->SetLineColor(kBlack);
         }
         if (true) { // handle tails
-          hLnDiffTi[2]->Fit("gaus", "SQ", "", -500, m2 + 2 * s2);
+          hLnDiffTi[2]->Fit("gaus", "Q", "", -50, m2 + 2 * s2);
           ff = hLnDiffTi[2]->GetFunction("gaus");
           if (ff) {
             m2 = ff->GetParameter(1);
             s2 = ff->GetParameter(2);
             dm2 = ff->GetParError(1);
             ds2 = ff->GetParError(2);
+	    ff->SetLineColor(kBlack);
           }
         }
       }
@@ -1650,11 +1695,11 @@ void PrtLutReco::Run(int start, int end) {
       }
       
       {
-        // bounce
-        ft.add_canvas("bounce", 800, 400);
-        hBounce->SetTitle(Form("theta %3.1f , TOF PID = %d", a, pid));
-        hBounce->Scale(1 / 4000.);
-        hBounce->Draw("hist");
+        // // bounce
+        // ft.add_canvas("bounce", 800, 400);
+        // hBounce->SetTitle(Form("theta %3.1f , TOF PID = %d", a, pid));
+        // hBounce->Scale(1 / 4000.);
+        // hBounce->Draw("hist");
       }
 
       {
@@ -1682,16 +1727,18 @@ void PrtLutReco::Run(int start, int end) {
         leg->SetBorderSize(0);
         leg->SetFillStyle(0);
 
+        hNph[2]->SetLineColor(kBlue);
+        hNph[4]->SetLineColor(kRed + 1);
         for (int i : {2, fPk}) {
-          hNph[i]->SetLineColor(ft.color(i));
           auto f = hNph[i]->GetFunction("gaus");
           if (f) {
+            f->SetNpx(300);
             f->SetLineWidth(2);
-            f->SetLineColor(kRed + 1);
+            f->SetLineColor(kBlack);
           }
           hNph[i]->Draw((i == 2) ? "" : "same");
-	  hNph_ti[i]->Draw("same");
-          leg->AddEntry(hNph[i], ft.name(i), "lp");	  
+	  // hNph_ti[i]->Draw("same");
+          leg->AddEntry(hNph[i], ft.name(i), "lp");
         }
         leg->Draw();
       }
@@ -1704,42 +1751,42 @@ void PrtLutReco::Run(int start, int end) {
         ft.add_canvas(cdigi);
       }
 
-      if (fVerbose == 3) {
-        TCanvas *cCher = new TCanvas("cCher", "cCher", 0, 0, 800, 400);
-        cCher->Divide(2, 1);
-        cCher->cd(1);
+      // if (fVerbose == 3) {
+      //   TCanvas *cCher = new TCanvas("cCher", "cCher", 0, 0, 800, 400);
+      //   cCher->Divide(2, 1);
+      //   cCher->cd(1);
 
-        fHist4->SetStats(0);
-        fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
-        fHist4->Draw("colz");
-        double x0(0), y0(0);
-        FitRing(x0, y0, cangle);
-        TVector3 corr(x0, y0, 1 - TMath::Sqrt(x0 * x0 + y0 * y0));
-        // std::cout << "Tcorr " << corr.Theta() * 1000 << "  Pcorr " << corr.Phi() << std::endl;
+      //   fHist4->SetStats(0);
+      //   fHist4->SetTitle(Form("Calculated from LUT, #theta = %3.1f#circ", a));
+      //   fHist4->Draw("colz");
+      //   double x0(0), y0(0);
+      //   FitRing(x0, y0, cangle);
+      //   TVector3 corr(x0, y0, 1 - TMath::Sqrt(x0 * x0 + y0 * y0));
+      //   // std::cout << "Tcorr " << corr.Theta() * 1000 << "  Pcorr " << corr.Phi() << std::endl;
 
-        TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.87);
-        leg->SetFillStyle(0);
-        leg->SetBorderSize(0);
-        leg->AddEntry((TObject *)0, Form("Entries %0.0f", fHist4->GetEntries()), "");
-        leg->AddEntry((TObject *)0, Form("#Delta#theta_{c} %f [mrad]", corr.Theta() * 1000), "");
-        leg->AddEntry((TObject *)0, Form("#Delta#varphi_{c} %f [mrad]", corr.Phi()), "");
-        leg->Draw();
+      //   TLegend *leg = new TLegend(0.5, 0.7, 0.85, 0.87);
+      //   leg->SetFillStyle(0);
+      //   leg->SetBorderSize(0);
+      //   leg->AddEntry((TObject *)0, Form("Entries %0.0f", fHist4->GetEntries()), "");
+      //   leg->AddEntry((TObject *)0, Form("#Delta#theta_{c} %f [mrad]", corr.Theta() * 1000), "");
+      //   leg->AddEntry((TObject *)0, Form("#Delta#varphi_{c} %f [mrad]", corr.Phi()), "");
+      //   leg->Draw();
 
-        TArc *arc = new TArc(x0, y0, cangle);
-        arc->SetLineColor(kRed);
-        arc->SetLineWidth(1);
-        arc->SetFillStyle(0);
-        arc->Draw();
-        fgg_i = 0;
-        fgg_gr.Set(0);
+      //   TArc *arc = new TArc(x0, y0, cangle);
+      //   arc->SetLineColor(kRed);
+      //   arc->SetLineWidth(1);
+      //   arc->SetFillStyle(0);
+      //   arc->Draw();
+      //   fgg_i = 0;
+      //   fgg_gr.Set(0);
 
-        cCher->cd(2);
-        gStyle->SetOptStat(1110);
-        fHist5->SetTitle(Form("True from MC, #theta = %3.1f#circ", a));
-        fHist5->Draw("colz");
+      //   cCher->cd(2);
+      //   gStyle->SetOptStat(1110);
+      //   fHist5->SetTitle(Form("True from MC, #theta = %3.1f#circ", a));
+      //   fHist5->Draw("colz");
 
-        ft.add_canvas(cCher);
-      }
+      //   ft.add_canvas(cCher);
+      // }
       gROOT->SetBatch(0);
     }
   }
