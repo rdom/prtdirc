@@ -295,7 +295,7 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
   }
 
   // Optical grease
-  if (fRunType != 6) {
+  if (fRunType != 6 && fRun->getStudy() != 462) {
     double greasew = 0.1 * mm;
     if (fLensId == 0) greasew = 0.1 * mm;
     G4Box *gOpticalGrease = new G4Box("gOpticalgrease", 0.5 * fBar[0], 0.5 * fBar[1], 0.5 * greasew);
@@ -304,7 +304,7 @@ G4VPhysicalVolume *PrtDetectorConstruction::Construct() {
     greased += greasew;
   }
 
-  if (fRun->getStudy() == 430) { // add cookies
+  if (fRun->getStudy() == 430 || fRun->getStudy() == 462) { // add cookies
     double cookiew = 2 * mm;
     G4Box *gCookie1 = new G4Box("gCookie1", 0.9 * fBar[0], 0.9 * fBar[1], 0.5 * cookiew);
     lCookie1 = new G4LogicalVolume(gCookie1, opticalCookieMaterial, "lCookie1", 0, 0, 0);
