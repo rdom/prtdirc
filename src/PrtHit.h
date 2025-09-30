@@ -25,7 +25,7 @@ class PrtHit : public TObject {
   Double_t getLeadTime() { return fLeadTime; }
   Double_t getTotTime() { return fTotTime; }
   Long_t getPathInPrizm() { return fPathInPrizm; }
-  // TVector3 GetPosition() { return fPosition; }
+  TVector3 getPosition() { return fPosition; }
 
   // mutators
   void setChannel(Int_t val) { fChannel = val; }
@@ -34,7 +34,7 @@ class PrtHit : public TObject {
   void setLeadTime(Double_t val) { fLeadTime = val; }
   void setTotTime(Double_t val) { fTotTime = val; }
   void setPathInPrizm(Long_t val) { fPathInPrizm = val; }
-  // void setPosition(TVector3 val) { fPosition = val; }
+  void setPosition(TVector3 val) { fPosition = val; }
 
  protected:
   Int_t fChannel;
@@ -43,7 +43,7 @@ class PrtHit : public TObject {
   Double_t fLeadTime;
   Double_t fTotTime;
   Long_t fPathInPrizm;
-  // TVector3 fPosition;
+  TVector3 fPosition;
   
   ClassDef(PrtHit, 8)
 };

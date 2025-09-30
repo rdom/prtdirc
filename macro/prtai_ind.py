@@ -115,7 +115,7 @@ class PrtNN(Model):
         
         # x = self.norm(x)
         # x = self.conv1(x)
-        # x = self.d1(x)
+        x = self.d1(x)
         # x = self.maxpool(x)
         # x = self.disc(x)
         x = self.flatten(x)
@@ -165,14 +165,14 @@ def test_step(images, labels):
 
   
 faccuracy = 0
-EPOCHS = 10
+EPOCHS = 15
 
 for epoch in range(EPOCHS):
     # Reset the metrics at the start of the next epoch
-    train_loss.reset_states()
-    train_accuracy.reset_states()
-    test_loss.reset_states()
-    test_accuracy.reset_states()
+    train_loss.reset_state()
+    train_accuracy.reset_state()
+    test_loss.reset_state()
+    test_accuracy.reset_state()
     
     for images, labels in train_ds:
         train_step(images, labels)
@@ -191,8 +191,8 @@ for epoch in range(EPOCHS):
 
 # tf.keras.utils.plot_model(model, to_file='model.png', show_shapes=True)
 
-model.model().summary()
-model.save('models/' + infile)
+#model.model().summary()
+#model.save('models/' + infile)
 
 
 print("Accuracy = ", faccuracy)

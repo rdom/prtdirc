@@ -552,7 +552,7 @@ bool PrtPixelSD::ProcessHits(G4Step *step, G4TouchableHistory *hist) {
  
   hit.setPathInPrizm(pathId);
 
-  // hit.SetPosition(globalPos);
+  hit.setPosition(globalPos);
   // hit.SetGlobalPos(globalPos;)
   // hit.SetLocalPos(localPos);
   // hit.SetDigiPos(digiPos);
