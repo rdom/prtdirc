@@ -39,7 +39,7 @@ while t.next() and t.i() < entries :
         pix = hit.getPixel()
         time = hit.getLeadTime()        
         ch = int(hit.getChannel())
-
+        
         time = time + ROOT.gRandom.Gaus(0, 0.2)
         
         if time > 30 or time < 0 or pmt > 7 :
