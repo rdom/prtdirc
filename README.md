@@ -35,6 +35,7 @@ example:
                 0    simulation
                 1    look-up table generation
 		11   look-up table generation using Cherenkov photons
+                20   uniform random sampling 
                 2    geometrical reconstruction
                 3    likelihood calculation
 		4    create pdf
