@@ -34,12 +34,12 @@ example:
 -r    run type
                 0    simulation
                 1    look-up table generation
-		11   look-up table generation using Cherenkov photons
+                11   look-up table generation using Cherenkov photons
                 20   uniform random sampling 
                 2    geometrical reconstruction
                 3    likelihood calculation
-		4    create pdf
-		5    simulate pdf
+                4    create pdf
+                5    simulate pdf
                 6    focal plane measurements
                 7    calibration
 
@@ -107,8 +107,8 @@ example:
               "kaon+"
                  ...
               "opticalphoton"
-	      "mix_pip" - (mix pions and protons)
-	      "mix_pik" - (mix pions and kaons ) 
+              "mix_pip" - (mix pions and protons)
+              "mix_pik" - (mix pions and kaons ) 
 
 -p    particle momentum [GeV/c]
 
@@ -119,12 +119,12 @@ example:
                 11   10 + 1
 
 -tr    time resolution [ns]
-               0.2  (default)  
+                0.2  (default)  
 
 -seed   seed number for the random generator 
 
 -b    batch mode
-               1    run silent (without GUI)
+                1    run silent (without GUI)
 
 ```
 
