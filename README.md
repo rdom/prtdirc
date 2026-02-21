@@ -38,7 +38,7 @@ for 2018 configuraion:
      0    simulation
      1    look-up table generation
      11   look-up table generation using Cherenkov photons
-     20   uniform random sampling 
+     20   uniform random sampling (22-140 deg and 0.5-3.5 GeV/c)
      2    geometrical reconstruction
      3    likelihood calculation
      4    create pdf
