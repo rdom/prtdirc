@@ -14,28 +14,38 @@ PrtManager::PrtManager(TString filename, PrtRun *run) {
   fRunType = fRun->getRunType();
   fEvent = new PrtEvent();
 
-  if (fRunType < 2 || fRunType == 5 || fRunType == 7 || fRunType == 11) {
-    fRootFile = new TFile(filename, "RECREATE");
-    fRun->setMc(true);
-  }
-
+  fRootFile = new TFile(filename, "RECREATE");
+  fRun->setMc(true);
+  
   fRunTree = new TTree("header", "run info");
   fRunTree->Branch("PrtRun", "PrtRun", &fRun, 64000, 2);
-
-  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
-    fTree = new TTree("data", "Prototype hits tree");
-    fTree->Branch("PrtEvent", "PrtEvent", &fEvent, 64000, 2);
-  }
-
-  if (fRunType == 1 || fRunType == 7 || fRunType == 11) {
-    fRun->setMc(true);
-    fLut = new TClonesArray("PrtLutNode");
-    fTree = new TTree("prtlut", "Look-up table for the geometrical reconstruction.");
-    fTree->Branch("LUT", &fLut, 256000, 2);
-    TClonesArray &fLuta = *fLut;
-    for (Long64_t i = 0; i < fRun->getNpmt()*fRun->getNpix(); i++) {
-      new ((fLuta)[i]) PrtLutNode(i);
-    }        
+  
+  switch (fRunType) {
+  
+    case 0:
+    case 5:
+    case 6:
+    case 20:   // NEW uniform sampling mode
+      fTree = new TTree("data", "Prototype hits tree");
+      fTree->Branch("PrtEvent", "PrtEvent", &fEvent, 64000, 2);
+      break;
+  
+    case 1:
+    case 7:
+    case 11:
+      fLut = new TClonesArray("PrtLutNode");
+      fTree = new TTree("prtlut", "Look-up table for the geometrical reconstruction.");
+      fTree->Branch("LUT", &fLut, 256000, 2);
+  
+      for (Long64_t i = 0; i < fRun->getNpmt()*fRun->getNpix(); i++) {
+        new ((*fLut)[i]) PrtLutNode(i);
+      }
+      break;
+  
+    default:
+      std::cerr << "ERROR: Unsupported fRunType = "
+                << fRunType << std::endl;
+      std::exit(EXIT_FAILURE);
   }
 
   fnX1 = TVector3(1, 0, 0);
@@ -54,36 +64,94 @@ PrtManager *PrtManager::Instance(TString outfile, PrtRun *run) {
 }
 
 void PrtManager::addEvent(PrtEvent event) {
-  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
-    fEvent = new PrtEvent(event);
+
+  switch (static_cast<PrtRunType>(fRunType)) {
+
+    case PrtRunType::Data:
+    case PrtRunType::Data5:
+    case PrtRunType::Data6:
+    case PrtRunType::UniformGun:
+      fEvent = new PrtEvent(event);
+      break;
+
+    default:
+      break;  // LUT modes do nothing
+  }
+}
+
+void PrtManager::addHit(PrtHit hit,
+                        TVector3 localpos,
+                        TVector3 digipos,
+                        TVector3 vertex) {
+
+  switch (static_cast<PrtRunType>(fRunType)) {
+
+    case PrtRunType::Data:
+    case PrtRunType::Data5:
+    case PrtRunType::Data6:
+    case PrtRunType::UniformGun:
+      fEvent->addHit(hit);
+      break;
+
+    case PrtRunType::Lut:
+    case PrtRunType::Lut7:
+    case PrtRunType::Lut11: {
+
+      if (fMomentum.Angle(fnX1) > fCriticalAngle &&
+          fMomentum.Angle(fnY1) > fCriticalAngle) {
+
+        int ch = hit.getChannel();
+        double time = hit.getLeadTime();
+
+        if (fRunType == 11)
+          time -= fEvent->getTime();
+
+        ((PrtLutNode*)(fLut->At(ch)))
+          ->AddEntry(ch, fMomentum,
+                     hit.getPathInPrizm(),
+                     0, time,
+                     localpos, digipos,
+                     0, vertex);
+      }
+      break;
+    }
+
+    default:
+      std::cerr << "ERROR: Unsupported runType in addHit()" << std::endl;
+      break;
   }
 }
 
 void PrtManager::addHit(PrtHit hit) {
-  fEvent->addHit(hit);
-}
 
-void PrtManager::addHit(PrtHit hit, TVector3 localpos, TVector3 digipos, TVector3 vertex) {
-  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
-    // fEvent->setPosition(vertex);
-    fEvent->addHit(hit);
-  } else if (fRunType == 1 || fRunType == 7 || fRunType == 11) {
-    if (fMomentum.Angle(fnX1) > fCriticalAngle && fMomentum.Angle(fnY1) > fCriticalAngle) {
-      int ch = hit.getChannel();
-      double time = hit.getLeadTime();
-      if (fRunType == 11) {
-        time -= fEvent->getTime();
-      }
-      ((PrtLutNode *)(fLut->At(ch)))
-        ->AddEntry(ch, fMomentum, hit.getPathInPrizm(), 0, time, localpos, digipos, 0, vertex);
-    }
+  switch (fRunType) {
+
+    case 0:
+    case 5:
+    case 6:
+    case 20:
+      fEvent->addHit(hit);
+      break;
+
+    default:
+      break;  // LUT modes ignore this
   }
 }
 
 void PrtManager::fill() {
-  if (fRunType == 0 || fRunType == 5 || fRunType == 6) {
-    fTree->Fill();
-    fEvent->Clear();
+
+  switch (static_cast<PrtRunType>(fRunType)) {
+
+    case PrtRunType::Data:
+    case PrtRunType::Data5:
+    case PrtRunType::Data6:
+    case PrtRunType::UniformGun:
+      fTree->Fill();
+      fEvent->Clear();
+      break;
+
+    default:
+      break;
   }
 }
 
@@ -95,7 +163,16 @@ void PrtManager::save(){
 }
 
 void PrtManager::fillLut() {
-  std::cout << "2 " << 2 << std::endl;
-  
-  if (fRunType == 1 || fRunType == 7 || fRunType == 11) fTree->Fill();
+
+  switch (static_cast<PrtRunType>(fRunType)) {
+
+    case PrtRunType::Lut:
+    case PrtRunType::Lut7:
+    case PrtRunType::Lut11:
+      fTree->Fill();
+      break;
+
+    default:
+      break;
+  }
 }

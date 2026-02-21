@@ -8,6 +8,11 @@ PrtOpBoundaryProcess::PrtOpBoundaryProcess() : G4OpBoundaryProcess() {
   fRunType = PrtManager::Instance()->getRun()->getRunType();
 }
 
+// Empty override to avoid undefined symbol
+void PrtOpBoundaryProcess::SetInvokeSD(G4bool) {
+
+}
+
 G4VParticleChange *PrtOpBoundaryProcess::PostStepDoIt(const G4Track &aTrack, const G4Step &aStep) {
 
   G4StepPoint *pPreStepPoint = aStep.GetPreStepPoint();
