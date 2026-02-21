@@ -113,13 +113,13 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
 
 if (fRun->getRunType() == 20) {
 
-  G4double momentum = 0.5 + G4UniformRand()*(3.5-0.5);
+  G4double momentum = G4UniformRand()*(3.5-0.5);
   fParticleGun->SetParticleMomentum(momentum*GeV);
   
   G4ThreeVector b( std::sin(22*deg), 0, std::cos(22*deg) );
 
   b = b.unit();                   // bar coordinate frame
-  G4ThreeVector u(0,1,0);         // bar coordinate frame
+  G4ThreeVector u(-1,0,0);         // bar coordinate frame
   G4ThreeVector w = b.cross(u);   // bar coordinate frame
   w = w.unit();
 
