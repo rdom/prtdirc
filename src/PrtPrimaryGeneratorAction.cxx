@@ -110,6 +110,45 @@ void PrtPrimaryGeneratorAction::GeneratePrimaries(G4Event *anEvent) {
 
     fParticleGun->SetParticleMomentumDirection(vec);
   }
+
+if (fRun->getRunType() == 20) {
+
+  G4double momentum = 0.5 + G4UniformRand()*(3.5-0.5);
+  fParticleGun->SetParticleMomentum(momentum*GeV);
+  
+  G4ThreeVector b( std::sin(22*deg), 0, std::cos(22*deg) );
+
+  b = b.unit();                   // bar coordinate frame
+  G4ThreeVector u(0,1,0);         // bar coordinate frame
+  G4ThreeVector w = b.cross(u);   // bar coordinate frame
+  w = w.unit();
+
+  // ---- sample angle ----
+  double cosMin = std::cos(140*deg);
+  double cosMax = std::cos(22*deg);
+  double cosTheta = cosMin + G4UniformRand()*(cosMax - cosMin);
+  double theta = std::acos(cosTheta);
+
+  double phi = 0.025*M_PI*G4UniformRand();
+
+  // ---- build direction ----
+  G4ThreeVector dir =
+      cosTheta * b
+    + std::sin(theta)*std::cos(phi) * u
+    + std::sin(theta)*std::sin(phi) * w;
+
+  dir = dir.unit();
+
+  G4ThreeVector entry(0, 0, 50*cm);
+
+  G4double L = 50*cm;   // same as your upstream distance
+  G4ThreeVector start = entry - L * dir;
+
+  fParticleGun->SetParticlePosition(start);
+  fParticleGun->SetParticleMomentumDirection(dir);
+}
+
+
   if (fRun->getRunType() == 1) { // LUT generation
     // fParticleGun->SetParticlePosition(G4ThreeVector(fRadiatorH*(0.5-G4UniformRand()),fRadiatorW*(0.5-G4UniformRand()),fRadiatorL/2.-0.1));
     fParticleGun->SetParticlePosition(G4ThreeVector(fRun->getPrismStepY(), //+5-10*G4UniformRand(),

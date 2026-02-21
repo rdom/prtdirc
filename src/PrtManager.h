@@ -19,6 +19,16 @@
 #include "PrtEvent.h"
 #include "PrtHit.h"
 
+enum class PrtRunType {
+  Data = 0,
+  Lut = 1,
+  Data5 = 5,
+  Data6 = 6,
+  Lut7 = 7,
+  Lut11 = 11,
+  UniformGun = 20
+};
+
 class PrtManager {
   static PrtManager *fInstance;
   TFile *fRootFile;
